@@ -21,10 +21,8 @@ preload.prototype = {
     preload: function () {
         
         // Preload images
-        game.load.spritesheet("explosion", "assets/explosion.png", 50, 128);
-        game.load.spritesheet("water", "assets/water.png", 64, 64);
-        game.load.audio('bomb', ['assets/bomb.mp3', 'assets/bomb.ogg']);
-        game.load.audio('drop', ['assets/drop.mp3', 'assets/drop.ogg']);
+        game.load.image("trump", "assets/trump.png");
+        game.load.image("bodyguard", "assets/bodyguard.png");
         
     },
     create: function () {
@@ -40,35 +38,18 @@ playgame.prototype = {
     create: function () {
       
         keyW = game.input.keyboard.addKey(Phaser.Keyboard.W);
-        keyW.onDown.add(this.addWater, this);
-
-        keyB = game.input.keyboard.addKey(Phaser.Keyboard.B);
-        keyB.onDown.add(this.addBomb, this);  
+        keyW.onDown.add(this.addProjectile, this);
         
     },
     update: function () {
 
 
     },
-    addWater: function () {
+    addProjectile: function () {
         var water = game.add.sprite(game.world.randomX, game.world.randomY, 'water');
         water.animations.add('waterDrop');
         water.animations.play('waterDrop', 30);
-        var sound = game.add.audio('drop');
-        sound.play();
-    },
-    addBomb: function() {
-        var explosion = game.add.sprite(game.world.randomX, game.world.randomY, 'explosion');
-        explosion.animations.add('explode');
-        explosion.animations.play('explode', 30);
-        var sound = game.add.audio('bomb');
-        sound.play();
-
-    },
-    render: function () {
-        
-        // uncomment following line to see the shape that is used on Flappy for collision detection
-        // game.debug.body(this.flappy);
-        
+        // var sound = game.add.audio('drop');
+        // sound.play();
     }
 }
