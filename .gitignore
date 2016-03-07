@@ -23,3 +23,16 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Windows shortcuts
+*.lnk
+
+#Jetbeans Folder
+.idea
