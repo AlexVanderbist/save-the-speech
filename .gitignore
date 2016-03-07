@@ -33,3 +33,6 @@ Desktop.ini
 
 # Windows shortcuts
 *.lnk
+
+#Jetbeans Folder
+.idea
