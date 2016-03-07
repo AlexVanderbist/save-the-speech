@@ -36,3 +36,6 @@ Desktop.ini
 
 #Jetbeans Folder
 .idea
+
+#Phonegap folder
+.cordova

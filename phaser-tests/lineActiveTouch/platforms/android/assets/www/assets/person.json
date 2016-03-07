@@ -1,0 +1,11 @@
+{ 
+    
+    "bodyguard": [
+        
+        {
+            "density": 2, "friction": 2, "bounce": 2, 
+            "filter": { "categoryBits": 1, "maskBits": 65535 },
+            "shape": [   40, 56  ,  24, 56  ,  8, 46  ,  0, 22  ,  18, 10  ,  45, 8  ,  64, 32  ]
+        }
+    ]
+}
