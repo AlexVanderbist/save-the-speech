@@ -1,6 +1,6 @@
 { 
     
-    "bodyguard": [
+    "person": [
         
         {
             "density": 2, "friction": 2, "bounce": 2, 
