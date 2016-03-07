@@ -8,5 +8,5 @@ A game about saving future presidents from flying objects.
 ## Developers
 - Alex Vanderbist
 - Ruben De Swaef
-- Rowan Van Eckere
-- Siebe Van Den Eynde
+- Rowan Van Ekeren
+- Siebe Vanden Eynden
