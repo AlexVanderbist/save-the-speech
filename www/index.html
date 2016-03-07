@@ -36,7 +36,7 @@
 <body>
 <script type="text/javascript">
 
-	var game = new Phaser.Game(800, 600, Phaser.CANVAS, '', {preload: preload, create: create, update: update});
+	var game = new Phaser.Game(360, 640, Phaser.CANVAS, '', {preload: preload, create: create, update: update});
 	var sprite = null;
 	var graphic = null;
 	var wasDown = false;
@@ -54,14 +54,14 @@
 	}
 
 	function preload() {
-		game.load.image('star', 'star.png');
+		game.load.image('guard', 'assets/bodyguard.png');
 	}
 
 
 	function create() {
 		graphic = game.add.graphics(0, 0);
 		blackoutGraphic();
-		sprite = game.add.sprite(100, 100, 'star');
+		sprite = game.add.sprite(64, 64, 'guard');
 		sprite.anchor.setTo(0.5, 0.5);
 	}
 
