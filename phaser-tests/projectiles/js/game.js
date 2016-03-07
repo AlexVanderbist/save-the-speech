@@ -49,16 +49,24 @@ playgame.prototype = {
         projectiles = game.add.group();
         projectiles.enableBody = true;
         projectiles.physicsBodyType = Phaser.Physics.P2JS;
+
+        game.trumpCollisionGroup = game.physics.p2.createCollisionGroup();
+        game.projectileCollisionGroup = game.physics.p2.createCollisionGroup();
+        game.physics.p2.updateBoundsCollisionGroup();
       
+        // when pressing W create a new projectile
         keyW = game.input.keyboard.addKey(Phaser.Keyboard.W);
         keyW.onDown.add(this.addProjectile, this);
 
+        // create trump
         game.trump = game.add.sprite(game.world.centerX, game.world.centerY, 'trump');
         game.trump.anchor.setTo(0.5,0.5);
         game.physics.p2.enable(game.trump);
         game.trump.body.clearShapes();
         game.trump.body.loadPolygon('personPhysics', 'person');
         game.trump.body.static = true;
+        game.trump.body.setCollisionGroup(game.trumpCollisionGroup);
+        game.trump.body.collides(game.projectileCollisionGroup, this.onProjectileHitTrump, this);
         
     },
     update: function () {
@@ -71,18 +79,22 @@ playgame.prototype = {
         projectiles.add(taco);
         taco.body.clearShapes();
         taco.body.loadPolygon('tacoPhysics', 'taco');
-        taco.onBeginContact(this.contactTest);
-        this.throwProjectileToObj(taco,game.trump, 120);
+        taco.body.setCollisionGroup(game.projectileCollisionGroup);
+        taco.body.collides([game.trumpCollisionGroup, game.projectileCollisionGroup]);
+        this.throwProjectileToObj(taco,game.trump, 200);
         // var sound = game.add.audio('drop');
         // sound.play();
     },
-    contactTest: function() {
-        console.log('stuff');
+    onProjectileHitTrump: function(obj1, obj2) {
+        console.log('hit trump');
+        obj2.damping = 0.8;
+        obj2.angularDamping = 0.7;
+        obj2.kill = true;
     },
     throwProjectileToObj: function (obj1, obj2, speed) {
         if (typeof speed === 'undefined') { speed = 60; }
         var angle = Math.atan2(obj2.y - obj1.y, obj2.x - obj1.x);
-        obj1.body.rotation = angle + game.math.degToRad(90);  // correct angle of angry bullets (depends on the sprite used)
+        obj1.body.rotation = angle + game.math.degToRad(-20);  // correct angle of angry bullets (depends on the sprite used)
         obj1.body.velocity.x = Math.cos(angle) * speed;    // accelerateToObject 
         obj1.body.velocity.y = Math.sin(angle) * speed;
     }
