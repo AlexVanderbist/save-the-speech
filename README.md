@@ -5,7 +5,7 @@ A game about saving future presidents from flying objects.
 - PhoneGap
 - Phaser.io
 
-# Developers
+## Developers
 - Alex Vanderbist
 - Ruben De Swaef
 - Rowan Van Eckere
