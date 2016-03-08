@@ -73,23 +73,41 @@ playgame.prototype = {
 
         game.trump.angle += 1;
 
+        projectiles.forEachExists(function(projectile) {
+            if(projectile.kill) {
+                projectile.alpha -= 0.04;
+                if(projectile.alpha < 0) {
+                    //remove the projectile
+                    projectile.destroy();
+                }
+            }
+        }, this);
+
+    },
+    getRandomPositionOffScreen: function() {
+        
+
     },
     addProjectile: function () {
         var taco = game.add.sprite(game.world.randomX, game.world.randomY, 'taco');
         projectiles.add(taco);
+        taco.kill = false;
         taco.body.clearShapes();
         taco.body.loadPolygon('tacoPhysics', 'taco');
         taco.body.setCollisionGroup(game.projectileCollisionGroup);
         taco.body.collides([game.trumpCollisionGroup, game.projectileCollisionGroup]);
         this.throwProjectileToObj(taco,game.trump, 200);
+
         // var sound = game.add.audio('drop');
         // sound.play();
     },
-    onProjectileHitTrump: function(obj1, obj2) {
+    onProjectileHitTrump: function(body1, body2) {
         console.log('hit trump');
-        obj2.damping = 0.8;
-        obj2.angularDamping = 0.7;
-        obj2.kill = true;
+        body2.damping = 0.8;
+        body2.angularDamping = 0.7;
+        body2.sprite.kill = true;
+        body2.collides([game.trumpCollisionGroup]);
+        //game.add.tween(body2.sprite).to( { alpha: 0 }, 2000, Phaser.Easing.Linear.None, true, 1, 1000, true);
     },
     throwProjectileToObj: function (obj1, obj2, speed) {
         if (typeof speed === 'undefined') { speed = 60; }
