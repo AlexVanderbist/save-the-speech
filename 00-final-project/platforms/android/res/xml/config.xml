@@ -7,7 +7,7 @@
     </feature>
     <allow-intent href="market:*" />
     <name>Save the Speech</name>
-    <description>Hello World sample application that responds to the deviceready event.</description>
+    <description>Save the future president from taco's.</description>
     <author email="support@phonegap.com" href="http://phonegap.com">PhoneGap Team</author>
     <content src="index.html" />
     <preference name="permissions" value="none" />

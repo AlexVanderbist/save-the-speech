@@ -43,7 +43,7 @@ preload.prototype = {
 		game.money = 5;
 
 	},
-	create: function ()
+	create : function ()
 	{
 
 		// Everything is loaded, start the "Playgame" State
@@ -57,7 +57,7 @@ playgame = function (game)
 };
 
 playgame.prototype = {
-	create: function ()
+	create              : function ()
 	{
 		game.add.sprite(0, 0, 'field');
 		game.physics.startSystem(Phaser.Physics.P2JS);
@@ -101,7 +101,7 @@ playgame.prototype = {
 		var style = {font: "40px Arial", fill: "#ffffff"};
 		game.labelGuards = this.game.add.text(game.world.width - 80, 28, game.money, style);
 	},
-	click: function(object)
+	click               : function (object)
 	{
 		var bodies = game.physics.p2.hitTest(object.position, guards.children);
 
@@ -115,14 +115,14 @@ playgame.prototype = {
 		}
 		else
 		{
-			bodies[0].parent.sprite.followPath.isActive = true;
-			guards.activeGuard = bodies[0].parent.sprite;
+			bodies[ 0 ].parent.sprite.followPath.isActive = true;
+			guards.activeGuard = bodies[ 0 ].parent.sprite;
 			result = "Hooray";
 		}
 
 		console.log(result);
 	},
-	update: function ()
+	update              : function ()
 	{
 
 		game.trump.angle += 1;
@@ -135,7 +135,7 @@ playgame.prototype = {
 
 		this.guardClickHandler();
 	},
-	guardClickHandler: function()
+	guardClickHandler   : function ()
 	{
 		if (game.input.pointer1.isDown && guards.activeGuard !== null)
 		{
@@ -165,35 +165,35 @@ playgame.prototype = {
 
 		this.guardMoveHandler();
 	},
-	guardMoveHandler: function()
+	guardMoveHandler    : function ()
 	{
-		for(var guard = 0; guard < guards.children.length; guard++)
+		for (var guard = 0; guard < guards.children.length; guard++)
 		{
-			var curGuard = guards.children[guard ].followPath;
+			var curGuard = guards.children[ guard ].followPath;
 			if (curGuard.path != null && curGuard.path.length > 0 && curGuard.pathSpriteIndex < curGuard.pathIndex)
 			{
 				curGuard.pathSpriteIndex = Math.min(curGuard.pathSpriteIndex, curGuard.path.length - 1);
-				game.physics.arcade.moveToXY(guards.children[guard ], curGuard.newPath[ 0 ].x, curGuard.newPath[ 0 ].y, 250);
+				game.physics.arcade.moveToXY(guards.children[ guard ], curGuard.newPath[ 0 ].x, curGuard.newPath[ 0 ].y, 250);
 
-				if (game.physics.arcade.distanceToXY(guards.children[guard ], curGuard.path[ curGuard.pathSpriteIndex ].x, curGuard.path[ curGuard.pathSpriteIndex ].y) < 20)
+				if (game.physics.arcade.distanceToXY(guards.children[ guard ], curGuard.path[ curGuard.pathSpriteIndex ].x, curGuard.path[ curGuard.pathSpriteIndex ].y) < 20)
 				{
 					curGuard.pathSpriteIndex++;
-					guards.children[guard].animations.play('walk');
+					guards.children[ guard ].animations.play('walk');
 					if (curGuard.pathSpriteIndex >= curGuard.pathIndex)
 					{
 						console.log("stop");
-						guards.children[guard].body.velocity.destination[ 0 ] = 0;
-						guards.children[guard].body.velocity.destination[ 1 ] = 0;
-						guards.children[guard].animations.stop(null, true);
-						guards.children[guard].frame = 0;
+						guards.children[ guard ].body.velocity.destination[ 0 ] = 0;
+						guards.children[ guard ].body.velocity.destination[ 1 ] = 0;
+						guards.children[ guard ].animations.stop(null, true);
+						guards.children[ guard ].frame = 0;
 					}
 					this.drawLine(curGuard);
-					this.rotateGuard(guards.children[guard]);
+					this.rotateGuard(guards.children[ guard ]);
 				}
 			}
 		}
 	},
-	rotateGuard: function (guard)
+	rotateGuard         : function (guard)
 	{
 		if (guard.followPath.newPath.length > 0)
 		{
@@ -210,7 +210,7 @@ playgame.prototype = {
 			guard.body.rotation = Math.atan(lengthY / lengthX) + Math.PI / 2 + correctingAngle;
 		}
 	},
-	drawLine: function(guard)
+	drawLine            : function (guard)
 	{
 		guard.newPath.splice(0, 1);
 
@@ -228,7 +228,7 @@ playgame.prototype = {
 			}
 		}
 	},
-	addProjectile: function ()
+	addProjectile       : function ()
 	{
 		var taco = game.add.sprite(game.world.randomX, game.world.randomY, 'taco');
 		projectiles.add(taco);
@@ -260,7 +260,7 @@ playgame.prototype = {
 		obj1.body.velocity.x = Math.cos(angle) * speed;    // accelerateToObject
 		obj1.body.velocity.y = Math.sin(angle) * speed;
 	},
-	addingGuardfunc: function ()
+	addingGuardfunc     : function ()
 	{
 		if (game.money > 0)
 		{
@@ -269,7 +269,7 @@ playgame.prototype = {
 		}
 
 	},
-	addGuard: function ()
+	addGuard            : function ()
 	{
 		var guard = game.add.sprite(game.input.x, game.input.y, 'bodyguard');
 		game.addingGuard.destroy();
@@ -282,7 +282,7 @@ playgame.prototype = {
 		guard.body.setCollisionGroup(game.guardCollisionGroup);
 		guard.body.collides([ game.projectileCollisionGroup, game.trumpCollisionGroup ]);
 
-		guard.animations.add('walk', [1,2], 5, true);
+		guard.animations.add('walk', [ 1, 2 ], 5, true);
 
 		guard.followPath = {};
 

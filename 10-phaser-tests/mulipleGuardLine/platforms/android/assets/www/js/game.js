@@ -105,8 +105,8 @@ playgame.prototype = {
 	{
 		var bodies = game.physics.p2.hitTest(object.position, guards.children);
 
-		console.log(bodies);
-		console.log(object);
+		//console.log(bodies);
+		//console.log(object);
 
 		var result;
 		if (bodies.length === 0)
@@ -273,7 +273,7 @@ playgame.prototype = {
 	{
 		var guard = game.add.sprite(game.input.x, game.input.y, 'bodyguard');
 		game.addingGuard.destroy();
-		game.money--;
+		//game.money--;
 		game.adding = false;
 		guards.add(guard);
 		guard.body.clearShapes();
