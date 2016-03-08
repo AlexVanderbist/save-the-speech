@@ -132,8 +132,8 @@ playgame.prototype = {
         game.trumprage.visible = false;
         game.trumphead.visible = false;
         game.trumphead.animations.add('speak',[0,1,2,3,4,5,4,3,2,1,0], true);
-        game.trumphead.scale.setTo(0.3, 0.3);
-        game.trumprage.scale.setTo(0.1,0.1);
+        game.trumphead.scale.setTo(0.17, 0.17);
+        game.trumprage.scale.setTo(0.06,0.06);
         game.trumphead.animations.play('speak', 40, true);
 
         // Add buttons
@@ -144,7 +144,7 @@ playgame.prototype = {
 
         var style = { font: "40px Arial", fill: "#ffffff" };  
         game.labelGuards = this.game.add.text(game.world.width - 80, 28, game.numberguards, style);
-        game.labelMoney = this.game.add.text(20, 28, "money:" + game.money, style);
+        game.labelMoney = this.game.add.text(80, 15, "money:" + game.money, style);
 
         // Give money every x seconds
 
@@ -262,7 +262,7 @@ playgame.prototype = {
     },
     presidentRageStop: function () {
         game.trumphead.visible = true;
-        game.trumprage.visible = false;;
+        game.trumprage.visible = false;
 },
     addProjectile: function () {
         var randomPos = this.getRandomPositionOffScreen();
