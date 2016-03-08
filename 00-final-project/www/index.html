@@ -28,76 +28,14 @@
 	<meta name="viewport"
 				content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi"/>
 	<link rel="stylesheet" type="text/css" href="css/index.css"/>
-	<title>Hello World</title>
-	<script type="text/javascript" src="js/jquery-2.2.1.min.js"></script>
-	<script type="text/javascript" src="js/phaser.min.js"></script>
-	<script type="text/javascript" src="js/index.js"></script>
+	<title>Save the Speech</title>
 </head>
 <body>
-<script type="text/javascript">
-
-	var game = new Phaser.Game(360, 640, Phaser.CANVAS, '', {preload: preload, create: create, update: update});
-	var sprite = null;
-	var graphic = null;
-	var wasDown = false;
-
-	var path = null;
-	var pathIndex = -1;
-	var pathSpriteIndex = -1;
-
-	function blackoutGraphic() {
-		graphic.beginFill(0x000000);
-		graphic.lineStyle(4, 0x000000, 1);
-		graphic.drawRect(0, 0, game.width, game.height);
-		graphic.endFill();
-		graphic.lineStyle(4, 0xFF0000, 1);
-	}
-
-	function preload() {
-		game.load.image('guard', 'assets/bodyguard.png');
-	}
-
-
-	function create() {
-		graphic = game.add.graphics(0, 0);
-		blackoutGraphic();
-		sprite = game.add.sprite(64, 64, 'guard');
-		sprite.anchor.setTo(0.5, 0.5);
-	}
-
-	function update() {
-		if (game.input.pointer1.isDown) {
-			if (!wasDown) {
-				graphic.moveTo(game.input.x, game.input.y);
-				blackoutGraphic();
-				pathIndex = 0;
-				pathSpriteIndex = 0;
-				path = [];
-				wasDown = true;
-			}
-
-			if (pathIndex == 0 || (path[pathIndex - 1].x != game.input.x || path[pathIndex - 1].y != game.input.y)) {
-				graphic.lineTo(game.input.x, game.input.y);
-				path[pathIndex] = new Phaser.Point(game.input.x, game.input.y);
-				pathIndex++;
-			}
-		}
-		else {
-			wasDown = false;
-		}
-		if (path != null && path.length > 0 && pathSpriteIndex < pathIndex) {
-			pathSpriteIndex = Math.min(pathSpriteIndex, path.length - 1);
-			game.physics.moveToXY(sprite, path[pathSpriteIndex].x, path[pathSpriteIndex].y, 250);
-			if (game.physics.distanceToXY(sprite, path[pathSpriteIndex].x, path[pathSpriteIndex].y) < 20) {
-				pathSpriteIndex++;
-				if (pathSpriteIndex >= pathIndex) {
-					sprite.body.velocity.setTo(0, 0);
-				}
-			}
-		}
-
-	}
-
-</script>
+	<script type="text/javascript" src="cordova.js"></script>
+	<script type="text/javascript" src="js/phaser.min.js"></script>
+	<script type="text/javascript" src="js/game.js"></script>
+	<script>
+		app.initialize();
+	</script>
 </body>
 </html>
