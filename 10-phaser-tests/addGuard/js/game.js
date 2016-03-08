@@ -5,7 +5,7 @@ var playgame;
 window.onload = function () {
     
     // Create a new Phaser Game
-    game = new Phaser.Game(360,640);
+    game = new Phaser.Game(window.innerWidth,window.innerHeight);
 
     // Add the game states
     game.state.add("Preload", preload);
@@ -34,6 +34,10 @@ preload.prototype = {
 
         game.adding = false; ////////////////////////////////////////////////////////////
         game.money = 0; ///////////////////////////////////////////////////////////////////
+        game.numberguards = 0; ///////////////////////////////////////////////////////////////////
+
+        //VAR
+        game.PriceGuard = 10;
         
     },
     create: function () {
@@ -84,16 +88,18 @@ playgame.prototype = {
         //GUARD BUTTON //////////////////////////////////////////////////////////////////////////////////////////////////
         button = game.add.button(game.world.width - 100, 10, 'addGuard', this.addingGuardfunc, this);
         var style = { font: "40px Arial", fill: "#ffffff" };  
-        game.labelGuards = this.game.add.text(game.world.width - 80, 28, game.money, style);
+        game.labelGuards = this.game.add.text(game.world.width - 80, 28, game.numberguards, style);
+        game.labelMoney = this.game.add.text(20, 28, "money:" + game.money, style);
+        game.time.events.loop(Phaser.Timer.SECOND * 2, this.addMoney, this);
     },
     update: function () {
 
         game.trump.angle += 1;
 
-        game.labelGuards.setText(game.money); //CHANGE TEXT IN GUARDBUTTON ////////////////////////////////////////////
+        game.labelGuards.setText(game.numberguards); //CHANGE TEXT IN GUARDBUTTON ////////////////////////////////////////////
+        game.labelMoney.setText(game.money);
         if (game.input.activePointer.isDown && game.adding) ////////////////////////////////////////////////////////
             {
-                
                 this.addGuard();
             }
 
@@ -114,8 +120,6 @@ playgame.prototype = {
         obj2.damping = 0.8;
         obj2.angularDamping = 0.7;
         obj2.kill = true;
-
-        game.money ++; //TEST VAR ////////////////////////////////////////////////////////////////////////////////////
     },
     throwProjectileToObj: function (obj1, obj2, speed) {
         if (typeof speed === 'undefined') { speed = 60; }
@@ -125,7 +129,7 @@ playgame.prototype = {
         obj1.body.velocity.y = Math.sin(angle) * speed;
     },
     addingGuardfunc: function () { //////////////////////////////////////////////////////////////////////////////////////
-        if (game.money > 0) 
+        if (game.numberguards > 0) 
         {
             game.adding = true;
             game.addingGuard = game.add.sprite(game.world.width - 100, 10, 'addingGuard');
@@ -135,7 +139,8 @@ playgame.prototype = {
     addGuard: function () { ///////////////////////////////////////////////////////////////////////////////////////////////
         var guard = game.add.sprite(game.input.x, game.input.y, 'bodyguard');
         game.addingGuard.destroy();
-        game.money --;
+        game.money = game.money - game.PriceGuard;
+        game.numberguards = game.numberguards - 1;
         game.adding = false;
         guards.add(guard);
         guard.body.clearShapes();
@@ -144,4 +149,13 @@ playgame.prototype = {
         guard.body.setCollisionGroup(game.guardCollisionGroup);
         guard.body.collides([game.projectileCollisionGroup, game.trumpCollisionGroup]);
     },
+    addMoney: function () { ///////////////////////////////////////////////////////////////////////////////////////////////
+        game.money ++;
+        console.log("test");
+        if (game.money % game.PriceGuard == 0) 
+        {
+            game.numberguards ++;
+            console.log("GUARD");
+        }
+    }
 }

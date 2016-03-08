@@ -44,10 +44,19 @@ preload.prototype = {
         game.load.image("trump", "assets/trump.png");
         game.load.image("bodyguard", "assets/bodyguard.png");
         game.load.image("taco", "assets/taco.png");
+        game.load.image("addGuard", "assets/addGuard.png");
+        game.load.image("addingGuard", "assets/addingGuard.png");
 
         // preload physics
         game.load.physics('tacoPhysics', 'assets/physics/taco.json');
         game.load.physics('personPhysics', 'assets/physics/person.json');
+
+        // Vars
+        game.PriceGuard = 10;
+        game.moneyTimeOut = 2; // om de twee seconden 1 muntje
+
+        game.adding = false; // later ID ofzo
+        game.money = 15;
         
     },
     create: function () {
@@ -62,27 +71,40 @@ playgame = function(game) {};
 playgame.prototype = {
     create: function () {
 
+        // Start P2 physics
+
         game.physics.startSystem(Phaser.Physics.P2JS);
         game.physics.p2.setImpactEvents(true);
         game.physics.p2.restitution = 0.8;
+
+        // Create Groups
+
+        guards = game.add.group(); 
+        guards.enableBody = true; 
+        guards.physicsBodyType = Phaser.Physics.P2JS;
 
         projectiles = game.add.group();
         projectiles.enableBody = true;
         projectiles.physicsBodyType = Phaser.Physics.P2JS;
 
+        // Create collision groups
+
         game.trumpCollisionGroup = game.physics.p2.createCollisionGroup();
         game.projectileCollisionGroup = game.physics.p2.createCollisionGroup();
         game.collidedCollisionGroup = game.physics.p2.createCollisionGroup();
+        game.guardCollisionGroup = game.physics.p2.createCollisionGroup();
 
         game.physics.p2.updateBoundsCollisionGroup();
       
-        // when pressing W create a new projectile
+        // Throw projectiles
+
         // keyW = game.input.keyboard.addKey(Phaser.Keyboard.W);
         // keyW.onDown.add(this.addProjectile, this);
 
         game.time.events.loop(Phaser.Timer.SECOND * 2, this.addProjectile, this);
 
         // create trump
+
         game.trump = game.add.sprite(game.world.centerX, game.world.centerY, 'trump');
         game.trump.anchor.setTo(0.5,0.5);
         game.physics.p2.enable(game.trump);
@@ -92,12 +114,38 @@ playgame.prototype = {
         game.trump.body.setCollisionGroup(game.trumpCollisionGroup);
         game.trump.body.collides(game.projectileCollisionGroup, this.onProjectileHitTrump, this);
 
-        this.getRandomPositionOffScreen();
+        // Add buttons
+
+        button = game.add.button(game.world.width - 100, 10, 'addGuard', this.addGuard, this);
+
+        // Add labels 
+
+        var style = { font: "40px Arial", fill: "#ffffff" };  
+        game.labelGuards = this.game.add.text(game.world.width - 80, 28, game.numberguards, style);
+        game.labelMoney = this.game.add.text(20, 28, "money:" + game.money, style);
+
+        // Give money every x seconds
+
+        game.time.events.loop(Phaser.Timer.SECOND * game.moneyTimeOut, this.addMoney, this, 1);
         
     },
     update: function () {
 
         game.trump.angle += 1;
+
+        // Update labels
+
+        game.labelGuards.setText(Math.floor(game.money / game.PriceGuard)); // update this
+        game.labelMoney.setText(game.money);
+
+        // If adding, place guard
+
+        if (game.input.activePointer.isDown && game.adding) 
+        {
+            this.placeGuard();
+        }
+
+        // Fade out projectiles and slow down when hit
 
         projectiles.forEachExists(function(projectile) {
             if(projectile.kill) {
@@ -157,5 +205,28 @@ playgame.prototype = {
         obj1.body.rotation = angle + game.math.degToRad(-20);  // correct angle of angry bullets (depends on the sprite used)
         obj1.body.velocity.x = Math.cos(angle) * speed;    // accelerateToObject 
         obj1.body.velocity.y = Math.sin(angle) * speed;
+    },
+    addGuard: function () {
+        if (game.money > game.PriceGuard) 
+        {
+            game.adding = true;
+            game.addingGuard = game.add.sprite(game.world.width - 100, 10, 'addingGuard');
+        }
+        
+    },
+    placeGuard: function () { 
+        var guard = game.add.sprite(game.input.x, game.input.y, 'bodyguard');
+        guards.add(guard);
+        game.addingGuard.destroy();
+        game.money -= game.PriceGuard;
+        game.adding = false;
+        guard.body.clearShapes();
+        guard.body.loadPolygon('personPhysics', 'person');
+        guard.body.static = true;
+        guard.body.setCollisionGroup(game.guardCollisionGroup);
+        guard.body.collides([game.projectileCollisionGroup]);
+    },
+    addMoney: function (amount) { 
+        game.money += amount;
     }
 }
