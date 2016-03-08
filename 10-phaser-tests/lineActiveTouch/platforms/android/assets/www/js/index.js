@@ -1,20 +1,24 @@
 var game = new Phaser.Game(800, 600, Phaser.CANVAS, '', {preload: preload, create: create, update: update});
 var sprite = null;
 var graphic = null;
+var fatLine = null;
+var greenLine = null;
 var wasDown = false;
 
 var path = null;
+var newPath = null;
 var pathIndex = -1;
 var pathSpriteIndex = -1;
 
 var drawPath = false;
 
-function blackoutGraphic() {
-	graphic.beginFill(0x000000);
-	graphic.lineStyle(4, 0x000000, 1);
-	graphic.drawRect(0, 0, game.width, game.height);
-	graphic.endFill();
-	graphic.lineStyle(4, 0xFF0000, 1);
+function blackoutGraphic()
+{
+	graphic.clear();
+	//graphic.lineStyle(8, 0xFF0000, 1);
+
+	fatLine.clear();
+	//fatLine.lineStyle(50, 0xFFFFFF, 1);
 }
 
 function preload() {
@@ -24,8 +28,12 @@ function preload() {
 
 
 function create() {
+	game.stage.backgroundColor = 'rgb(68, 136, 170)';
 	game.physics.startSystem(Phaser.Physics.P2JS);
 	graphic = game.add.graphics(0, 0);
+	fatLine = game.add.graphics(0, 0);
+	greenLine = game.add.graphics(0, 0);
+
 	blackoutGraphic();
 	sprite = game.add.sprite(100, 100, 'bodyguard');
 	sprite.anchor.setTo(0.5, 0.5);
@@ -70,26 +78,32 @@ function click(object)
 		}
 	}
 
-	console.log(result);
+	//console.log(result);
 }
 
-function update() {
+function update()
+{
 
 	if (game.input.pointer1.isDown && drawPath)
 	{
-		console.log("ok");
-		if (!wasDown) {
-			graphic.moveTo(game.input.x, game.input.y);
+		//console.log("ok");
+		if (!wasDown)
+		{
 			blackoutGraphic();
+			graphic.moveTo(game.input.x, game.input.y);
+			fatLine.moveTo(game.input.x, game.input.y);
+			greenLine.moveTo(game.input.x, game.input.y);
 			pathIndex = 0;
 			pathSpriteIndex = 0;
 			path = [];
+			newPath = [];
 			wasDown = true;
 		}
-
-		if (pathIndex == 0 || (path[pathIndex - 1].x != game.input.x || path[pathIndex - 1].y != game.input.y)) {
+		if (pathIndex == 0 || (path[pathIndex - 1].x != game.input.x || path[pathIndex - 1].y != game.input.y))
+		{
 			graphic.lineTo(game.input.x, game.input.y);
 			path[pathIndex] = new Phaser.Point(game.input.x, game.input.y);
+			newPath.push(new Phaser.Point(game.input.x, game.input.y));
 			pathIndex++;
 		}
 	}
@@ -100,7 +114,10 @@ function update() {
 	if (path != null && path.length > 0 && pathSpriteIndex < pathIndex)
 	{
 		pathSpriteIndex = Math.min(pathSpriteIndex, path.length - 1);
-		game.physics.arcade.moveToXY(sprite, path[pathSpriteIndex].x, path[pathSpriteIndex].y, 250);
+		game.physics.arcade.moveToXY(sprite, newPath[0].x, newPath[0].y, 250);
+
+		//fatLine.lineTo(sprite.position.x, sprite.position.y);
+
 		if (game.physics.arcade.distanceToXY(sprite, path[pathSpriteIndex].x, path[pathSpriteIndex].y) < 20)
 		{
 			pathSpriteIndex++;
@@ -109,7 +126,28 @@ function update() {
 				sprite.body.velocity.destination[0] = 0;
 				sprite.body.velocity.destination[1] = 0;
 			}
+
+			reDrawLine();
 		}
 	}
 
+}
+
+function reDrawLine()
+{
+	//console.log("Path sprite index: " + pathSpriteIndex);
+	//console.log("Array path: ");
+	//console.log(newPath);
+	newPath.splice(0, 1);
+	//console.log("Na verwijderen: ");
+	//console.log(newPath);
+
+	greenLine.clear();
+	greenLine.lineStyle(15, 0x00FF00, 1);
+	if(newPath.length > 0) {
+		greenLine.moveTo(newPath[0].x, newPath[0].y);
+		for (var i = 1; i < newPath.length; i++) {
+			greenLine.lineTo(newPath[i].x, newPath[i].y);
+		}
+	}
 }
