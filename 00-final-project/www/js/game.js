@@ -42,13 +42,14 @@ preload.prototype = {
         
         // Preload images
         game.load.image("trump", "assets/trump.png");
-        game.load.image("bodyguard", "assets/bodyguard.png");
+        //game.load.image("bodyguard", "assets/bodyguard.png");
         game.load.image("taco", "assets/taco.png");
         game.load.image("addGuard", "assets/addGuard.png");
         game.load.image("addingGuard", "assets/addingGuard.png");
         game.load.image("trumprage", 'assets/trumprage.png');
         // and sprites
         game.load.spritesheet('trumpsprite', 'assets/trumpsprite.png', 353, 624, 6);
+        game.load.spritesheet('bodyguard', 'assets/bodyguardSprite.png', 64, 64);
 
         // Preload sounds
         game.load.audio('quote1', 'assets/sounds/Worst_President.mp3');        
@@ -91,6 +92,7 @@ playgame.prototype = {
         guards = game.add.group(); 
         guards.enableBody = true; 
         guards.physicsBodyType = Phaser.Physics.P2JS;
+        guards.someOneIsActive = false;
 
         projectiles = game.add.group();
         projectiles.enableBody = true;
@@ -104,6 +106,10 @@ playgame.prototype = {
         game.guardCollisionGroup = game.physics.p2.createCollisionGroup();
 
         game.physics.p2.updateBoundsCollisionGroup();
+
+
+        //check when is touched, then launch click function
+        game.input.onDown.add(this.click, this);
       
         // Throw projectiles
 
@@ -171,6 +177,9 @@ playgame.prototype = {
 
         game.trump.angle += 1;
 
+        // Check for clicks on guards
+        this.guardClickHandler();
+
         // Update labels
 
         game.labelGuards.setText(Math.floor(game.money / game.PriceGuard)); // update this
@@ -195,9 +204,13 @@ playgame.prototype = {
             }
         }, this);
 
-        // Fade out guards and slow down when hit
+        // Fade out guards and slow down when hit AND move healthbars
 
         guards.forEachExists(function(guard) {
+            // move health bar
+            guard.healthBar.setPosition( guard.position.x,  guard.position.y - 40);
+
+            // kill guard with fade
             if(guard.kill) {
                 guard.alpha -= 0.04;
                 guard.scale.setTo(guard.alpha, guard.alpha);
@@ -208,6 +221,99 @@ playgame.prototype = {
             }
         }, this);
 
+    },
+    guardClickHandler: function()
+    {
+        if (game.input.pointer1.isDown && guards.activeGuard !== null)
+        {
+            //console.log("ok");
+            if (!wasDown)
+            {
+                //console.log("eerste");
+                guards.activeGuard.followPath.greenLine.moveTo(game.input.x, game.input.y);
+                guards.activeGuard.followPath.pathIndex = 0;
+                guards.activeGuard.followPath.pathSpriteIndex = 0;
+                guards.activeGuard.followPath.path = [];
+                guards.activeGuard.followPath.newPath = [];
+                wasDown = true;
+            }
+            if (guards.activeGuard.followPath.pathIndex == 0 || (guards.activeGuard.followPath.path[ guards.activeGuard.followPath.pathIndex - 1 ].x != game.input.x || guards.activeGuard.followPath.path[ guards.activeGuard.followPath.pathIndex - 1 ].y != game.input.y))
+            {
+                guards.activeGuard.followPath.path[ guards.activeGuard.followPath.pathIndex ] = new Phaser.Point(game.input.x, game.input.y);
+                guards.activeGuard.followPath.newPath.push(new Phaser.Point(game.input.x, game.input.y));
+                guards.activeGuard.followPath.pathIndex++;
+            }
+        }
+        else
+        {
+            guards.activeGuard = null;
+            wasDown = false;
+        }
+
+        this.guardMoveHandler();
+    },
+    guardMoveHandler: function()
+    {
+        for(var guard = 0; guard < guards.children.length; guard++)
+        {
+            var curGuard = guards.children[guard ].followPath;
+            if (curGuard.path != null && curGuard.path.length > 0 && curGuard.pathSpriteIndex < curGuard.pathIndex)
+            {
+                curGuard.pathSpriteIndex = Math.min(curGuard.pathSpriteIndex, curGuard.path.length - 1);
+                game.physics.arcade.moveToXY(guards.children[guard ], curGuard.newPath[ 0 ].x, curGuard.newPath[ 0 ].y, 250);
+
+                if (game.physics.arcade.distanceToXY(guards.children[guard ], curGuard.path[ curGuard.pathSpriteIndex ].x, curGuard.path[ curGuard.pathSpriteIndex ].y) < 20)
+                {
+                    curGuard.pathSpriteIndex++;
+                    guards.children[guard].animations.play('walk');
+                    if (curGuard.pathSpriteIndex >= curGuard.pathIndex)
+                    {
+                        console.log("stop");
+                        guards.children[guard].body.velocity.destination[ 0 ] = 0;
+                        guards.children[guard].body.velocity.destination[ 1 ] = 0;
+                        guards.children[guard].animations.stop(null, true);
+                        guards.children[guard].frame = 0;
+                    }
+                    this.drawLine(curGuard);
+                    this.rotateGuard(guards.children[guard]);
+                }
+            }
+        }
+    },
+    rotateGuard: function (guard)
+    {
+        if (guard.followPath.newPath.length > 0)
+        {
+            console.log("rot");
+            var lengthX = guard.followPath.newPath[ 0 ].x - guard.position.x;
+            var lengthY = guard.followPath.newPath[ 0 ].y - guard.position.y;
+            var correctingAngle = 0;
+
+            if (lengthX < 0)
+            {
+                correctingAngle = Math.PI;
+            }
+
+            guard.body.rotation = Math.atan(lengthY / lengthX) + Math.PI / 2 + correctingAngle;
+        }
+    },
+    drawLine: function(guard)
+    {
+        guard.newPath.splice(0, 1);
+
+        guard.greenLine.clear();
+        guard.greenLine.lineStyle(15, 0x00FF00, 1);
+
+        if (guard.newPath.length > 0)
+        {
+            //rotateBodyGuard();
+            guard.greenLine.moveTo(guard.newPath[ 0 ].x, guard.newPath[ 0 ].y);
+
+            for (var i = 1; i < guard.newPath.length; i++)
+            {
+                guard.greenLine.lineTo(guard.newPath[ i ].x, guard.newPath[ i ].y);
+            }
+        }
     },
     checkHealth: function() {
 
@@ -220,7 +326,6 @@ playgame.prototype = {
 
         // update trump health bar
         game.trump.healthBar.setPercent((game.trump.health/game.defaultPresidentHealth)*100);
-
 
         // check & update health bars for guards
         guards.forEachExists(function(guard) {
@@ -331,6 +436,17 @@ playgame.prototype = {
         guard.body.static = true;
         guard.body.setCollisionGroup(game.guardCollisionGroup);
         guard.body.collides([game.projectileCollisionGroup], this.onProjectileHitGuard, this);
+
+        guard.animations.add('walk', [1,2], 5, true);
+
+        guard.followPath = {};
+
+        guard.followPath.isActive = false;
+        guard.followPath.path = [];
+        guard.followPath.newPath = [];
+        guard.followPath.pathIndex = -1;
+        guard.followPath.pathSpriteIndex = -1;
+        guard.followPath.greenLine = game.add.graphics(0, 0);
     },
     onProjectileHitGuard: function(guardBody, projectileBody) {
         this.stopProjectile(projectileBody.sprite);
@@ -343,5 +459,26 @@ playgame.prototype = {
     },
     addMoney: function (amount) { 
         game.money += amount;
+    },
+    click: function(object)
+    {
+        var bodies = game.physics.p2.hitTest(object.position, guards.children);
+
+        //console.log(bodies);
+        //console.log(object);
+
+        var result;
+        if (bodies.length === 0)
+        {
+            result = "You didn't click a Body";
+        }
+        else
+        {
+            bodies[0].parent.sprite.followPath.isActive = true;
+            guards.activeGuard = bodies[0].parent.sprite;
+            result = "Hooray";
+        }
+
+        //console.log(result);
     }
 }
