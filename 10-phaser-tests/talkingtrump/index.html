@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+      <script type="text/javascript" src="phaser.js"></script>
+        <link rel="stylesheet" type="text/css" href="style.css" />
+        
+        
+
+</head>
+<body>
+<script type="text/javascript">
+    var game = new Phaser.Game(800, 600, Phaser.CANVAS, '', {preload: preload, create: create, update: update});
+    function preload() {
+        game.load.spritesheet('trumpsprite', 'trumpsprite.png', 353, 624, 5);
+        game.load.audio('sound1', 'Worst_President.mp3');
+    }
+var srpite = null;
+function create (){
+
+    sprite = game.add.sprite(695, 0, 'trumpsprite');
+
+    sprite.animations.add('walk',[0,1,2,3,4,5,4,3,2,1,0], true);
+    sprite.scale.setTo(0.3, 0.3);
+    sprite.animations.play('walk', 40, true);
+
+    music = game.add.audio('sound1');
+
+    music.play();
+    music.onStop.add(soundStopped, this);
+
+
+
+
+
+
+}
+
+    function soundStopped(sound){
+        sprite.animations.stop(null, true);
+    }
+ function update(){
+
+ }
+
+</script>
+    
+</body>
+</html>
