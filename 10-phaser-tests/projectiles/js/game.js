@@ -57,8 +57,10 @@ playgame.prototype = {
         game.physics.p2.updateBoundsCollisionGroup();
       
         // when pressing W create a new projectile
-        keyW = game.input.keyboard.addKey(Phaser.Keyboard.W);
-        keyW.onDown.add(this.addProjectile, this);
+        // keyW = game.input.keyboard.addKey(Phaser.Keyboard.W);
+        // keyW.onDown.add(this.addProjectile, this);
+
+        game.time.events.loop(Phaser.Timer.SECOND * 2, this.addProjectile, this);
 
         // create trump
         game.trump = game.add.sprite(game.world.centerX, game.world.centerY, 'trump');
