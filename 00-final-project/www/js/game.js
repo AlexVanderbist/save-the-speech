@@ -83,7 +83,7 @@ playgame = function(game) {};
 playgame.prototype = {
     create: function () {
 
-        
+
         // Create BG
         game.add.sprite(0,0,'concrete');
         var stand = game.add.sprite(game.world.centerX, game.world.centerY, 'stand');
@@ -387,7 +387,7 @@ playgame.prototype = {
         taco.body.setCollisionGroup(game.projectileCollisionGroup);
         taco.body.collides([game.trumpCollisionGroup, game.projectileCollisionGroup, game.guardCollisionGroup]);
         taco.body.collideWorldBounds = false;
-        this.throwProjectileToObj(taco,game.trump, 200);
+        this.throwProjectileToObj(taco,game.trump, 160);
 
         // var sound = game.add.audio('drop');
         // sound.play();
