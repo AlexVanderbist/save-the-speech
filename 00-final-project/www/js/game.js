@@ -47,6 +47,8 @@ preload.prototype = {
         game.load.image("addGuard", "assets/addGuard.png");
         game.load.image("addingGuard", "assets/addingGuard.png");
         game.load.image("trumprage", 'assets/trumprage.png');
+        game.load.image("concrete", 'assets/concrete.png');
+        game.load.image("stand", 'assets/stand.png');
         // and sprites
         game.load.spritesheet('trumpsprite', 'assets/trumpsprite.png', 353, 624, 6);
         game.load.spritesheet('bodyguard', 'assets/bodyguardSprite.png', 64, 64);
@@ -80,6 +82,12 @@ preload.prototype = {
 playgame = function(game) {};
 playgame.prototype = {
     create: function () {
+
+        
+        // Create BG
+        game.add.sprite(0,0,'concrete');
+        var stand = game.add.sprite(game.world.centerX, game.world.centerY, 'stand');
+        stand.anchor.setTo(0.5,0.5);
 
         // Start P2 physics
 
