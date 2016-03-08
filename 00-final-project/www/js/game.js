@@ -46,6 +46,12 @@ preload.prototype = {
         game.load.image("taco", "assets/taco.png");
         game.load.image("addGuard", "assets/addGuard.png");
         game.load.image("addingGuard", "assets/addingGuard.png");
+        game.load.image("trumprage", 'assets/trumprage.png');
+        // and sprites
+        game.load.spritesheet('trumpsprite', 'assets/trumpsprite.png', 353, 624, 6);
+
+        // Preload sounds
+        game.load.audio('quote1', 'assets/sounds/Worst_President.mp3');        
 
         // preload physics
         game.load.physics('tacoPhysics', 'assets/physics/taco.json');
@@ -54,6 +60,9 @@ preload.prototype = {
         // Vars
         game.PriceGuard = 10;
         game.moneyTimeOut = 2; // om de twee seconden 1 muntje
+        game.tacoDamage = 30;
+        game.defaultGuardHealth = 70.0;
+        game.defaultPresidentHealth = 100.0;
 
         game.adding = false; // later ID ofzo
         game.money = 15;
@@ -106,6 +115,8 @@ playgame.prototype = {
         // create trump
 
         game.trump = game.add.sprite(game.world.centerX, game.world.centerY, 'trump');
+        game.trump.health = game.defaultPresidentHealth;
+        game.trump.healthBar = new HealthBar(this.game, {x: game.trump.position.x, y: game.trump.position.y - 40, width: 60, height: 10});
         game.trump.anchor.setTo(0.5,0.5);
         game.physics.p2.enable(game.trump);
         game.trump.body.clearShapes();
@@ -113,6 +124,17 @@ playgame.prototype = {
         game.trump.body.static = true;
         game.trump.body.setCollisionGroup(game.trumpCollisionGroup);
         game.trump.body.collides(game.projectileCollisionGroup, this.onProjectileHitTrump, this);
+
+        // Create Trump heads
+
+        game.trumphead = game.add.sprite(10, 10, 'trumpsprite');
+        game.trumprage = game.add.sprite(10, 10, 'trumprage');
+        game.trumprage.visible = false;
+        game.trumphead.visible = false;
+        game.trumphead.animations.add('speak',[0,1,2,3,4,5,4,3,2,1,0], true);
+        game.trumphead.scale.setTo(0.3, 0.3);
+        game.trumprage.scale.setTo(0.1,0.1);
+        game.trumphead.animations.play('speak', 40, true);
 
         // Add buttons
 
@@ -127,7 +149,23 @@ playgame.prototype = {
         // Give money every x seconds
 
         game.time.events.loop(Phaser.Timer.SECOND * game.moneyTimeOut, this.addMoney, this, 1);
-        
+
+        // Start waves
+        this.startWave(1);
+    },
+    startWave: function(waveNumber) {
+        // play first quote
+
+        quote = game.add.audio('quote1');
+
+        game.trumphead.visible = true;
+        quote.play();
+        quote.onStop.add(quoteStopped, this);
+        function quoteStopped(quote){
+            game.trumphead.animations.stop(null, true);
+        }
+
+
     },
     update: function () {
 
@@ -157,6 +195,44 @@ playgame.prototype = {
             }
         }, this);
 
+        // Fade out guards and slow down when hit
+
+        guards.forEachExists(function(guard) {
+            if(guard.kill) {
+                guard.alpha -= 0.04;
+                guard.scale.setTo(guard.alpha, guard.alpha);
+                if(guard.alpha < 0) {
+                    //remove the guard
+                    guard.destroy();
+                }
+            }
+        }, this);
+
+    },
+    checkHealth: function() {
+
+        // check trump health
+        if(game.trump.health <= 0) {
+            // trump died :(
+            this.destroyHealthbar(game.trump.healthBar);
+            game.trump.destroy(); // for now
+        }
+
+        // update trump health bar
+        game.trump.healthBar.setPercent((game.trump.health/game.defaultPresidentHealth)*100);
+
+
+        // check & update health bars for guards
+        guards.forEachExists(function(guard) {
+            guard.healthBar.setPosition( guard.position.x,  guard.position.y - 40);
+            guard.healthBar.setPercent((guard.health/game.defaultGuardHealth)*100);
+
+            if(guard.health <= 0) {
+                guard.body.angularVelocity = 10;
+                guard.kill = true;
+                this.destroyHealthbar(guard.healthBar);
+            }
+        }, this);
     },
     getRandomPositionOffScreen: function() {
         var radius = Math.sqrt(Math.pow(game.world.width/2, 2) + Math.pow(game.world.height/2, 2));
@@ -176,6 +252,18 @@ playgame.prototype = {
         return pos;
         
     },
+    presidentRageStart: function () {
+        // enable rage
+        game.trumphead.visible = false;
+        game.trumprage.visible = true;
+
+        // stop after 1500ms CHANGE THIS
+        game.time.events.loop(Phaser.Timer.SECOND * 1, this.presidentRageStop, this);
+    },
+    presidentRageStop: function () {
+        game.trumphead.visible = true;
+        game.trumprage.visible = false;;
+},
     addProjectile: function () {
         var randomPos = this.getRandomPositionOffScreen();
         var taco = game.add.sprite(randomPos.x, randomPos.y, 'taco');
@@ -184,7 +272,7 @@ playgame.prototype = {
         taco.body.clearShapes();
         taco.body.loadPolygon('tacoPhysics', 'taco');
         taco.body.setCollisionGroup(game.projectileCollisionGroup);
-        taco.body.collides([game.trumpCollisionGroup, game.projectileCollisionGroup]);
+        taco.body.collides([game.trumpCollisionGroup, game.projectileCollisionGroup, game.guardCollisionGroup]);
         taco.body.collideWorldBounds = false;
         this.throwProjectileToObj(taco,game.trump, 200);
 
@@ -192,12 +280,23 @@ playgame.prototype = {
         // sound.play();
     },
     onProjectileHitTrump: function(body1, body2) {
-        console.log('hit trump');
-        body2.damping = 0.8;
-        body2.angularDamping = 0.7;
-        body2.sprite.kill = true;
-        body2.setCollisionGroup(game.collidedCollisionGroup);
-        //game.add.tween(body2.sprite).to( { alpha: 0 }, 2000, Phaser.Easing.Linear.None, true, 1, 1000, true);
+        // stop the projectile
+        this.stopProjectile(body2.sprite);
+
+        // take trumps health
+        if(body2.sprite.key == 'taco') {
+            game.trump.health -= game.tacoDamage;
+            this.checkHealth();
+        }
+
+        //rage
+        this.presidentRageStart();
+    },
+    stopProjectile: function (projectileSprite) {
+        projectileSprite.body.damping = 0.8;
+        projectileSprite.body.angularDamping = 0.7;
+        projectileSprite.body.setCollisionGroup(game.collidedCollisionGroup);
+        projectileSprite.kill = true;
     },
     throwProjectileToObj: function (obj1, obj2, speed) {
         if (typeof speed === 'undefined') { speed = 60; }
@@ -214,17 +313,33 @@ playgame.prototype = {
         }
         
     },
+    destroyHealthbar: function (healthbar) {
+        healthbar.barSprite.destroy();
+        healthbar.bgSprite.destroy();
+    },
     placeGuard: function () { 
         var guard = game.add.sprite(game.input.x, game.input.y, 'bodyguard');
         guards.add(guard);
         game.addingGuard.destroy();
         game.money -= game.PriceGuard;
         game.adding = false;
+        guard.healthBar = new HealthBar(this.game, {x: guard.position.x, y: guard.position.y - 40, width: 60, height: 10});
+        guard.health = game.defaultGuardHealth;
+        guard.kill = false;
         guard.body.clearShapes();
         guard.body.loadPolygon('personPhysics', 'person');
         guard.body.static = true;
         guard.body.setCollisionGroup(game.guardCollisionGroup);
-        guard.body.collides([game.projectileCollisionGroup]);
+        guard.body.collides([game.projectileCollisionGroup], this.onProjectileHitGuard, this);
+    },
+    onProjectileHitGuard: function(guardBody, projectileBody) {
+        this.stopProjectile(projectileBody.sprite);
+
+        // take guard health
+        if(projectileBody.sprite.key == 'taco') {
+            guardBody.sprite.health -= game.tacoDamage;
+            this.checkHealth();
+        }
     },
     addMoney: function (amount) { 
         game.money += amount;
