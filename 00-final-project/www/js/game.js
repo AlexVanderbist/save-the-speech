@@ -62,8 +62,8 @@ preload.prototype = {
         game.PriceGuard = 10;
         game.moneyTimeOut = 2; // om de twee seconden 1 muntje
         game.tacoDamage = 30;
-        game.defaultGuardHealth = 70.0;
-        game.defaultPresidentHealth = 100.0;
+        game.defaultGuardHealth = 100.0;
+        game.defaultPresidentHealth = 160.0;
 
         game.adding = false; // later ID ofzo
         game.money = 15;
@@ -411,7 +411,7 @@ playgame.prototype = {
         obj1.body.velocity.y = Math.sin(angle) * speed;
     },
     addGuard: function () {
-        if (game.money > game.PriceGuard) 
+        if (game.money >= game.PriceGuard) 
         {
             game.adding = true;
             game.addingGuard = game.add.sprite(game.world.width - 100, 10, 'addingGuard');
