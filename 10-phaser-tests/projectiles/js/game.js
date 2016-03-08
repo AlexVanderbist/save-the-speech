@@ -52,6 +52,8 @@ playgame.prototype = {
 
         game.trumpCollisionGroup = game.physics.p2.createCollisionGroup();
         game.projectileCollisionGroup = game.physics.p2.createCollisionGroup();
+        game.collidedCollisionGroup = game.physics.p2.createCollisionGroup();
+
         game.physics.p2.updateBoundsCollisionGroup();
       
         // when pressing W create a new projectile
@@ -124,7 +126,7 @@ playgame.prototype = {
         body2.damping = 0.8;
         body2.angularDamping = 0.7;
         body2.sprite.kill = true;
-        body2.collides([game.trumpCollisionGroup]);
+        body2.setCollisionGroup(game.collidedCollisionGroup);
         //game.add.tween(body2.sprite).to( { alpha: 0 }, 2000, Phaser.Easing.Linear.None, true, 1, 1000, true);
     },
     throwProjectileToObj: function (obj1, obj2, speed) {
