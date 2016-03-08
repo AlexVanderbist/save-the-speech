@@ -67,6 +67,8 @@ playgame.prototype = {
         game.trump.body.static = true;
         game.trump.body.setCollisionGroup(game.trumpCollisionGroup);
         game.trump.body.collides(game.projectileCollisionGroup, this.onProjectileHitTrump, this);
+
+        this.getRandomPositionOffScreen();
         
     },
     update: function () {
@@ -85,17 +87,33 @@ playgame.prototype = {
 
     },
     getRandomPositionOffScreen: function() {
-        
+        var radius = Math.sqrt(Math.pow(game.world.width/2, 2) + Math.pow(game.world.height/2, 2));
+        radius += 40; // make sure nothing is visible when spawning
+        var angle = Math.random() * Math.PI * 2;
 
+        var pos = {
+            x: Math.cos(angle)*radius + game.world.centerX,
+            y: Math.sin(angle)*radius + game.world.centerY
+        };
+
+        //debug stuff
+        // var graphics = game.add.graphics(game.world.centerX, game.world.centerY);
+        // graphics.beginFill(0xFF0000, 1);
+        // graphics.drawCircle(0, 0, radius * 2);
+
+        return pos;
+        
     },
     addProjectile: function () {
-        var taco = game.add.sprite(game.world.randomX, game.world.randomY, 'taco');
+        var randomPos = this.getRandomPositionOffScreen();
+        var taco = game.add.sprite(randomPos.x, randomPos.y, 'taco');
         projectiles.add(taco);
         taco.kill = false;
         taco.body.clearShapes();
         taco.body.loadPolygon('tacoPhysics', 'taco');
         taco.body.setCollisionGroup(game.projectileCollisionGroup);
         taco.body.collides([game.trumpCollisionGroup, game.projectileCollisionGroup]);
+        taco.body.collideWorldBounds = false;
         this.throwProjectileToObj(taco,game.trump, 200);
 
         // var sound = game.add.audio('drop');
