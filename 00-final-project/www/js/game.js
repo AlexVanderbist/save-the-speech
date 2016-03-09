@@ -411,7 +411,7 @@ playgame.prototype = {
         projectileSprite.body.setCollisionGroup(game.collidedCollisionGroup);
         projectileSprite.kill = true;
     },
-    throwProjectileToObj: function (obj1, obj2, speed) {
+    throwProjectileToObj: function (obj1, obj2, speed) { 
         if (typeof speed === 'undefined') { speed = 60; }
         var angle = Math.atan2(obj2.y - obj1.y, obj2.x - obj1.x);
         obj1.body.rotation = angle + game.math.degToRad(-20);  // correct angle of angry bullets (depends on the sprite used)
