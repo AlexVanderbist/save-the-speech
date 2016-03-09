@@ -13,24 +13,24 @@ Trump.Preloader.prototype = {
 		this.load.setPreloadSprite(this.preloadBar);
 
 		// Preload images
-		game.load.image("trump", "assets/trump.png");
-		game.load.image("taco", "assets/taco.png");
-		game.load.image("addGuard", "assets/addGuard.png");
-		game.load.image("addingGuard", "assets/addingGuard.png");
-		game.load.image("trumprage", 'assets/trumprage.png');
-		game.load.image("concrete", 'assets/concrete.png');
-		game.load.image("stand", 'assets/stand.png');
+		this.load.image("trump", "assets/trump.png");
+		this.load.image("taco", "assets/taco.png");
+		this.load.image("addGuard", "assets/addGuard.png");
+		this.load.image("addingGuard", "assets/addingGuard.png");
+		this.load.image("trumprage", 'assets/trumprage.png');
+		this.load.image("concrete", 'assets/concrete.png');
+		this.load.image("stand", 'assets/stand.png');
         
 		// and sprites
-		game.load.spritesheet('trumpsprite', 'assets/trumpsprite.png', 353, 624, 6);
-		game.load.spritesheet('bodyguard', 'assets/bodyguardSprite.png', 64, 64);
+		this.load.spritesheet('trumpsprite', 'assets/trumpsprite.png', 353, 624, 6);
+		this.load.spritesheet('bodyguard', 'assets/bodyguardSprite.png', 64, 64);
 
 		// Preload sounds
-		game.load.audio('quote1', 'assets/sounds/Worst_President.mp3');
+		this.load.audio('quote1', 'assets/sounds/Worst_President.mp3');
 
 		// preload physics
-		game.load.physics('tacoPhysics', 'assets/physics/taco.json');
-		game.load.physics('personPhysics', 'assets/physics/person.json');
+		this.load.physics('tacoPhysics', 'assets/physics/taco.json');
+		this.load.physics('personPhysics', 'assets/physics/person.json');
 
 	},
 

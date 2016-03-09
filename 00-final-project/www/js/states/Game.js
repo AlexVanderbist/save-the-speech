@@ -1,4 +1,4 @@
-MissileCommand.Game = function (game) {
+Trump.Game = function (game) {
 
     this.PriceGuard = 10,
     this.moneyTimeOut = 2, // om de twee seconden 1 muntje
@@ -11,7 +11,7 @@ MissileCommand.Game = function (game) {
 
 };
 
-MissileCommand.Game.prototype = {
+Trump.Game.prototype = {
 
 	create: function () {
 
