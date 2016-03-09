@@ -17,7 +17,7 @@
 		game.state.start("Boot");
 	};
 
-
-	document.addEventListener('deviceready', loadGame, false);
+	window.onload = function () { loadGame(); };
+	//document.addEventListener('deviceready', loadGame, false);
 
 })();
