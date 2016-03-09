@@ -5,7 +5,7 @@ var playgame;
 window.onload = function () {
     
     // Create a new Phaser Game
-    game = new Phaser.Game(360,640);
+    game = new Phaser.Game(window.innerWidth,window.innerHeight);
 
     // Add the game states
     game.state.add("Preload", preload);
@@ -24,9 +24,10 @@ preload.prototype = {
         game.load.image("trump", "assets/trump.png");
         game.load.image("bodyguard", "assets/bodyguard.png");
         game.load.image("taco", "assets/taco.png");
-        game.load.image("field", "assets/soccerfield.png");
+        game.load.image("field", "assets/concrete.png");
         game.load.image("addGuard", "assets/addGuard.png");
         game.load.image("addingGuard", "assets/addingGuard.png");
+        game.load.image("stand", "assets/Stand.png");
 
         // preload physics
         game.load.physics('tacoPhysics', 'assets/physics/taco.json');
@@ -52,6 +53,11 @@ playgame = function(game) {};
 playgame.prototype = {
     create: function () {
         game.add.sprite(0, 0, 'field'); //////////////////////////////////////////////////
+        game.stand = game.add.sprite(game.world.centerX, game.world.centerY, 'stand'); //////////////////
+        game.stand.anchor.setTo(0.5,0.5); /////////////////
+
+
+
         game.physics.startSystem(Phaser.Physics.P2JS);
         game.physics.p2.setImpactEvents(true);
         game.physics.p2.restitution = 0.8;
