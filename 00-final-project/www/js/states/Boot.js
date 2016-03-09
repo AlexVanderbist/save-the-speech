@@ -13,8 +13,6 @@ Trump.Boot.prototype = {
         // load only the preloadbar for the next state
         this.load.image('preloaderBar', 'assets/preload.png');
 
-        console.log('boot reached');
-
     },
 
     create: function () {
