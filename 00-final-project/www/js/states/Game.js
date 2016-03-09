@@ -11,7 +11,7 @@ Trump.Game = function (game)
 	this.money = 15;
 
 	this.maxLineLength = 1000;
-	this.guardFreeZoneRadius = 250;
+	this.guardFreeZoneRadius = 150;
 
 };
 
@@ -384,7 +384,20 @@ Trump.Game.prototype = {
 	{
 		var radius = Math.sqrt(Math.pow(this.world.width / 2, 2) + Math.pow(this.world.height / 2, 2));
 		radius += 40; // make sure nothing is visible when spawning
-		var angle = Math.random() * Math.PI * 2;
+
+        var isValidAngle = function (angle) {
+            var degrees = angle * (180/Math.PI);
+            var valid = true;
+            if(degrees > 160 && degrees < 200) valid = false;
+            if(degrees > 340 && degrees < 20) valid = false;
+
+            return valid;
+        }
+
+        var angle;
+        do {
+            angle = Math.random() * Math.PI * 2;
+        } while (! isValidAngle(angle))
 
 		var pos = {
 			x: Math.cos(angle) * radius + this.world.centerX,
@@ -464,6 +477,12 @@ Trump.Game.prototype = {
 			speed = 60;
 		}
 		var angle = Math.atan2(obj2.y - obj1.y, obj2.x - obj1.x);
+
+        if(Math.random() < 0.2) {
+            console.log("miss");
+            angle += (0.3 * 2) * Math.random() - 0.3;
+        }
+
 		obj1.body.rotation = angle + this.math.degToRad(-20);  // correct angle of angry bullets (depends on the sprite used)
 		obj1.body.velocity.x = Math.cos(angle) * speed;    // accelerateToObject
 		obj1.body.velocity.y = Math.sin(angle) * speed;
