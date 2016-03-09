@@ -576,8 +576,11 @@ Trump.Game.prototype = {
 		this.moneyhit.play();
 		this.presidentHappyStart();
 		this.money += this.moneyValue;
-		body2.sprite.body.setCollisionGroup(this.collidedCollisionGroup);
-		body2.sprite.kill = true;
+
+        // kill the projectile
+        this.stopProjectile(body2.sprite);
+		//body2.sprite.kill = true;
+        //body2.sprite.body.setCollisionGroup(this.collidedCollisionGroup);
 	},
 
 	stopProjectile: function (projectileSprite)
