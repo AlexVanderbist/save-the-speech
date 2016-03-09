@@ -382,6 +382,9 @@ playgame.prototype = {
 	},
 	drawLine: function (guard)
 	{
+		game.world.sendToBack(guard.greenLine);
+		game.world.moveUp(guard.greenLine);
+		//game.world.bringToTop(projectiles);
 		guard.newPath.splice(0, 1);
 
 		guard.greenLine.clear();
@@ -553,31 +556,42 @@ playgame.prototype = {
 	},
 	placeGuard: function ()
 	{
-		var guard = game.add.sprite(game.input.x, game.input.y, 'bodyguard');
-		guards.add(guard);
-		game.addingGuard.destroy();
-		game.money -= game.PriceGuard;
-		game.adding = false;
-		guard.healthBar = new HealthBar(this.game, {x: guard.position.x, y: guard.position.y - 40, width: 60, height: 10});
-		guard.health = game.defaultGuardHealth;
-		guard.kill = false;
-		guard.body.clearShapes();
-		guard.body.loadPolygon('personPhysics', 'person');
-		guard.body.static = true;
-		guard.body.setCollisionGroup(game.guardCollisionGroup);
-		guard.body.collides([ game.projectileCollisionGroup ], this.onProjectileHitGuard, this);
+		var inputX = game.input.x;
+		var inputY = game.input.y;
 
-		guard.animations.add('walk', [ 1, 2 ], 5, true);
+		if(this.calculateDistance(inputX, inputY, game.world.centerX, game.world.centerY) > guardFreeZoneRadius/2)
+		{
+			var guard = game.add.sprite(inputX, inputY, 'bodyguard');
+			guards.add(guard);
+			game.addingGuard.destroy();
+			game.money -= game.PriceGuard;
+			game.adding = false;
+			guard.healthBar = new HealthBar(this.game, {
+				x     : guard.position.x,
+				y     : guard.position.y - 40,
+				width : 60,
+				height: 10
+			});
+			guard.health = game.defaultGuardHealth;
+			guard.kill = false;
+			guard.body.clearShapes();
+			guard.body.loadPolygon('personPhysics', 'person');
+			guard.body.static = true;
+			guard.body.setCollisionGroup(game.guardCollisionGroup);
+			guard.body.collides([ game.projectileCollisionGroup ], this.onProjectileHitGuard, this);
 
-		guard.followPath = {};
+			guard.animations.add('walk', [ 1, 2 ], 5, true);
 
-		guard.followPath.isActive = false;
-		guard.followPath.path = [];
-		guard.followPath.newPath = [];
-		guard.followPath.pathIndex = -1;
-		guard.followPath.pathSpriteIndex = -1;
-		guard.followPath.lengthLine = 0;
-		guard.followPath.greenLine = game.add.graphics(0, 0);
+			guard.followPath = {};
+
+			guard.followPath.isActive = false;
+			guard.followPath.path = [];
+			guard.followPath.newPath = [];
+			guard.followPath.pathIndex = -1;
+			guard.followPath.pathSpriteIndex = -1;
+			guard.followPath.lengthLine = 0;
+			guard.followPath.greenLine = game.add.graphics(0, 0);
+		}
 	},
 	onProjectileHitGuard: function (guardBody, projectileBody)
 	{
