@@ -26,7 +26,7 @@ var loadGame = function ()
 {
 
 	// Create a new Phaser Game
-	game = new Phaser.Game(window.innerWidth, window.innerHeight);
+	game = new Phaser.Game(720, 1280);
 
 	// Add the game states
 	game.state.add("Preload", preload);
