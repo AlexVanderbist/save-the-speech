@@ -11,7 +11,7 @@ Trump.Game = function (game)
 	this.money = 15;
 
 	this.maxLineLength = 1000;
-	this.guardFreeZoneRadius = 250;
+	this.guardFreeZoneRadius = 50;
 
 	this.stupidquote = [];
 	this.ouch = [];
@@ -661,7 +661,7 @@ Trump.Game.prototype = {
 		cashBody.sprite.body.setCollisionGroup(this.collidedCollisionGroup);
 		cashBody.sprite.kill = true;
 		//console.log(" YOU ARE FIRED!");
-		moneyhitguard.play();
+		this.moneyhitguard.play();
 		guardBody.sprite.health -= this.tacoDamage;
 		this.checkHealth();
 	},
