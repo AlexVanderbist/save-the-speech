@@ -81,6 +81,7 @@ preload.prototype = {
         game.moneyValue = 5; ///////////////////////////////////////////////////////////////////////////////////////
         game.moneyRate = 6; ////////////////////////////////////////////////////////////
         game.tacoRate = 2; ////////////////////////////////////////////////////////////////////////////////////
+        game.healthRegenerate = 2; ////////////////////////////////////////////////////////////////////////////////////
 
 	},
 	create: function ()
@@ -193,6 +194,8 @@ playgame.prototype = {
         // Give money every x seconds
 
         game.time.events.loop(Phaser.Timer.SECOND * game.moneyTimeOut, this.addMoney, this, 1);
+
+        game.time.events.loop(Phaser.Timer.SECOND, this.regenerate, this, game.healthRegenerate); ////////////////////////////////////////////////
 
         // Start waves
         this.startWave(1);
@@ -565,5 +568,15 @@ playgame.prototype = {
         }
 
         //console.log(result);
+    },
+    regenerate: function(healthRegenerateValue) {
+        guards.forEachExists(function(guard) {
+            if (guard.health < 100) 
+            {
+                guard.health += healthRegenerateValue;
+                this.checkHealth();
+            }
+            
+        }, this);
     }
 }
