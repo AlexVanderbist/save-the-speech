@@ -383,7 +383,7 @@ playgame.prototype = {
         game.trumprage.visible = true;
 
         // stop after 1500ms CHANGE THIS
-        game.time.events.loop(Phaser.Timer.SECOND * 1, this.presidentRageStop, this);
+        game.time.events.add(Phaser.Timer.SECOND * 1, this.presidentRageStop, this);
     },
     presidentRageStop: function () {
         game.trumphead.visible = true;
