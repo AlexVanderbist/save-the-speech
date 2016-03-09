@@ -596,9 +596,18 @@ Trump.Game.prototype = {
 		}
 		var angle = Math.atan2(obj2.y - obj1.y, obj2.x - obj1.x);
 
-        if(Math.random() < 0.2) {
+        if(Math.random() < 0.35) {
+
             console.log("miss");
-            angle += (0.3 * 2) * Math.random() - 0.3;
+
+            // miss amount
+            var missAmount = Math.random() * 0.2 + 0.1;
+
+            // left or right?
+            if(Math.random() >= 0.5) missAmount = - missAmount;
+
+            // add to angle
+            angle += missAmount;
         }
 
 		obj1.body.rotation = angle + this.math.degToRad(-20);  // correct angle of angry bullets (depends on the sprite used)
