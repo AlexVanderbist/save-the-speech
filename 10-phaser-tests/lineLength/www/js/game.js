@@ -22,10 +22,12 @@ var game;
 var preload;
 var playgame;
 
+/* Begin Siebe Add*/
 var maxLineLength = 1000;
 var guardFreeZoneRadius = 250;
 
 var DEBUG = false;
+/* End Siebe Add*/
 
 var loadGame = function ()
 {
@@ -173,11 +175,12 @@ playgame.prototype = {
 		game.labelGuards = this.game.add.text(game.world.width - 80, 28, game.numberguards, style);
 		game.labelMoney = this.game.add.text(80, 15, "money:" + game.money, style);
 
+		/* Begin Siebe Add*/
 		// draw a circle
 		guardFreeZone = game.add.graphics(0,0);
 		guardFreeZone.lineStyle(2, 0x0000FF, 1);
 		guardFreeZone.drawCircle(game.world.centerX, game.world.centerY, guardFreeZoneRadius);
-
+		/* End Siebe Add*/
 		// Give money every x seconds
 
 		game.time.events.loop(Phaser.Timer.SECOND * game.moneyTimeOut, this.addMoney, this, 1);
@@ -246,23 +249,30 @@ playgame.prototype = {
 			// kill guard with fade
 			if (guard.kill)
 			{
-				path = guard.followPath.greenLine;
+				/* Begin Siebe Add*/
+				path = guard.followPath.followLine;
+				/* End Siebe Add*/
 
 				guard.alpha -= 0.04;
 				guard.scale.setTo(guard.alpha, guard.alpha);
 
+				/* Begin Siebe Add*/
 				path.alpha -= 0.04;
+				/* End Siebe Add*/
 
 				if (guard.alpha < 0)
 				{
 					//remove the guard
 					guard.destroy();
+					/* Begin Siebe Add*/
 					path.destroy();
+					/* End Siebe Add*/
 				}
 			}
 		}, this);
 
 	},
+	/* Begin Siebe Add (best deze functie's kopieren en plakken*/
 	guardClickHandler: function ()
 	{
 		if (game.input.pointer1.isDown && guards.activeGuard !== null)
@@ -275,7 +285,7 @@ playgame.prototype = {
 			if (!wasDown)
 			{
 				//console.log("eerste");
-				guardFollowPath.greenLine.moveTo(gameX, gameY);
+				guardFollowPath.followLine.moveTo(gameX, gameY);
 				guardFollowPath.pathIndex = 0;
 				guardFollowPath.pathSpriteIndex = 0;
 				guardFollowPath.path = [];
@@ -363,11 +373,11 @@ playgame.prototype = {
 			}
 		}
 	},
+	/* End Siebe Add*/
 	rotateGuard: function (guard)
 	{
 		if (guard.followPath.newPath.length > 0)
 		{
-			//console.log("rot");
 			var lengthX = guard.followPath.newPath[ 0 ].x - guard.position.x;
 			var lengthY = guard.followPath.newPath[ 0 ].y - guard.position.y;
 			var correctingAngle = 0;
@@ -380,15 +390,16 @@ playgame.prototype = {
 			guard.body.rotation = Math.atan(lengthY / lengthX) + Math.PI / 2 + correctingAngle;
 		}
 	},
+	/* Begin Siebe Add, best ook deze functie kopieren en plakken*/
 	drawLine: function (guard)
 	{
-		game.world.sendToBack(guard.greenLine);
-		game.world.moveUp(guard.greenLine);
-		//game.world.bringToTop(projectiles);
+		game.world.sendToBack(guard.followLine);
+		game.world.moveUp(guard.followLine);
+
 		guard.newPath.splice(0, 1);
 
-		guard.greenLine.clear();
-		guard.greenLine.lineStyle(15, 0x00FF00, 1);
+		guard.followLine.clear();
+		guard.followLine.lineStyle(15, 0x00FF00, 1);
 
 		guard.lengthLine = 0;
 
@@ -399,7 +410,7 @@ playgame.prototype = {
 				console.log("========New=========");
 				console.log("lengte totaal:" + guard.lengthLine);
 			}
-			guard.greenLine.moveTo(guard.newPath[ 0 ].x, guard.newPath[ 0 ].y);
+			guard.followLine.moveTo(guard.newPath[ 0 ].x, guard.newPath[ 0 ].y);
 
 			for (var i = 1; i < guard.newPath.length; i++)
 			{
@@ -409,14 +420,9 @@ playgame.prototype = {
 				var toX = guard.newPath[ i ].x;
 				var toY = guard.newPath[ i ].y;
 
-				//calculate length of line
-				//console.log("From x: "+fromX+", from y: "+fromY);
-				//console.log("To x: "+toX+", to y: "+toY);
-
-
 				guard.lengthLine += this.calculateDistance(toX, toY, fromX, fromY);
 
-				guard.greenLine.lineTo(guard.newPath[ i ].x, guard.newPath[ i ].y);
+				guard.followLine.lineTo(guard.newPath[ i ].x, guard.newPath[ i ].y);
 			}
 		}
 		if(DEBUG)
@@ -431,6 +437,7 @@ playgame.prototype = {
 
 		return Math.sqrt((lengthX * lengthX) + (lengthY * lengthY));
 	},
+	/* End Siebe add */
 	checkHealth: function ()
 	{
 
@@ -556,12 +563,14 @@ playgame.prototype = {
 	},
 	placeGuard: function ()
 	{
+		/* Begin Siebe Add*/
 		var inputX = game.input.x;
 		var inputY = game.input.y;
 
 		if(this.calculateDistance(inputX, inputY, game.world.centerX, game.world.centerY) > guardFreeZoneRadius/2)
 		{
 			var guard = game.add.sprite(inputX, inputY, 'bodyguard');
+			/* End Siebe Add*/
 			guards.add(guard);
 			game.addingGuard.destroy();
 			game.money -= game.PriceGuard;
@@ -574,6 +583,7 @@ playgame.prototype = {
 			});
 			guard.health = game.defaultGuardHealth;
 			guard.kill = false;
+
 			guard.body.clearShapes();
 			guard.body.loadPolygon('personPhysics', 'person');
 			guard.body.static = true;
@@ -582,16 +592,19 @@ playgame.prototype = {
 
 			guard.animations.add('walk', [ 1, 2 ], 5, true);
 
-			guard.followPath = {};
+			/* Begin Siebe Add*/
+			guard.followPath = {
+				isActive: false,
+				path: [],
+				newPath: [],
+				pathIndex : -1,
+				pathSpriteIndex: -1,
+				lengthLine: 0,
+				followLine: game.add.graphics(0, 0)
+			};
 
-			guard.followPath.isActive = false;
-			guard.followPath.path = [];
-			guard.followPath.newPath = [];
-			guard.followPath.pathIndex = -1;
-			guard.followPath.pathSpriteIndex = -1;
-			guard.followPath.lengthLine = 0;
-			guard.followPath.greenLine = game.add.graphics(0, 0);
 		}
+		/* End Siebe Add*/
 	},
 	onProjectileHitGuard: function (guardBody, projectileBody)
 	{
@@ -612,13 +625,12 @@ playgame.prototype = {
 	{
 		var bodies = game.physics.p2.hitTest(object.position, guards.children);
 
-		//console.log(bodies);
-		//console.log(object);
-
+		/* Begin Siebe Add*/
 		if (bodies.length !== 0)
 		{
 			bodies[ 0 ].parent.sprite.followPath.isActive = true;
 			guards.activeGuard = bodies[ 0 ].parent.sprite;
 		}
+		/* End Siebe Add*/
 	}
 };
