@@ -21,12 +21,14 @@ var app = {
 var game;
 var preload;
 var playgame;
+//var gameSize = {width: 640, height: 1136};
+var gameSize = {width: 480, height: 800};
 
 var loadGame = function ()
 {
 
 	// Create a new Phaser Game
-	game = new Phaser.Game(window.innerWidth, window.innerHeight);
+	game = new Phaser.Game(gameSize.width, gameSize.height);
 
 	// Add the game states
 	game.state.add("Preload", preload);
@@ -43,10 +45,10 @@ preload = function (game)
 preload.prototype = {
 	preload: function ()
 	{
+        this.scaleGame();
 
 		// Preload images
 		game.load.image("trump", "assets/trump.png");
-		//game.load.image("bodyguard", "assets/bodyguard.png");
 		game.load.image("taco", "assets/taco.png");
 		game.load.image("addGuard", "assets/addGuard.png");
 		game.load.image("addingGuard", "assets/addingGuard.png");
@@ -76,6 +78,21 @@ preload.prototype = {
 		game.money = 15;
 
 	},
+    scaleGame: function () {
+        game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+        game.scale.maxWidth = gameSize.width * 2.5; //You can change game to gameSize.width*2.5 if needed            
+        game.scale.maxHeight = gameSize.height * 2.5; //Make sure these values are proportional to the gameSize.width and gameSize.height            
+        game.scale.pageAlignHorizontally = true;            
+        game.scale.pageAlignVertically = true;            
+        game.scale.forceOrientation(false, true);
+
+        //game.scale.hasResized.add(game.gameResized, game);            
+        //game.scale.enterIncorrectOrientation.add(game.enterIncorrectOrientation, game);            
+        //game.scale.leaveIncorrectOrientation.add(game.leaveIncorrectOrientation, game);            
+        
+        game.scale.updateLayout();
+
+    },
 	create: function ()
 	{
 
