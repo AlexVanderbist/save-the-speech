@@ -528,7 +528,7 @@ Trump.Game.prototype = {
 		taco.body.clearShapes();
 		taco.body.loadPolygon('tacoPhysics', 'taco');
 		taco.body.setCollisionGroup(this.projectileCollisionGroup);
-		taco.body.collides([ this.trumpCollisionGroup, this.projectileCollisionGroup, this.guardCollisionGroup ]);
+		taco.body.collides([ this.cashCollisionGroup, this.trumpCollisionGroup, this.projectileCollisionGroup, this.guardCollisionGroup ]);
 		taco.body.collideWorldBounds = false;
 		this.throwProjectileToObj(taco, this.trump, 160);
 
@@ -544,7 +544,7 @@ Trump.Game.prototype = {
 		cashgroup.add(cash);
 		cash.kill = false;
 		cash.body.setCollisionGroup(this.cashCollisionGroup);
-		cash.body.collides([this.trumpCollisionGroup, this.guardCollisionGroup]);
+		cash.body.collides([this.trumpCollisionGroup, this.guardCollisionGroup, this.projectileCollisionGroup]);
 		cash.body.collideWorldBounds = false;
 		this.throwProjectileToObj(cash,this.trump, 160);
 	},
