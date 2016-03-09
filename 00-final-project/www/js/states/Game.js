@@ -11,7 +11,20 @@ Trump.Game = function (game)
 	this.money = 15;
 
 	this.maxLineLength = 1000;
-	this.guardFreeZoneRadius = 150;
+	this.guardFreeZoneRadius = 100;
+
+	this.stupidquote = [];
+	this.ouch = [];
+	this.moneyhittrump = [];
+
+	this.moneyhitguard = null;
+	this.moneyhit = null;
+	this.tacohit = null;
+
+	this.moneyValue = 5;
+	this.moneyRate = 6;
+	this.tacoRate = 2;
+	this.healthRegenerate = 2;
 
 };
 
@@ -19,6 +32,34 @@ Trump.Game.prototype = {
 
 	create: function ()
 	{
+		//put sounds in array
+		this.stupidquote.push(
+			this.add.audio('quote1'),
+			this.add.audio('quote2'),
+			this.add.audio('quote3'),
+			this.add.audio('quote4'),
+			this.add.audio('quote5'),
+			this.add.audio('quote6'),
+			this.add.audio('quote7'),
+			this.add.audio('quote8'),
+			this.add.audio('quote9'),
+			this.add.audio('quote10')
+		);
+
+		this.ouch.push(
+			this.add.audio('ouch1'),
+			this.add.audio('ouch2')
+		);
+
+		this.moneyhittrump.push(
+			this.add.audio('money1'),
+			this.add.audio('money2'),
+			this.add.audio('money3')
+		);
+
+		this.tacohit = this.add.audio('tacohit');
+		this.moneyhitguard = this.add.audio('guardmoneyhit');
+		this.moneyhit = this.add.audio('moneyhit');
 
 		// Create BG
 		this.add.sprite(0, 0, 'concrete');
@@ -27,20 +68,23 @@ Trump.Game.prototype = {
 
 		// Start P2 physics
 
-		this.physics.startSystem(Phaser.Physics.P2JS);
-		this.physics.p2.setImpactEvents(true);
-		this.physics.p2.restitution = 0.8;
+		//this.physics.startSystem(Phaser.Physics.P2JS);
+		//this.physics.p2.setImpactEvents(true);
+		//this.physics.p2.restitution = 0.8;
 
 		// Create Groups
 
 		guards = this.add.group();
 		guards.enableBody = true;
 		guards.physicsBodyType = Phaser.Physics.P2JS;
-		guards.someOneIsActive = false;
 
 		projectiles = this.add.group();
 		projectiles.enableBody = true;
 		projectiles.physicsBodyType = Phaser.Physics.P2JS;
+
+		cashgroup = this.add.group();
+		cashgroup.enableBody = true;
+		cashgroup.physicsBodyType = Phaser.Physics.P2JS;
 
 		// Create collision groups
 
@@ -48,6 +92,7 @@ Trump.Game.prototype = {
 		this.projectileCollisionGroup = this.physics.p2.createCollisionGroup();
 		this.collidedCollisionGroup = this.physics.p2.createCollisionGroup();
 		this.guardCollisionGroup = this.physics.p2.createCollisionGroup();
+		this.cashCollisionGroup = this.physics.p2.createCollisionGroup();
 
 		this.physics.p2.updateBoundsCollisionGroup();
 
@@ -60,12 +105,15 @@ Trump.Game.prototype = {
 		//keyW = this.input.keyboard.addKey(Phaser.Keyboard.W);
 		//keyW.onDown.add(this.addCash, this);
 
-		this.time.events.loop(Phaser.Timer.SECOND * 2, this.addProjectile, this);
+		this.time.events.loop(Phaser.Timer.SECOND * this.tacoRate, this.addProjectile, this);
+		this.time.events.loop(Phaser.Timer.SECOND * this.moneyRate, this.addCash, this);
 
 		// create trump
 
-		this.trump = this.add.sprite(this.world.centerX, this.world.centerY, 'trump');
+		this.trump = this.add.sprite(this.world.centerX, this.world.height, 'trump');
+		this.trump.animations.add('trumpwalk', [1,2], 5, true);
 		this.trump.health = this.defaultPresidentHealth;
+		this.trump.walking = false;
 		this.trump.healthBar = new HealthBar(this, {
 			x     : this.trump.position.x,
 			y     : this.trump.position.y - 40,
@@ -79,15 +127,20 @@ Trump.Game.prototype = {
 		this.trump.body.static = true;
 		this.trump.body.setCollisionGroup(this.trumpCollisionGroup);
 		this.trump.body.collides(this.projectileCollisionGroup, this.onProjectileHitTrump, this);
+		this.trump.body.collides(this.cashCollisionGroup, this.onCashHitTrump, this)
+		this.trumpIntro();
 
 		// trumpheads
 		this.trumphead = this.add.sprite(10, 10, 'trumpsprite');
 		this.trumprage = this.add.sprite(10, 10, 'trumprage');
+		this.trumphappy = this.add.sprite(10,10, 'happytrump');
+		this.trumphappy.visible = false;
 		this.trumprage.visible = false;
 		this.trumphead.visible = false;
-		this.trumphead.animations.add('speak', [ 0, 1, 2, 3, 4, 5, 4, 3, 2, 1, 0 ], true);
+		this.trumphead.animations.add('speak',[0,1,2,3,4,5,4,3,2,1,0], true);
 		this.trumphead.scale.setTo(0.17, 0.17);
-		this.trumprage.scale.setTo(0.06, 0.06);
+		this.trumprage.scale.setTo(0.06,0.06);
+		this.trumphappy.scale.setTo(0.06,0.06);
 		this.trumphead.animations.play('speak', 40, true);
 
 		// Add buttons
@@ -103,14 +156,23 @@ Trump.Game.prototype = {
 		// draw a circle around president
 		guardFreeZone = this.add.graphics(0, 0);
 		guardFreeZone.lineStyle(1, 0xFF0000, 1);
-		guardFreeZone.drawCircle(this.world.centerX, this.world.centerY, this.guardFreeZoneRadius);
+		guardFreeZone.drawCircle(this.world.centerX, this.world.centerY, this.guardFreeZoneRadius*2);
 
 		// Give money every x seconds
 
 		this.time.events.loop(Phaser.Timer.SECOND * this.moneyTimeOut, this.addMoney, this, 1);
+		this.time.events.loop(Phaser.Timer.SECOND, this.regenerate, this, this.healthRegenerate);
 
 		// Start waves
 		this.startWave(1);
+	},
+
+	trumpIntro: function()
+	{
+		console.log("ok");
+		this.trump.animations.play('trumpwalk');
+		this.physics.arcade.moveToXY(this.trump, this.world.centerX, this.world.centerY, 150);
+		this.trump.walking = true;
 	},
 
 	update: function ()
@@ -147,6 +209,14 @@ Trump.Game.prototype = {
 			}
 		}, this);
 
+		cashgroup.forEachExists(function(cash)
+		{
+			if(cash.kill)
+			{
+				cash.destroy();
+			}
+		}, this);
+
 		// Fade out guards and slow down when hit AND move healthbars
 
 		guards.forEachExists(function (guard)
@@ -172,6 +242,16 @@ Trump.Game.prototype = {
 			}
 		}, this);
 
+		this.trump.healthBar.setPosition(this.trump.position.x, this.trump.position.y - 60);
+		if(this.trump.walking && this.physics.arcade.distanceToXY(this.trump, this.world.centerX, this.world.centerY) < 10)
+		{
+			this.trump.animations.stop(null, true);
+			this.trump.frame = 0;
+			this.trump.body.velocity.y = 0;
+			this.trump.body.velocity.x = 0;
+			this.trump.walking = false;
+		}
+
 	},
 
 	startWave: function (waveNumber)
@@ -187,8 +267,7 @@ Trump.Game.prototype = {
 		{
 			this.trumphead.animations.stop(null, true);
 		}
-
-
+		console.log(waveNumber);
 	},
 	quitGame: function ()
 	{
@@ -215,9 +294,9 @@ Trump.Game.prototype = {
 				guardFollowPath.newPath = [];
 				wasDown = true;
 			}
-			var distanceToCenter = this.calculateDistance(gameX, gameY, game.world.centerX, game.world.centerY);
+			var distanceToCenter = this.calculateDistance(gameX, gameY, this.world.centerX, this.world.centerY);
 
-			if(distanceToCenter > this.guardFreeZoneRadius/2)
+			if(distanceToCenter > this.guardFreeZoneRadius)
 			{
 				if (guardFollowPath.pathIndex != 0)
 				{
@@ -420,13 +499,24 @@ Trump.Game.prototype = {
 		this.trumprage.visible = true;
 
 		// stop after 1500ms CHANGE THIS
-		this.time.events.add(Phaser.Timer.SECOND * 1, this.presidentRageStop, this);
+		this.time.events.add(Phaser.Timer.SECOND, this.presidentRageStop, this);
 	},
 
 	presidentRageStop: function ()
 	{
 		this.trumphead.visible = true;
 		this.trumprage.visible = false;
+	},
+	presidentHappyStart: function()
+	{
+		this.trumphead.visible = false;
+		this.trumphappy.visible = true;
+		this.time.events.add(Phaser.Timer.SECOND, this.presidentHappyStop, this);
+	},
+	presidentHappyStop: function()
+	{
+		this.trumphead.visible = true;
+		this.trumphappy.visible = false;
 	},
 
 	addProjectile: function ()
@@ -446,20 +536,48 @@ Trump.Game.prototype = {
 		// sound.play();
 	},
 
+	addCash: function()
+	{
+		var randomPos = this.getRandomPositionOffScreen();
+		var cash = this.add.sprite(randomPos.x, randomPos.y, 'money');
+
+		cashgroup.add(cash);
+		cash.kill = false;
+		cash.body.setCollisionGroup(this.cashCollisionGroup);
+		cash.body.collides([this.trumpCollisionGroup, this.guardCollisionGroup]);
+		cash.body.collideWorldBounds = false;
+		this.throwProjectileToObj(cash,this.trump, 160);
+	},
+
 	onProjectileHitTrump: function (body1, body2)
 	{
 		// stop the projectile
 		this.stopProjectile(body2.sprite);
 
+		var rndouch = Math.floor(Math.random() * this.ouch.length);
+
 		// take trumps health
 		if (body2.sprite.key == 'taco')
 		{
 			this.trump.health -= this.tacoDamage;
+			this.tacohit.play();
+			this.ouch[rndouch].play();
 			this.checkHealth();
 		}
 
 		//rage
 		this.presidentRageStart();
+	},
+
+	onCashHitTrump: function(body1, body2) {
+		// stop the cash
+		var rndouch = Math.floor(Math.random() * this.moneyhittrump.length);
+		this.moneyhittrump[rndouch].play();
+		this.moneyhit.play();
+		this.presidentHappyStart();
+		this.money += this.moneyValue;
+		body2.sprite.body.setCollisionGroup(this.collidedCollisionGroup);
+		body2.sprite.kill = true;
 	},
 
 	stopProjectile: function (projectileSprite)
@@ -509,7 +627,7 @@ Trump.Game.prototype = {
 		var inputX = this.input.x;
 		var inputY = this.input.y;
 
-		if(this.calculateDistance(inputX, inputY, this.world.centerX, this.world.centerY))
+		if(this.calculateDistance(inputX, inputY, this.world.centerX, this.world.centerY) > this.guardFreeZoneRadius)
 		{
 			var guard = this.add.sprite(inputX, inputY, 'bodyguard');
 			guards.add(guard);
@@ -528,7 +646,8 @@ Trump.Game.prototype = {
 			guard.body.loadPolygon('personPhysics', 'person');
 			guard.body.static = true;
 			guard.body.setCollisionGroup(this.guardCollisionGroup);
-			guard.body.collides([ this.projectileCollisionGroup ], this.onProjectileHitGuard, this);
+			guard.body.collides(this.projectileCollisionGroup, this.onProjectileHitGuard, this);
+			guard.body.collides(this.cashCollisionGroup, this.onCashHitGuard, this);
 
 			guard.animations.add('walk', [ 1, 2 ], 5, true);
 
@@ -539,7 +658,7 @@ Trump.Game.prototype = {
 				pathIndex : -1,
 				pathSpriteIndex: -1,
 				lengthLine: 0,
-				followLine: game.add.graphics(0, 0)
+				followLine: this.add.graphics(0, 0)
 			};
 		}
 	},
@@ -556,6 +675,16 @@ Trump.Game.prototype = {
 		}
 	},
 
+	onCashHitGuard: function(guardBody, cashBody)
+	{
+		cashBody.sprite.body.setCollisionGroup(this.collidedCollisionGroup);
+		cashBody.sprite.kill = true;
+		//console.log(" YOU ARE FIRED!");
+		this.moneyhitguard.play();
+		guardBody.sprite.health -= this.tacoDamage;
+		this.checkHealth();
+	},
+
 	addMoney: function (amount)
 	{
 		this.money += amount;
@@ -570,6 +699,17 @@ Trump.Game.prototype = {
 			bodies[ 0 ].parent.sprite.followPath.isActive = true;
 			guards.activeGuard = bodies[ 0 ].parent.sprite;
 		}
-	}
+	},
 
+	regenerate: function(healthRegenerateValue)
+	{
+		guards.forEachExists(function(guard) {
+			if (guard.health < 100)
+			{
+				guard.health += healthRegenerateValue;
+				this.checkHealth();
+			}
+
+		}, this);
+	}
 };
