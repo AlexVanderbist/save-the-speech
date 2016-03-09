@@ -45,7 +45,7 @@ preload.prototype = {
 	{
 
 		// Preload images
-		game.load.image("trump", "assets/trump.png");
+		//game.load.image("trump", "assets/trump.png"); ///////////////////////////////////////////////////////////////
 		//game.load.image("bodyguard", "assets/bodyguard.png");
 		game.load.image("taco", "assets/taco.png");
 		game.load.image("addGuard", "assets/addGuard.png");
@@ -58,6 +58,7 @@ preload.prototype = {
 		// and sprites
 		game.load.spritesheet('trumpsprite', 'assets/trumpsprite.png', 353, 624, 6);
 		game.load.spritesheet('bodyguard', 'assets/bodyguardSprite.png', 64, 64);
+        game.load.spritesheet('trump', 'assets/trumpWalk.png', 64, 64); /////////////////////////////////
 
 		// Preload sounds
 		game.load.audio('quote1', 'assets/sounds/Worst_President.mp3');
@@ -149,8 +150,10 @@ playgame.prototype = {
 
 		// create trump
 
-		game.trump = game.add.sprite(game.world.centerX, game.world.centerY, 'trump');
+		game.trump = game.add.sprite(game.world.centerX, game.world.height, 'trump'); ////////////////
+        game.trump.animations.add('trumpwalk', [1,2], 5, true); ////////////////////////////////////
 		game.trump.health = game.defaultPresidentHealth;
+        game.trump.walking = false;
 		game.trump.healthBar = new HealthBar(this.game, {
 			x     : game.trump.position.x,
 			y     : game.trump.position.y - 40,
@@ -165,6 +168,7 @@ playgame.prototype = {
 		game.trump.body.setCollisionGroup(game.trumpCollisionGroup);
 		game.trump.body.collides(game.projectileCollisionGroup, this.onProjectileHitTrump, this);
         game.trump.body.collides(game.cashCollisionGroup, this.onCashHitTrump, this); /////////////////////////////////////////////////////////////
+        this.trumpIntro(); ////////////////////////////////////////////////////////////
 
         // trumpheads
         game.trumphead = game.add.sprite(10, 10, 'trumpsprite');
@@ -192,6 +196,13 @@ playgame.prototype = {
 
         // Start waves
         this.startWave(1);
+    },
+    trumpIntro : function() { //////////////////////////////////////////////////////////////////////////////////////////
+
+        game.trump.animations.play('trumpwalk');
+        game.physics.arcade.moveToXY(game.trump, game.world.centerX, game.world.centerY, 150);
+        game.trump.walking = true;
+
     },
     startWave: function(waveNumber) {
         // play first quote
@@ -261,6 +272,15 @@ playgame.prototype = {
                 }
             }
         }, this);
+
+        game.trump.healthBar.setPosition(game.trump.position.x,game.trump.position.y - 60); /////////////////////////////////////
+        if(game.trump.walking && game.physics.arcade.distanceToXY(game.trump, game.world.centerX, game.world.centerY) < 1) ////////////////////////////
+        {
+            game.trump.animations.stop(null, true);
+            game.trump.frame = 0;
+            game.trump.body.velocity.y = 0;
+            game.trump.walking = false;
+        }
 
     },
     guardClickHandler: function()
