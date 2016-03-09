@@ -23,6 +23,7 @@ var preload;
 var playgame;
 
 var maxLineLength = 1000;
+var guardFreeZoneRadius = 250;
 
 var DEBUG = false;
 
@@ -172,6 +173,11 @@ playgame.prototype = {
 		game.labelGuards = this.game.add.text(game.world.width - 80, 28, game.numberguards, style);
 		game.labelMoney = this.game.add.text(80, 15, "money:" + game.money, style);
 
+		// draw a circle
+		guardFreeZone = game.add.graphics(0,0);
+		guardFreeZone.lineStyle(2, 0x0000FF, 1);
+		guardFreeZone.drawCircle(game.world.centerX, game.world.centerY, guardFreeZoneRadius);
+
 		// Give money every x seconds
 
 		game.time.events.loop(Phaser.Timer.SECOND * game.moneyTimeOut, this.addMoney, this, 1);
@@ -278,32 +284,43 @@ playgame.prototype = {
 				wasDown = true;
 			}
 
-			if(guardFollowPath.pathIndex != 0)
-			{
-				var fromX = guardFollowPath.path[ guardFollowPath.pathIndex - 1 ].x;
-				var fromY = guardFollowPath.path[ guardFollowPath.pathIndex - 1 ].y;
+			//Check if not in guard dead zone
+			var distanceToCenter = this.calculateDistance(gameX, gameY, game.world.centerX, game.world.centerY);
 
-				if (fromX != gameX || fromY != gameY)
+			if(distanceToCenter > guardFreeZoneRadius/2)
+			{
+				if (guardFollowPath.pathIndex != 0)
 				{
-					if(guardFollowPath.lengthLine < maxLineLength)
+					var fromX = guardFollowPath.path[ guardFollowPath.pathIndex - 1 ].x;
+					var fromY = guardFollowPath.path[ guardFollowPath.pathIndex - 1 ].y;
+
+					if (fromX != gameX || fromY != gameY)
 					{
-						guardFollowPath.path[ guardFollowPath.pathIndex ] = new Phaser.Point(gameX, gameY);
-						guardFollowPath.newPath.push(new Phaser.Point(gameX, gameY));
-						guardFollowPath.pathIndex++;
+						if (guardFollowPath.lengthLine < maxLineLength)
+						{
+							guardFollowPath.path[ guardFollowPath.pathIndex ] = new Phaser.Point(gameX, gameY);
+							guardFollowPath.newPath.push(new Phaser.Point(gameX, gameY));
+							guardFollowPath.pathIndex++;
+						}
+						else
+						{
+							//console.log("Te lang");
+							guards.activeGuard = null;
+							wasDown = false;
+						}
 					}
-					else
-					{
-						//console.log("Te lang");
-						guards.activeGuard = null;
-						wasDown = false;
-					}
+				}
+				else
+				{
+					guardFollowPath.path[ guardFollowPath.pathIndex ] = new Phaser.Point(gameX, gameY);
+					guardFollowPath.newPath.push(new Phaser.Point(gameX, gameY));
+					guardFollowPath.pathIndex++;
 				}
 			}
 			else
 			{
-				guardFollowPath.path[ guardFollowPath.pathIndex ] = new Phaser.Point(gameX, gameY);
-				guardFollowPath.newPath.push(new Phaser.Point(gameX, gameY));
-				guardFollowPath.pathIndex++;
+				guards.activeGuard = null;
+				wasDown = false;
 			}
 		}
 		else
@@ -393,17 +410,8 @@ playgame.prototype = {
 				//console.log("From x: "+fromX+", from y: "+fromY);
 				//console.log("To x: "+toX+", to y: "+toY);
 
-				var lengthX = parseInt(toX) - parseInt(fromX);
-				var lengthY = parseInt(toY) - parseInt(fromY);
 
-				//console.log("Lengte x: "+lengthX);
-				//console.log("Lengte y: "+lengthY);
-				if(DEBUG)
-				{
-					console.log("Lengte c: " + Math.sqrt((lengthX * lengthX) + (lengthY * lengthY)));
-					console.log("Nieuwe lengte: " + (parseInt(guard.lengthLine) + Math.sqrt((lengthX * lengthX) + (lengthY * lengthY))));
-				}
-				guard.lengthLine += Math.sqrt((lengthX * lengthX) + (lengthY * lengthY));
+				guard.lengthLine += this.calculateDistance(toX, toY, fromX, fromY);
 
 				guard.greenLine.lineTo(guard.newPath[ i ].x, guard.newPath[ i ].y);
 			}
@@ -412,6 +420,13 @@ playgame.prototype = {
 		{
 			console.log("Lengte totaal: " + guard.lengthLine);
 		}
+	},
+	calculateDistance: function(x1, y1, x2, y2)
+	{
+		var lengthX = parseInt(x1) - parseInt(x2);
+		var lengthY = parseInt(y1) - parseInt(y2);
+
+		return Math.sqrt((lengthX * lengthX) + (lengthY * lengthY));
 	},
 	checkHealth: function ()
 	{
