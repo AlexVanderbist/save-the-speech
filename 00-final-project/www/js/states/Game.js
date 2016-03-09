@@ -11,7 +11,7 @@ Trump.Game = function (game)
 	this.money = 15;
 
 	this.maxLineLength = 1000;
-	this.guardFreeZoneRadius = 100;
+	this.guardFreeZoneRadius = 70;
 
 	this.stupidquote = [];
 	this.ouch = [];
