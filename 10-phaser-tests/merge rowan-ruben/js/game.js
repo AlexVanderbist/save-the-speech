@@ -63,6 +63,7 @@ preload.prototype = {
 		game.load.image("concrete", 'assets/concrete.png');
 		game.load.image("stand", 'assets/stand.png');
         game.load.image("money", 'assets/money.png'); ////////////////////////////////////////////////////////////////
+        game.load.image("happytrump", 'assets/happytrump.png');
 
 		// and sprites
 		game.load.spritesheet('trumpsprite', 'assets/trumpsprite.png', 353, 624, 6);
@@ -230,13 +231,17 @@ playgame.prototype = {
         this.trumpIntro(); ////////////////////////////////////////////////////////////
 
         // trumpheads
+
         game.trumphead = game.add.sprite(10, 10, 'trumpsprite');
         game.trumprage = game.add.sprite(10, 10, 'trumprage');
+        game.trumphappy = game.add.sprite(10,10, 'happytrump');
+        game.trumphappy.visible = false;
         game.trumprage.visible = false;
         game.trumphead.visible = false;
         game.trumphead.animations.add('speak',[0,1,2,3,4,5,4,3,2,1,0], true);
         game.trumphead.scale.setTo(0.17, 0.17);
         game.trumprage.scale.setTo(0.06,0.06);
+        game.trumphappy.scale.setTo(0.06,0.06);
         game.trumphead.animations.play('speak', 40, true);
 
         // Add buttons
@@ -483,6 +488,7 @@ playgame.prototype = {
         // enable rage
         game.trumphead.visible = false;
         game.trumprage.visible = true;
+        game.trumphappy.visible = false;
 
         // stop after 1500ms CHANGE THIS
         game.time.events.add(Phaser.Timer.SECOND * 1, this.presidentRageStop, this);
@@ -490,7 +496,19 @@ playgame.prototype = {
     presidentRageStop: function () {
         game.trumphead.visible = true;
         game.trumprage.visible = false;
-},
+    },
+    presidentHappyStart: function()
+    {
+        game.trumphead.visible = false;
+        game.trumphappy.visible = true;
+        game.time.events.add(Phaser.Timer.SECOND * 1, this.presidentHappyStop, this);
+    },
+    presidentHappyStop: function()
+    {
+        game.trumphead.visible = true;
+        game.trumphappy.visible = false;
+    },
+
     addProjectile: function () {
         var randomPos = this.getRandomPositionOffScreen();
         var taco = game.add.sprite(randomPos.x, randomPos.y, 'taco');
@@ -536,6 +554,7 @@ playgame.prototype = {
         var rndouch = Math.floor(Math.random() * moneyhittrump.length);
         moneyhittrump[rndouch].play();
         moneyhit.play();
+        this.presidentHappyStart();
         game.money += game.moneyValue;
         body2.sprite.body.setCollisionGroup(game.collidedCollisionGroup);
         body2.sprite.kill = true;
