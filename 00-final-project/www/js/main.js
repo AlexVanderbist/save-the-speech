@@ -11,7 +11,7 @@
 		game.state.add("Boot", Trump.Boot);
 		game.state.add("Preloader", Trump.Preloader);
 		game.state.add("MainMenu", Trump.MainMenu);
-		game.state.add("Game", Trump.Playgame);
+		game.state.add("Game", Trump.Game);
 
 		// Start the "Boot" state
 		game.state.start("Boot");

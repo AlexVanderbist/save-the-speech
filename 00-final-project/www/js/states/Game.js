@@ -1,13 +1,13 @@
 Trump.Game = function (game) {
 
-    this.PriceGuard = 10,
-    this.moneyTimeOut = 2, // om de twee seconden 1 muntje
-    this.tacoDamage = 30,
-    this.defaultGuardHealth = 100.0,
-    this.defaultPresidentHealth = 160.0,
+    this.PriceGuard = 10;
+    this.moneyTimeOut = 2; // om de twee seconden 1 muntje
+    this.tacoDamage = 30;
+    this.defaultGuardHealth = 100.0;
+    this.defaultPresidentHealth = 160.0;
 
-    this.adding = false, // later ID ofzo
-    this.money = 15,
+    this.adding = false; // later ID ofzo
+    this.money = 15;
 
 };
 
@@ -61,7 +61,7 @@ Trump.Game.prototype = {
 
         this.trump = this.add.sprite(this.world.centerX, this.world.centerY, 'trump');
         this.trump.health = this.defaultPresidentHealth;
-        this.trump.healthBar = new HealthBar(this.this, {
+        this.trump.healthBar = new HealthBar(this, {
             x     : this.trump.position.x,
             y     : this.trump.position.y - 40,
             width : 60,
@@ -92,8 +92,8 @@ Trump.Game.prototype = {
         // Add labels 
 
         var style = { font: "40px Arial", fill: "#ffffff" };  
-        this.labelGuards = this.this.add.text(this.world.width - 80, 28, this.numberguards, style);
-        this.labelMoney = this.this.add.text(80, 15, "money:" + this.money, style);
+        this.labelGuards = this.add.text(this.world.width - 80, 28, this.numberguards, style);
+        this.labelMoney = this.add.text(80, 15, "money:" + this.money, style);
 
         // Give money every x seconds
 
@@ -104,19 +104,19 @@ Trump.Game.prototype = {
 	},
 
 	update: function () {
-        game.trump.angle += 1;
+        this.trump.angle += 1;
 
         // Check for clicks on guards
         this.guardClickHandler();
 
         // Update labels
 
-        game.labelGuards.setText(Math.floor(game.money / game.PriceGuard)); // update this
-        game.labelMoney.setText(game.money);
+        this.labelGuards.setText(Math.floor(this.money / this.PriceGuard)); // update this
+        this.labelMoney.setText(this.money);
 
         // If adding, place guard
 
-        if (game.input.activePointer.isDown && game.adding) 
+        if (this.input.activePointer.isDown && this.adding) 
         {
             this.placeGuard();
         }
