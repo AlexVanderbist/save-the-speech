@@ -21,14 +21,12 @@ var app = {
 var game;
 var preload;
 var playgame;
-//var gameSize = {width: 640, height: 1136};
-var gameSize = {width: 480, height: 800};
 
 var loadGame = function ()
 {
 
 	// Create a new Phaser Game
-	game = new Phaser.Game(gameSize.width, gameSize.height);
+	game = new Phaser.Game(window.innerWidth, window.innerHeight);
 
 	// Add the game states
 	game.state.add("Preload", preload);
@@ -45,17 +43,18 @@ preload = function (game)
 preload.prototype = {
 	preload: function ()
 	{
-        this.scaleGame();
 
 		// Preload images
 		game.load.image("trump", "assets/trump.png");
+		//game.load.image("bodyguard", "assets/bodyguard.png");
 		game.load.image("taco", "assets/taco.png");
 		game.load.image("addGuard", "assets/addGuard.png");
 		game.load.image("addingGuard", "assets/addingGuard.png");
 		game.load.image("trumprage", 'assets/trumprage.png');
 		game.load.image("concrete", 'assets/concrete.png');
 		game.load.image("stand", 'assets/stand.png');
-        
+        game.load.image("money", 'assets/money.png'); ////////////////////////////////////////////////////////////////
+
 		// and sprites
 		game.load.spritesheet('trumpsprite', 'assets/trumpsprite.png', 353, 624, 6);
 		game.load.spritesheet('bodyguard', 'assets/bodyguardSprite.png', 64, 64);
@@ -77,22 +76,12 @@ preload.prototype = {
 		game.adding = false; // later ID ofzo
 		game.money = 15;
 
+
+        game.moneyValue = 5; ///////////////////////////////////////////////////////////////////////////////////////
+        game.moneyRate = 6; ////////////////////////////////////////////////////////////
+        game.tacoRate = 2; ////////////////////////////////////////////////////////////////////////////////////
+
 	},
-    scaleGame: function () {
-        game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-        game.scale.maxWidth = gameSize.width * 2.5; //You can change game to gameSize.width*2.5 if needed            
-        game.scale.maxHeight = gameSize.height * 2.5; //Make sure these values are proportional to the gameSize.width and gameSize.height            
-        game.scale.pageAlignHorizontally = true;            
-        game.scale.pageAlignVertically = true;            
-        game.scale.forceOrientation(false, true);
-
-        //game.scale.hasResized.add(game.gameResized, game);            
-        //game.scale.enterIncorrectOrientation.add(game.enterIncorrectOrientation, game);            
-        //game.scale.leaveIncorrectOrientation.add(game.leaveIncorrectOrientation, game);            
-        
-        game.scale.updateLayout();
-
-    },
 	create: function ()
 	{
 
@@ -132,13 +121,17 @@ playgame.prototype = {
 		projectiles.enableBody = true;
 		projectiles.physicsBodyType = Phaser.Physics.P2JS;
 
+        cashgroup = game.add.group(); ////////////////////////////////////////////////////////////////////////////////
+        cashgroup.enableBody = true;
+        cashgroup.physicsBodyType = Phaser.Physics.P2JS;
+
 		// Create collision groups
 
 		game.trumpCollisionGroup = game.physics.p2.createCollisionGroup();
 		game.projectileCollisionGroup = game.physics.p2.createCollisionGroup();
 		game.collidedCollisionGroup = game.physics.p2.createCollisionGroup();
 		game.guardCollisionGroup = game.physics.p2.createCollisionGroup();
-
+        game.cashCollisionGroup = game.physics.p2.createCollisionGroup(); /////////////////////////////////////////////////////
 		game.physics.p2.updateBoundsCollisionGroup();
 
 
@@ -148,9 +141,11 @@ playgame.prototype = {
 		// Throw projectiles
 
 		//keyW = game.input.keyboard.addKey(Phaser.Keyboard.W);
-		//keyW.onDown.add(this.addCash, this);
+		//keyW.onDown.add(this.addCash, this); 
 
-		game.time.events.loop(Phaser.Timer.SECOND * 2, this.addProjectile, this);
+		game.time.events.loop(Phaser.Timer.SECOND * game.tacoRate, this.addProjectile, this); ///////////////////////////////
+
+        game.time.events.loop(Phaser.Timer.SECOND * game.moneyRate, this.addCash, this); //////////////////////////////////////////
 
 		// create trump
 
@@ -169,6 +164,7 @@ playgame.prototype = {
 		game.trump.body.static = true;
 		game.trump.body.setCollisionGroup(game.trumpCollisionGroup);
 		game.trump.body.collides(game.projectileCollisionGroup, this.onProjectileHitTrump, this);
+        game.trump.body.collides(game.cashCollisionGroup, this.onCashHitTrump, this); /////////////////////////////////////////////////////////////
 
         // trumpheads
         game.trumphead = game.add.sprite(10, 10, 'trumpsprite');
@@ -239,6 +235,13 @@ playgame.prototype = {
                     //remove the projectile
                     projectile.destroy();
                 }
+            }
+        }, this);
+
+        cashgroup.forEachExists(function(cash) { ///////////////////////////////////////////////////////////////
+            if(cash.kill) 
+            {
+                cash.destroy();
             }
         }, this);
 
@@ -406,7 +409,7 @@ playgame.prototype = {
     presidentRageStop: function () {
         game.trumphead.visible = true;
         game.trumprage.visible = false;
-    },
+},
     addProjectile: function () {
         var randomPos = this.getRandomPositionOffScreen();
         var taco = game.add.sprite(randomPos.x, randomPos.y, 'taco');
@@ -422,6 +425,16 @@ playgame.prototype = {
         // var sound = game.add.audio('drop');
         // sound.play();
     },
+    addCash: function () { ////////////////////////////////////////////////////////////////////////////////
+        var randomPos = this.getRandomPositionOffScreen();
+        var cash = game.add.sprite(randomPos.x, randomPos.y, 'money');
+        cashgroup.add(cash);
+        cash.kill = false;
+        cash.body.setCollisionGroup(game.cashCollisionGroup);
+        cash.body.collides([game.trumpCollisionGroup, game.guardCollisionGroup]);
+        cash.body.collideWorldBounds = false;
+        this.throwProjectileToObj(cash,game.trump, 160);
+    },
     onProjectileHitTrump: function(body1, body2) {
         // stop the projectile
         this.stopProjectile(body2.sprite);
@@ -434,6 +447,12 @@ playgame.prototype = {
 
         //rage
         this.presidentRageStart();
+    },
+    onCashHitTrump: function(body1, body2) {
+        // stop the cash
+        game.money += game.moneyValue;
+        body2.sprite.body.setCollisionGroup(game.collidedCollisionGroup);
+        body2.sprite.kill = true;
     },
     stopProjectile: function (projectileSprite) {
         projectileSprite.body.damping = 0.8;
@@ -473,7 +492,8 @@ playgame.prototype = {
         guard.body.loadPolygon('personPhysics', 'person');
         guard.body.static = true;
         guard.body.setCollisionGroup(game.guardCollisionGroup);
-        guard.body.collides([game.projectileCollisionGroup], this.onProjectileHitGuard, this);
+        guard.body.collides(game.projectileCollisionGroup, this.onProjectileHitGuard, this);
+        guard.body.collides(game.cashCollisionGroup, this.onCashHitGuard, this); ////////////////////////////////////////////////////
 
         guard.animations.add('walk', [1,2], 5, true);
 
@@ -494,6 +514,13 @@ playgame.prototype = {
             guardBody.sprite.health -= game.tacoDamage;
             this.checkHealth();
         }
+    },
+    onCashHitGuard: function(guardBody, cashBody) { //////////////////////////////////////////////////////////////////////////
+        cashBody.sprite.body.setCollisionGroup(game.collidedCollisionGroup);
+        cashBody.sprite.kill = true;
+        console.log(" YOU ARE FIRED!");
+        guardBody.sprite.health -= game.tacoDamage;
+        this.checkHealth();
     },
     addMoney: function (amount) { 
         game.money += amount;
