@@ -1,6 +1,7 @@
 Trump.Preloader = function (game) {
 
 	this.preloadBar = null;
+	this.menuBackground = null;
 
 };
 
@@ -8,7 +9,14 @@ Trump.Preloader.prototype = {
 
 	preload: function () {
 
-		this.preloadBar = this.add.sprite(0, 100, 'preloaderBar');
+		game.stage.backgroundColor = "#FFFFFF";
+
+		this.menuBackground = this.add.sprite(0,0, 'menuBackground');
+		this.menuBackground.scale.setTo(0.3333);
+
+		this.preloadBar = this.add.sprite(this.world.centerX, this.world.centerY + 200, 'preloaderBar');
+		this.preloadBar.anchor.setTo(0.5);
+		this.preloadBar.scale.setTo(0.7);
 
 		this.load.setPreloadSprite(this.preloadBar);
 
