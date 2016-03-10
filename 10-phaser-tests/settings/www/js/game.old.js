@@ -21,12 +21,14 @@ var app = {
 var game;
 var preload;
 var playgame;
+//var gameSize = {width: 640, height: 1136};
+var gameSize = {width: 480, height: 800};
 
 var loadGame = function ()
 {
 
 	// Create a new Phaser Game
-	game = new Phaser.Game(window.innerWidth, window.innerHeight);
+	game = new Phaser.Game(gameSize.width, gameSize.height);
 
 	// Add the game states
 	game.state.add("Preload", preload);
@@ -43,22 +45,20 @@ preload = function (game)
 preload.prototype = {
 	preload: function ()
 	{
+        this.scaleGame();
 
 		// Preload images
-		//game.load.image("trump", "assets/trump.png"); ///////////////////////////////////////////////////////////////
-		//game.load.image("bodyguard", "assets/bodyguard.png");
+		game.load.image("trump", "assets/trump.png");
 		game.load.image("taco", "assets/taco.png");
 		game.load.image("addGuard", "assets/addGuard.png");
 		game.load.image("addingGuard", "assets/addingGuard.png");
 		game.load.image("trumprage", 'assets/trumprage.png');
 		game.load.image("concrete", 'assets/concrete.png');
 		game.load.image("stand", 'assets/stand.png');
-        game.load.image("money", 'assets/money.png'); ////////////////////////////////////////////////////////////////
-
+        
 		// and sprites
 		game.load.spritesheet('trumpsprite', 'assets/trumpsprite.png', 353, 624, 6);
 		game.load.spritesheet('bodyguard', 'assets/bodyguardSprite.png', 64, 64);
-        game.load.spritesheet('trump', 'assets/trumpWalk.png', 64, 64); /////////////////////////////////
 
 		// Preload sounds
 		game.load.audio('quote1', 'assets/sounds/Worst_President.mp3');
@@ -77,19 +77,22 @@ preload.prototype = {
 		game.adding = false; // later ID ofzo
 		game.money = 15;
 
-
-        game.moneyValue = 5; ///////////////////////////////////////////////////////////////////////////////////////
-        game.moneyRate = 5; ////////////////////////////////////////////////////////////
-        game.moneyEndRate = 3; ////////////////////////////////////////////////////////////
-        game.tacoRate = 2; ////////////////////////////////////////////////////////////////////////////////////
-        game.tacoEndRate = 1.7; ////////////////////////////////////////////////////////////////////////////////////
-        game.healthRegenerate = 3; ////////////////////////////////////////////////////////////////////////////////////
-        game.waveLength = 16; /////////////////////////////////////////////////////////////////////////
-        game.waveNumber = 0; ///////////////////////////////////////////////////////////////////
-
-        game.score = 0; //////////////////////////////////////////////////////////////////////////
-
 	},
+    scaleGame: function () {
+        game.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+        game.scale.maxWidth = gameSize.width * 2.5; //You can change game to gameSize.width*2.5 if needed            
+        game.scale.maxHeight = gameSize.height * 2.5; //Make sure these values are proportional to the gameSize.width and gameSize.height            
+        game.scale.pageAlignHorizontally = true;            
+        game.scale.pageAlignVertically = true;            
+        game.scale.forceOrientation(false, true);
+
+        //game.scale.hasResized.add(game.gameResized, game);            
+        //game.scale.enterIncorrectOrientation.add(game.enterIncorrectOrientation, game);            
+        //game.scale.leaveIncorrectOrientation.add(game.leaveIncorrectOrientation, game);            
+        
+        game.scale.updateLayout();
+
+    },
 	create: function ()
 	{
 
@@ -129,17 +132,13 @@ playgame.prototype = {
 		projectiles.enableBody = true;
 		projectiles.physicsBodyType = Phaser.Physics.P2JS;
 
-        cashgroup = game.add.group(); ////////////////////////////////////////////////////////////////////////////////
-        cashgroup.enableBody = true;
-        cashgroup.physicsBodyType = Phaser.Physics.P2JS;
-
 		// Create collision groups
 
 		game.trumpCollisionGroup = game.physics.p2.createCollisionGroup();
 		game.projectileCollisionGroup = game.physics.p2.createCollisionGroup();
 		game.collidedCollisionGroup = game.physics.p2.createCollisionGroup();
 		game.guardCollisionGroup = game.physics.p2.createCollisionGroup();
-        game.cashCollisionGroup = game.physics.p2.createCollisionGroup(); /////////////////////////////////////////////////////
+
 		game.physics.p2.updateBoundsCollisionGroup();
 
 
@@ -149,22 +148,14 @@ playgame.prototype = {
 		// Throw projectiles
 
 		//keyW = game.input.keyboard.addKey(Phaser.Keyboard.W);
-		//keyW.onDown.add(this.addCash, this); 
+		//keyW.onDown.add(this.addCash, this);
 
-		game.tacoLoop = game.time.events.loop(Phaser.Timer.SECOND * game.tacoRate, this.addProjectile, this); ///////////////////////////////
-
-        game.moneyLoop = game.time.events.loop(Phaser.Timer.SECOND * game.moneyRate, this.addCash, this); //////////////////////////////////////////
-
-        game.time.events.loop(Phaser.Timer.SECOND * game.waveLength, this.nextWave, this); //////////////////////////////////////////
-
-        game.time.events.loop(Phaser.Timer.SECOND, this.addScore, this); //////////////////////////////////////////
+		game.time.events.loop(Phaser.Timer.SECOND * 2, this.addProjectile, this);
 
 		// create trump
 
-		game.trump = game.add.sprite(game.world.centerX, game.world.height, 'trump'); ////////////////
-        game.trump.animations.add('trumpwalk', [1,2], 5, true); ////////////////////////////////////
+		game.trump = game.add.sprite(game.world.centerX, game.world.centerY, 'trump');
 		game.trump.health = game.defaultPresidentHealth;
-        game.trump.walking = false;
 		game.trump.healthBar = new HealthBar(this.game, {
 			x     : game.trump.position.x,
 			y     : game.trump.position.y - 40,
@@ -178,8 +169,6 @@ playgame.prototype = {
 		game.trump.body.static = true;
 		game.trump.body.setCollisionGroup(game.trumpCollisionGroup);
 		game.trump.body.collides(game.projectileCollisionGroup, this.onProjectileHitTrump, this);
-        game.trump.body.collides(game.cashCollisionGroup, this.onCashHitTrump, this); /////////////////////////////////////////////////////////////
-        this.trumpIntro(); ////////////////////////////////////////////////////////////
 
         // trumpheads
         game.trumphead = game.add.sprite(10, 10, 'trumpsprite');
@@ -197,37 +186,16 @@ playgame.prototype = {
 
         // Add labels 
 
-        game.labelStyle = { font: "40px Arial", fill: "#ffffff" };  
-        game.labelGuards = this.game.add.text(game.world.width - 80, 28, game.numberguards, game.labelStyle);
-        game.labelMoney = this.game.add.text(80, 15, "money:" + game.money, game.labelStyle);
-
-        var scoreLabelStyle = {font: "40px Arial", fill: "#ffffff", align: "center"}; ////////////////////////////////////////
-        game.labelScore = this.add.text(game.world.centerX, 50, game.score, scoreLabelStyle); ///////////////////////////// V
-        game.labelScore.anchor.setTo(0.5,0.5);
-        game.labelScore.stroke = "#000000"; //////////////////////////////////////////
-        game.labelScore.strokeThickness = 6;
-
-        var waveLabelStyle = {font: "20px Arial", fill: "#ffffff", align: "center"}; ////////////////////////////////////////
-        game.labelCurrentWave = this.add.text(game.world.centerX, 80, "wave " + game.waveNumber, waveLabelStyle); ///////////////////////////// V
-        game.labelCurrentWave.anchor.setTo(0.5,0.5);
-        game.labelCurrentWave.stroke = "#000000"; //////////////////////////////////////////
-        game.labelCurrentWave.strokeThickness = 6;
+        var style = { font: "40px Arial", fill: "#ffffff" };  
+        game.labelGuards = this.game.add.text(game.world.width - 80, 28, game.numberguards, style);
+        game.labelMoney = this.game.add.text(80, 15, "money:" + game.money, style);
 
         // Give money every x seconds
 
-        game.addingLoop = game.time.events.loop(Phaser.Timer.SECOND * game.moneyTimeOut, this.addMoney, this, 1); ////////////////////////
-
-        game.time.events.loop(Phaser.Timer.SECOND, this.regenerate, this, game.healthRegenerate); ////////////////////////////////////////////////
+        game.time.events.loop(Phaser.Timer.SECOND * game.moneyTimeOut, this.addMoney, this, 1);
 
         // Start waves
         this.startWave(1);
-    },
-    trumpIntro : function() { //////////////////////////////////////////////////////////////////////////////////////////
-
-        game.trump.animations.play('trumpwalk');
-        game.physics.arcade.moveToXY(game.trump, game.world.centerX, game.world.centerY, 150);
-        game.trump.walking = true;
-
     },
     startWave: function(waveNumber) {
         // play first quote
@@ -255,10 +223,6 @@ playgame.prototype = {
         game.labelGuards.setText(Math.floor(game.money / game.PriceGuard)); // update this
         game.labelMoney.setText(game.money);
 
-
-        game.labelScore.setText(game.score); /////////////////////////////////////////////////////////////////
-        game.labelCurrentWave.setText("wave " + game.waveNumber); /////////////////////////////////////////////////////////////////
-
         // If adding, place guard
 
         if (game.input.activePointer.isDown && game.adding) 
@@ -278,13 +242,6 @@ playgame.prototype = {
             }
         }, this);
 
-        cashgroup.forEachExists(function(cash) { ///////////////////////////////////////////////////////////////
-            if(cash.kill) 
-            {
-                cash.destroy();
-            }
-        }, this);
-
         // Fade out guards and slow down when hit AND move healthbars
 
         guards.forEachExists(function(guard) {
@@ -301,15 +258,6 @@ playgame.prototype = {
                 }
             }
         }, this);
-
-        game.trump.healthBar.setPosition(game.trump.position.x,game.trump.position.y - 60); /////////////////////////////////////
-        if(game.trump.walking && game.physics.arcade.distanceToXY(game.trump, game.world.centerX, game.world.centerY) < 1) ////////////////////////////
-        {
-            game.trump.animations.stop(null, true);
-            game.trump.frame = 0;
-            game.trump.body.velocity.y = 0;
-            game.trump.walking = false;
-        }
 
     },
     guardClickHandler: function()
@@ -358,7 +306,7 @@ playgame.prototype = {
                     guards.children[guard].animations.play('walk');
                     if (curGuard.pathSpriteIndex >= curGuard.pathIndex)
                     {
-                        //console.log("stop");
+                        console.log("stop");
                         guards.children[guard].body.velocity.destination[ 0 ] = 0;
                         guards.children[guard].body.velocity.destination[ 1 ] = 0;
                         guards.children[guard].animations.stop(null, true);
@@ -374,7 +322,7 @@ playgame.prototype = {
     {
         if (guard.followPath.newPath.length > 0)
         {
-            //console.log("rot");
+            console.log("rot");
             var lengthX = guard.followPath.newPath[ 0 ].x - guard.position.x;
             var lengthY = guard.followPath.newPath[ 0 ].y - guard.position.y;
             var correctingAngle = 0;
@@ -412,24 +360,6 @@ playgame.prototype = {
             // trump died :(
             this.destroyHealthbar(game.trump.healthBar);
             game.trump.destroy(); // for now
-
-
-            if(!!localStorage) { /////////////////////////////////////////////////////////////////////////////////////////////////////
-                // Step 2
-                this.bestScore = localStorage.getItem('bestScore');
-
-                // Step 3
-                if(!this.bestScore || this.bestScore < game.score) {
-                  this.bestScore = game.score;
-                  localStorage.setItem('bestScore', this.bestScore); ///////////////////////////////////////////////////////////////////
-                  console.log("beste score: " + this.bestScore)
-                  //    game.state.start('Game');
-                }
-            } 
-            else {
-                // Fallback. LocalStorage isn't available
-                this.bestScore = 'N/A';
-            }//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         }
 
         // update trump health bar
@@ -476,7 +406,7 @@ playgame.prototype = {
     presidentRageStop: function () {
         game.trumphead.visible = true;
         game.trumprage.visible = false;
-},
+    },
     addProjectile: function () {
         var randomPos = this.getRandomPositionOffScreen();
         var taco = game.add.sprite(randomPos.x, randomPos.y, 'taco');
@@ -492,16 +422,6 @@ playgame.prototype = {
         // var sound = game.add.audio('drop');
         // sound.play();
     },
-    addCash: function () { ////////////////////////////////////////////////////////////////////////////////
-        var randomPos = this.getRandomPositionOffScreen();
-        var cash = game.add.sprite(randomPos.x, randomPos.y, 'money');
-        cashgroup.add(cash);
-        cash.kill = false;
-        cash.body.setCollisionGroup(game.cashCollisionGroup);
-        cash.body.collides([game.trumpCollisionGroup, game.guardCollisionGroup]);
-        cash.body.collideWorldBounds = false;
-        this.throwProjectileToObj(cash,game.trump, 160);
-    },
     onProjectileHitTrump: function(body1, body2) {
         // stop the projectile
         this.stopProjectile(body2.sprite);
@@ -514,12 +434,6 @@ playgame.prototype = {
 
         //rage
         this.presidentRageStart();
-    },
-    onCashHitTrump: function(body1, body2) {
-        // stop the cash
-        game.money += game.moneyValue;
-        body2.sprite.body.setCollisionGroup(game.collidedCollisionGroup);
-        body2.sprite.kill = true;
     },
     stopProjectile: function (projectileSprite) {
         projectileSprite.body.damping = 0.8;
@@ -559,8 +473,7 @@ playgame.prototype = {
         guard.body.loadPolygon('personPhysics', 'person');
         guard.body.static = true;
         guard.body.setCollisionGroup(game.guardCollisionGroup);
-        guard.body.collides(game.projectileCollisionGroup, this.onProjectileHitGuard, this);
-        guard.body.collides(game.cashCollisionGroup, this.onCashHitGuard, this); ////////////////////////////////////////////////////
+        guard.body.collides([game.projectileCollisionGroup], this.onProjectileHitGuard, this);
 
         guard.animations.add('walk', [1,2], 5, true);
 
@@ -581,13 +494,6 @@ playgame.prototype = {
             guardBody.sprite.health -= game.tacoDamage;
             this.checkHealth();
         }
-    },
-    onCashHitGuard: function(guardBody, cashBody) { //////////////////////////////////////////////////////////////////////////
-        cashBody.sprite.body.setCollisionGroup(game.collidedCollisionGroup);
-        cashBody.sprite.kill = true;
-        console.log(" YOU ARE FIRED!");
-        guardBody.sprite.health -= game.tacoDamage;
-        this.checkHealth();
     },
     addMoney: function (amount) { 
         game.money += amount;
@@ -612,44 +518,5 @@ playgame.prototype = {
         }
 
         //console.log(result);
-    },
-    regenerate: function(healthRegenerateValue) {
-        guards.forEachExists(function(guard) {
-            if (guard.health < 100) 
-            {
-                guard.health += healthRegenerateValue;
-                this.checkHealth();
-            }
-            
-        }, this);
-    },
-    nextWave: function() { ////////////////////////////////////////////////////////////////////////////////////////
-        game.time.events.remove(game.tacoLoop);
-        game.time.events.remove(game.moneyLoop);
-        game.time.events.remove(game.addingLoop);
-        game.tacoRate = (game.tacoRate - game.tacoEndRate)*Math.pow(0.8,game.waveNumber)+game.tacoEndRate;
-        game.moneyRate = (game.moneyRate - game.moneyEndRate)*Math.pow(0.8,game.waveNumber)+game.moneyEndRate;
-        game.moneyTimeOut = (game.moneyTimeOut - game.tacoEndRate)*Math.pow(0.8,game.waveNumber)+game.tacoEndRate;
-        console.log("taco rate: " + game.tacoRate);
-        console.log("money rate: " + game.moneyRate);
-        console.log("moneytime: " + game.moneyTimeOut);
-        game.labelWave = this.game.add.text(game.world.centerX, game.world.centerY, "NEXT WAVE", game.labelStyle);
-        game.labelWave.anchor.set(0.5);
-
-        game.waveNumber ++;
-        //game.paused = true;
-        game.time.events.add(Phaser.Timer.SECOND * 1.5, this.deleteLabel, this, game.labelWave);
-        game.tacoLoop = game.time.events.loop(Phaser.Timer.SECOND * game.tacoRate, this.addProjectile, this); ///////////////////////////////
-        game.moneyLoop = game.time.events.loop(Phaser.Timer.SECOND * game.moneyRate, this.addCash, this); //////////////////////////////////
-        game.addingLoop = game.time.events.loop(Phaser.Timer.SECOND * game.moneyTimeOut, this.addMoney, this, 1); ////////////////////////////
-    },
-    deleteLabel: function(label){ ////////////////////////////////////////////////////////////////////////////
-        label.destroy();
-        //game.paused = false;
-    }
-    ,
-    addScore: function(){ ////////////////////////////////////////////////////////////////////////////
-        game.score ++;
-        //console.log("score:" + game.score);
     }
 }

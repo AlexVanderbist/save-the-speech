@@ -31,7 +31,8 @@ Trump.Preloader.prototype = {
 		this.load.image("fence", 'assets/fence.png'); ////////////////////////////
 		this.load.image("money", 'assets/money.png');
 		this.load.image("happytrump", 'assets/happytrump.png');
-		this.load.image("defaultGuard", 'assets/bodyguard.png');
+
+		this.load.image('settings', 'assets/settings.png');
 
         
 		// and sprites
@@ -40,6 +41,8 @@ Trump.Preloader.prototype = {
 		this.load.spritesheet("trump", 'assets/trumpWalk.png', 64, 64);
 		this.load.spritesheet('playButton', 'assets/play.png', 686, 207);
 		this.load.spritesheet('instructionButton', 'assets/instrucBtn.png', 686, 207);
+		this.load.spritesheet('backButton', 'assets/backBtn.png', 686, 207);
+		this.load.spritesheet('settingsButton', 'assets/settingsBtn.png', 686, 207);
 
 		// Preload sounds
 		this.load.audio('quote1', 'assets/sounds/stupidquote/stupidquote1.mp3');
