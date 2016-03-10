@@ -86,8 +86,12 @@ Trump.Game.prototype =
 
 	create: function ()
 	{
+		// debug
+		game.time.advancedTiming = true;
+
 		this.setDefaultsValues();
-    // Reset Game
+    	
+    	// Reset Game
 		game.addingGuard = false; // later ID ofzo
 		game.addingFence = false;
 		this.money = 15;
@@ -282,6 +286,8 @@ Trump.Game.prototype =
 
 	update: function ()
 	{
+		// Debug
+		game.debug.text(game.time.fps, 100, 100, "000000");
 
 		// Check for clicks on guards
 		this.guardClickHandler();
@@ -750,7 +756,7 @@ Trump.Game.prototype =
         bomber.body.collideWorldBounds = false;
         bomber.body.collides([this.trumpCollisionGroup, this.fencesCollisionGroup, this.guardCollisionGroup], this.onBomberCollide, this);
 
-        this.throwProjectileToObj(bomber,this.trump, 60);
+        this.throwProjectileToObj(bomber,this.trump, 70, false);
         this.rotateBomber(bomber);
 
     },
@@ -835,7 +841,7 @@ Trump.Game.prototype =
 		}
 	},
 
-	throwProjectileToObj: function (obj1, obj2, speed)
+	throwProjectileToObj: function (obj1, obj2, speed, allowMisses = false)
 	{
 		if (typeof speed === 'undefined')
 		{
@@ -843,7 +849,7 @@ Trump.Game.prototype =
 		}
 		var angle = Math.atan2(obj2.y - obj1.y, obj2.x - obj1.x);
 
-		if (Math.random() < 0.2)
+		if (Math.random() < 0.2 && allowMisses)
 		{
 
 			//console.log("miss");
