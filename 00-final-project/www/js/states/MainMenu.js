@@ -52,7 +52,7 @@ Trump.MainMenu.prototype = {
         var instrucMoney = game.add.sprite(29, 355, 'money');
         instrucMoney.scale.setTo(1.2, 1.2);
         this.game.add.text(100, 340, "Does damage to bodyguards, but \nTrump will gain money.", game.instrucStyle);
-        var instrucGuard = game.add.sprite(22, 395, 'bodyguard');
+        var instrucGuard = game.add.sprite(22, 395, 'defaultGuard');
         instrucGuard.scale.setTo(0.9, 0.9);
         this.game.add.text(100, 410, "Click and drag to move and block taco's.", game.instrucStyle);
         var instrucFence = game.add.sprite(20, 464, 'fence');

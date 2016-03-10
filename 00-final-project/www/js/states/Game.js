@@ -7,8 +7,9 @@ Trump.Game = function (game)
 	this.defaultGuardHealth = 100.0;
 	this.defaultPresidentHealth = 160.0;
 
-	this.adding = false; // later ID ofzo
-	this.money = 15;
+	// this.adding = false; // later ID ofzo
+	// this.money = 15;
+ //    this.score = 0;
 
 	this.maxLineLength = 1000;
 	this.guardFreeZoneRadius = 60;
@@ -24,7 +25,7 @@ Trump.Game = function (game)
 	this.moneyValue = 5;
 	this.moneyRate = 6;
 	this.tacoRate = 2;
-	this.healthRegenerate = 2;
+	this.healthRegenerate = 4;
 
 	this.projectileDespawnTime = 7;
 
@@ -48,6 +49,11 @@ Trump.Game.prototype = {
 
 	create: function ()
 	{
+        // Reset Game
+        this.adding = false; // later ID ofzo
+        this.money = 15;
+        this.score = 0;
+
 		//put sounds in array
 		this.stupidquote.push(
 			this.add.audio('quote1'),
@@ -185,7 +191,7 @@ Trump.Game.prototype = {
 		// Give money every x seconds
 
 		this.time.events.loop(Phaser.Timer.SECOND * this.moneyTimeOut, this.addMoney, this, 1);
-		this.time.events.loop(Phaser.Timer.SECOND, this.regenerate, this, this.healthRegenerate);
+		this.time.events.loop(Phaser.Timer.SECOND, this.regenerateHealth, this);
 
 		// Start waves
 		this.startWave(1);
@@ -280,7 +286,7 @@ Trump.Game.prototype = {
 
 	},
 
-	startWave        : function (waveNumber)
+	startWave: function (waveNumber)
 	{
 		// play first quote
 
@@ -296,7 +302,7 @@ Trump.Game.prototype = {
 
 		console.log(waveNumber);
 	},
-	quitGame         : function ()
+	quitGame: function ()
 	{
 		this.state.start('MainMenu');
 	},
@@ -810,16 +816,19 @@ Trump.Game.prototype = {
 		}
 	},
 
-	regenerate: function (healthRegenerateValue)
-	{
+	regenerateHealth: function() {
+		// for guards
 		guards.forEachExists(function (guard)
 		{
-			if (guard.health < 100)
-			{
-				guard.health += healthRegenerateValue;
-				this.checkHealth();
-			}
+            if (guard.health < 100)
+            {
+                guard.health += this.healthRegenerate;
+            }
+		}, this);	
 
-		}, this);
+		// for trump
+		if(this.trump.health < 100) this.trump.health += this.healthRegenerate;	
+
+		this.checkHealth();
 	}
 };
