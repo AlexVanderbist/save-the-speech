@@ -79,11 +79,13 @@ preload.prototype = {
 
 
         game.moneyValue = 5; ///////////////////////////////////////////////////////////////////////////////////////
-        game.moneyRate = 6; ////////////////////////////////////////////////////////////
+        game.moneyRate = 5; ////////////////////////////////////////////////////////////
+        game.moneyEndRate = 3; ////////////////////////////////////////////////////////////
         game.tacoRate = 2; ////////////////////////////////////////////////////////////////////////////////////
+        game.tacoEndRate = 1.7; ////////////////////////////////////////////////////////////////////////////////////
         game.healthRegenerate = 3; ////////////////////////////////////////////////////////////////////////////////////
-        game.waveLength = 30; /////////////////////////////////////////////////////////////////////////
-        game.waveDifference = 1.15; ///////////////////////////////////////////////////////////////////
+        game.waveLength = 16; /////////////////////////////////////////////////////////////////////////
+        game.waveNumber = 0; ///////////////////////////////////////////////////////////////////
 
         game.score = 0; //////////////////////////////////////////////////////////////////////////
 
@@ -153,7 +155,7 @@ playgame.prototype = {
 
         game.moneyLoop = game.time.events.loop(Phaser.Timer.SECOND * game.moneyRate, this.addCash, this); //////////////////////////////////////////
 
-        game.time.events.loop(Phaser.Timer.SECOND * game.waveLength, this.nextWave, this, game.waveDifference); //////////////////////////////////////////
+        game.time.events.loop(Phaser.Timer.SECOND * game.waveLength, this.nextWave, this); //////////////////////////////////////////
 
         game.time.events.loop(Phaser.Timer.SECOND, this.addScore, this); //////////////////////////////////////////
 
@@ -205,6 +207,12 @@ playgame.prototype = {
         game.labelScore.stroke = "#000000"; //////////////////////////////////////////
         game.labelScore.strokeThickness = 6;
 
+        var waveLabelStyle = {font: "20px Arial", fill: "#ffffff", align: "center"}; ////////////////////////////////////////
+        game.labelCurrentWave = this.add.text(game.world.centerX, 80, "wave " + game.waveNumber, waveLabelStyle); ///////////////////////////// V
+        game.labelCurrentWave.anchor.setTo(0.5,0.5);
+        game.labelCurrentWave.stroke = "#000000"; //////////////////////////////////////////
+        game.labelCurrentWave.strokeThickness = 6;
+
         // Give money every x seconds
 
         game.addingLoop = game.time.events.loop(Phaser.Timer.SECOND * game.moneyTimeOut, this.addMoney, this, 1); ////////////////////////
@@ -249,6 +257,7 @@ playgame.prototype = {
 
 
         game.labelScore.setText(game.score); /////////////////////////////////////////////////////////////////
+        game.labelCurrentWave.setText("wave " + game.waveNumber); /////////////////////////////////////////////////////////////////
 
         // If adding, place guard
 
@@ -614,16 +623,20 @@ playgame.prototype = {
             
         }, this);
     },
-    nextWave: function(waveDifference) { ////////////////////////////////////////////////////////////////////////////////////////
+    nextWave: function() { ////////////////////////////////////////////////////////////////////////////////////////
         game.time.events.remove(game.tacoLoop);
         game.time.events.remove(game.moneyLoop);
         game.time.events.remove(game.addingLoop);
-        game.tacoRate = game.tacoRate / waveDifference;
-        game.moneyRate = game.moneyRate / waveDifference;
-        game.moneyTimeOut = game.moneyTimeOut / waveDifference;
-        console.log("wave rate: " + game.tacoRate);
+        game.tacoRate = (game.tacoRate - game.tacoEndRate)*Math.pow(0.8,game.waveNumber)+game.tacoEndRate;
+        game.moneyRate = (game.moneyRate - game.moneyEndRate)*Math.pow(0.8,game.waveNumber)+game.moneyEndRate;
+        game.moneyTimeOut = (game.moneyTimeOut - game.tacoEndRate)*Math.pow(0.8,game.waveNumber)+game.tacoEndRate;
+        console.log("taco rate: " + game.tacoRate);
+        console.log("money rate: " + game.moneyRate);
+        console.log("moneytime: " + game.moneyTimeOut);
         game.labelWave = this.game.add.text(game.world.centerX, game.world.centerY, "NEXT WAVE", game.labelStyle);
         game.labelWave.anchor.set(0.5);
+
+        game.waveNumber ++;
         //game.paused = true;
         game.time.events.add(Phaser.Timer.SECOND * 1.5, this.deleteLabel, this, game.labelWave);
         game.tacoLoop = game.time.events.loop(Phaser.Timer.SECOND * game.tacoRate, this.addProjectile, this); ///////////////////////////////
@@ -637,6 +650,6 @@ playgame.prototype = {
     ,
     addScore: function(){ ////////////////////////////////////////////////////////////////////////////
         game.score ++;
-        console.log("score:" + game.score);
+        //console.log("score:" + game.score);
     }
 }
