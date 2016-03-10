@@ -39,7 +39,6 @@ Trump.MainMenu.prototype = {
 	showInstructions: function () {
 		this.instructionBackground = this.add.sprite(0,0, 'instructions');
 		this.instructionBackground.scale.setTo(0.3333);
-		this.input.onDown.addOnce(this.startGame, this);
 
 		this.playButton = game.add.button(game.world.centerX, game.world.centerY + 290, 'playButton', this.startGame, this, 0, 0, 1);
         this.playButton.scale.setTo(0.5);
