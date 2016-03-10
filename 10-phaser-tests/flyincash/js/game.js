@@ -85,6 +85,8 @@ preload.prototype = {
         game.waveLength = 30; /////////////////////////////////////////////////////////////////////////
         game.waveDifference = 1.15; ///////////////////////////////////////////////////////////////////
 
+        game.score = 0; //////////////////////////////////////////////////////////////////////////
+
 	},
 	create: function ()
 	{
@@ -153,6 +155,8 @@ playgame.prototype = {
 
         game.time.events.loop(Phaser.Timer.SECOND * game.waveLength, this.nextWave, this, game.waveDifference); //////////////////////////////////////////
 
+        game.time.events.loop(Phaser.Timer.SECOND, this.addScore, this); //////////////////////////////////////////
+
 		// create trump
 
 		game.trump = game.add.sprite(game.world.centerX, game.world.height, 'trump'); ////////////////
@@ -195,6 +199,12 @@ playgame.prototype = {
         game.labelGuards = this.game.add.text(game.world.width - 80, 28, game.numberguards, game.labelStyle);
         game.labelMoney = this.game.add.text(80, 15, "money:" + game.money, game.labelStyle);
 
+        var scoreLabelStyle = {font: "40px Arial", fill: "#ffffff", align: "center"}; ////////////////////////////////////////
+        game.labelScore = this.add.text(game.world.centerX, 50, game.score, scoreLabelStyle); ///////////////////////////// V
+        game.labelScore.anchor.setTo(0.5,0.5);
+        game.labelScore.stroke = "#000000"; //////////////////////////////////////////
+        game.labelScore.strokeThickness = 6;
+
         // Give money every x seconds
 
         game.addingLoop = game.time.events.loop(Phaser.Timer.SECOND * game.moneyTimeOut, this.addMoney, this, 1); ////////////////////////
@@ -236,6 +246,9 @@ playgame.prototype = {
 
         game.labelGuards.setText(Math.floor(game.money / game.PriceGuard)); // update this
         game.labelMoney.setText(game.money);
+
+
+        game.labelScore.setText(game.score); /////////////////////////////////////////////////////////////////
 
         // If adding, place guard
 
@@ -390,6 +403,24 @@ playgame.prototype = {
             // trump died :(
             this.destroyHealthbar(game.trump.healthBar);
             game.trump.destroy(); // for now
+
+
+            if(!!localStorage) { /////////////////////////////////////////////////////////////////////////////////////////////////////
+                // Step 2
+                this.bestScore = localStorage.getItem('bestScore');
+
+                // Step 3
+                if(!this.bestScore || this.bestScore < game.score) {
+                  this.bestScore = game.score;
+                  localStorage.setItem('bestScore', this.bestScore); ///////////////////////////////////////////////////////////////////
+                  console.log("beste score: " + this.bestScore)
+                  //    game.state.start('Game');
+                }
+            } 
+            else {
+                // Fallback. LocalStorage isn't available
+                this.bestScore = 'N/A';
+            }//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         }
 
         // update trump health bar
@@ -602,5 +633,10 @@ playgame.prototype = {
     deleteLabel: function(label){ ////////////////////////////////////////////////////////////////////////////
         label.destroy();
         //game.paused = false;
+    }
+    ,
+    addScore: function(){ ////////////////////////////////////////////////////////////////////////////
+        game.score ++;
+        console.log("score:" + game.score);
     }
 }
