@@ -1018,35 +1018,38 @@ Trump.Game.prototype = {
         //console.log("score:" + this.score);
         //console.log("beste score: " + this.bestScore)
     },
-    nextWave: function() { 
-    	this.time.events.remove(this.tacoLoop);
-        this.time.events.remove(this.moneyLoop);
-        this.time.events.remove(this.addingLoop);
-        this.tacoRate = (this.tacoRate - this.tacoEndRate)*Math.pow(0.8,this.waveNumber)+this.tacoEndRate;
-        this.moneyRate = (this.moneyRate - this.moneyEndRate)*Math.pow(0.8,this.waveNumber)+this.moneyEndRate;
-        this.moneyTimeOut = (this.moneyTimeOut - this.tacoEndRate)*Math.pow(0.8,this.waveNumber)+this.tacoEndRate;
-        //console.log("taco rate: " + this.tacoRate);
-        //console.log("money rate: " + this.moneyRate);
-        //console.log("moneytime: " + this.moneyTimeOut);
-        this.labelWave = this.game.add.text(this.world.centerX, this.world.centerY, "NEXT WAVE", this.scoreLabelStyle);
-        this.labelWave.anchor.set(0.5);
 
-        this.waveNumber ++;
-        this.time.events.add(Phaser.Timer.SECOND * 1.5, this.deleteLabel, this, this.labelWave);
-        this.tacoLoop = this.time.events.loop(Phaser.Timer.SECOND * this.tacoRate, this.addProjectile, this); 
-        this.moneyLoop = this.time.events.loop(Phaser.Timer.SECOND * this.moneyRate, this.addCash, this); 
-        this.addingLoop = this.time.events.loop(Phaser.Timer.SECOND * this.moneyTimeOut, this.addMoney, this, 1); 
+	nextWave: function()
+	{
+		this.time.events.remove(this.tacoLoop);
+		this.time.events.remove(this.moneyLoop);
+		this.time.events.remove(this.addingLoop);
+		this.tacoRate = (this.tacoRate - this.tacoEndRate) * Math.pow(0.8, this.waveNumber) + this.tacoEndRate;
+		this.moneyRate = (this.moneyRate - this.moneyEndRate) * Math.pow(0.8, this.waveNumber) + this.moneyEndRate;
+		this.moneyTimeOut = (this.moneyTimeOut - this.tacoEndRate) * Math.pow(0.8, this.waveNumber) + this.tacoEndRate;
+		//console.log("taco rate: " + this.tacoRate);
+		//console.log("money rate: " + this.moneyRate);
+		//console.log("moneytime: " + this.moneyTimeOut);
+		this.labelWave = this.game.add.text(this.world.centerX, this.world.centerY, "NEXT WAVE", this.scoreLabelStyle);
+		this.labelWave.anchor.set(0.5);
 
-        /////// ALEX FIX DIT ////////////////////////////////
-        quote = game.add.audio('quote1');
-        this.trumphead.visible = true;
-        quote.play();
-        quote.onStop.add(quoteStopped, this);
-        function quoteStopped(quote){
-        	this.trumphead.animations.stop(null, true);
-        }
-        ////////////////////////////////////////////////////////
-    },
+		this.waveNumber++;
+		this.time.events.add(Phaser.Timer.SECOND * 1.5, this.deleteLabel, this, this.labelWave);
+		this.tacoLoop = this.time.events.loop(Phaser.Timer.SECOND * this.tacoRate, this.addProjectile, this);
+		this.moneyLoop = this.time.events.loop(Phaser.Timer.SECOND * this.moneyRate, this.addCash, this);
+		this.addingLoop = this.time.events.loop(Phaser.Timer.SECOND * this.moneyTimeOut, this.addMoney, this, 1);
+
+		/////// ALEX FIX DIT ////////////////////////////////
+		quote = game.add.audio('quote1');
+		this.trumphead.visible = true;
+		quote.play();
+		quote.onStop.add(quoteStopped, this);
+		function quoteStopped(quote)
+		{
+			this.trumphead.animations.stop(null, true);
+			////////////////////////////////////////////////////////
+		}
+	},
     deleteLabel: function(label){
         label.destroy();
     }
