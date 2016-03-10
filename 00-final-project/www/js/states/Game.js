@@ -1,12 +1,15 @@
 Trump.Game = function (game)
 {
+	this.defaultValues = {};
 
 	this.PriceGuard = 10;
 	this.PriceFence = 15;
 	this.moneyTimeOut = 2; // om de twee seconden 1 muntje
 	this.tacoDamage = 30;
+    this.bomberDamage = 100;
 	this.defaultGuardHealth = 100.0;
 	this.defaultPresidentHealth = 160.0;
+	this.defaultFenceHealth = 200.0;
 
 	// moved to create
 	// this.adding = false; // later ID ofzo
@@ -24,19 +27,22 @@ Trump.Game = function (game)
 	this.moneyhit = null;
 	this.tacohit = null;
 
-	this.moneyValue = 5;
-	this.moneyRate = 6;
-	this.moneyEndRate = 4;
-	this.tacoRate = 2;
+	this.defaultValues.moneyValue = 5;
+	this.defaultValues.moneyRate = 6;
+	this.defaultValues.moneyEndRate = 4;
+	this.defaultValues.tacoRate = 2;
 	
-	this.bomberRate = 4;
-	this.tacoEndRate = 1.7;
-	this.healthRegenerate = 4;
-	this.waveLength = 16;
+	this.defaultValues.bomberRate = 15;
+	this.defaultValues.tacoEndRate = 1.7;
+	this.defaultValues.healthRegenerate = 4;
+	this.defaultValues.waveLength = 16;
 
 	this.projectileDespawnTime = 7;
 
-	this.triggerDistance = 70;
+	this.defaultValues.triggerDistance = 70;
+	this.defaultValues.waveNumber = 1;
+
+	this.defaultValues.speedGuard = 250;
 
 	this.guardColors = [
 		"000000",
@@ -50,18 +56,43 @@ Trump.Game = function (game)
 		"897192",
 		"525a26"
 	];
+
+	game.defaultValues = this.defaultValues;
 };
 
-Trump.Game.prototype = {
+Trump.Game.prototype =
+{
+	/* Start Siebe Add */
+	returnTrueValue: function (variable, defaultValue)
+	{
+		if(variable === undefined)
+		{
+			return defaultValue;
+		}
+		else
+		{
+			return variable;
+		}
+	},
+	setDefaultsValues: function()
+	{
+		var defaultValues = this.defaultValues;
+		for(defaultValue in defaultValues)
+		{
+			this[defaultValue] = this.returnTrueValue(game[defaultValue], this.defaultValues[defaultValue]);
+		}
+	},
+	/* End Siebe Add */
 
 	create: function ()
 	{
-        // Reset Game
+		this.setDefaultsValues();
+    // Reset Game
 		game.addingGuard = false; // later ID ofzo
-        game.addingFence = false;
-        this.money = 15;
-        game.score = 0;
-		this.waveNumber = 1;
+		game.addingFence = false;
+		this.money = 15;
+		game.score = 0;
+		//this.waveNumber = 1; wordt gedaan in setDefaultValues zodat we da in settings kunnen veranderen
 
 		//put sounds in array
 		this.stupidquote.push(
@@ -319,6 +350,23 @@ Trump.Game.prototype = {
 			}
 		}, this);
 
+		// loop over fences
+		fences.forEachExists(function (fence)
+		{
+
+			// kill guard with fade
+			if (fence.kill)
+			{
+				fence.alpha -= 0.04;
+				fence.scale.setTo(fence.alpha, fence.alpha);
+				if (fence.alpha < 0)
+				{
+					//remove the fence
+					fence.destroy();
+				}
+			}
+		}, this);
+
 		this.trump.healthBar.setPosition(this.trump.position.x, this.trump.position.y - 60);
 		if (this.trump.walking && this.physics.arcade.distanceToXY(this.trump, this.world.centerX, this.world.centerY) < 10)
 		{
@@ -413,8 +461,8 @@ Trump.Game.prototype = {
 			if (curGuardFollowPath.path != null && curGuardFollowPath.path.length > 0 && curGuardFollowPath.pathSpriteIndex < curGuardFollowPath.pathIndex)
 			{
 				curGuardFollowPath.pathSpriteIndex = Math.min(curGuardFollowPath.pathSpriteIndex, curGuardFollowPath.path.length - 1);
-				this.physics.arcade.moveToXY(guards.children[ guard ], curGuardFollowPath.newPath[ 0 ].x, curGuardFollowPath.newPath[ 0 ].y, 250);
-				this.physics.arcade.moveToXY(guards.children[ guard ].bodyBack, curGuardFollowPath.newPath[ 0 ].x, curGuardFollowPath.newPath[ 0 ].y, 250);
+				this.physics.arcade.moveToXY(guards.children[ guard ], curGuardFollowPath.newPath[ 0 ].x, curGuardFollowPath.newPath[ 0 ].y, this.speedGuard);
+				this.physics.arcade.moveToXY(guards.children[ guard ].bodyBack, curGuardFollowPath.newPath[ 0 ].x, curGuardFollowPath.newPath[ 0 ].y, this.speedGuard);
 
 				if (this.physics.arcade.distanceToXY(guards.children[ guard ], curGuardFollowPath.path[ curGuardFollowPath.pathSpriteIndex ].x, curGuardFollowPath.path[ curGuardFollowPath.pathSpriteIndex ].y) < 20)
 				{
@@ -503,8 +551,10 @@ Trump.Game.prototype = {
 	{
 
 		// check trump health
+            	console.log(this.trump.health, this.trump.died);
 		if (this.trump.health <= 0 && this.trump.died == false)
 		{
+
 			// trump died :(  
             var sound = this.add.audio('dead');
             sound.play();
@@ -695,6 +745,24 @@ Trump.Game.prototype = {
 
         this.throwProjectileToObj(bomber,this.trump, 60);
         this.rotateBomber(bomber);
+
+    },
+
+    onBomberCollide: function(bomber, collisionbody)
+    {
+		var explosion = this.add.sprite(bomber.sprite.position.x, bomber.sprite.position.y, 'explosion');
+		explosion.anchor.setTo(0.5, 0.5);
+		explosion.scale.setTo(2,2);
+		var explode = explosion.animations.add('explode');
+		explosion.animations.play('explode', 20, false);
+		this.explosionsound.play();
+		bomber.sprite.destroy();
+
+		this.checkHealth();
+
+
+		collisionbody.sprite.health -= this.bomberDamage;
+
 
     },
 
@@ -901,6 +969,7 @@ Trump.Game.prototype = {
 	        fence.body.collides([this.bombersCollisionGroup]);
 	        this.rotateFence(fence);
 	        fence.health = this.defaultFenceHealth;
+	        fence.kill = false;
 	        fence.healthBar = new HealthBar(this.game, {x: fence.position.x, y: fence.position.y - 40, width: 60, height: 10});
 	    }
     },
@@ -973,7 +1042,7 @@ Trump.Game.prototype = {
 						guards.activeGuard = guard;
 					}
 				}
-			});
+			}, this);
 		}
 	},
 
@@ -997,36 +1066,37 @@ Trump.Game.prototype = {
         //console.log("score:" + this.score);
         //console.log("beste score: " + this.bestScore)
     },
-    nextWave: function() { 
-    	this.time.events.remove(this.tacoLoop);
-        this.time.events.remove(this.moneyLoop);
-        this.time.events.remove(this.addingLoop);
-        this.tacoRate = (this.tacoRate - this.tacoEndRate)*Math.pow(0.8,this.waveNumber)+this.tacoEndRate;
-        this.moneyRate = (this.moneyRate - this.moneyEndRate)*Math.pow(0.8,this.waveNumber)+this.moneyEndRate;
-        this.moneyTimeOut = (this.moneyTimeOut - this.tacoEndRate)*Math.pow(0.8,this.waveNumber)+this.tacoEndRate;
-        console.log("wave " + this.waveNumber + ", rate: " + this.tacoRate);
-        //console.log("money rate: " + this.moneyRate);
-        //console.log("moneytime: " + this.moneyTimeOut);
-        this.labelWave = this.game.add.text(this.world.centerX, this.world.centerY, "NEXT WAVE", this.scoreLabelStyle);
-        this.labelWave.anchor.set(0.5);
+	nextWave: function()
+	{
+		this.time.events.remove(this.tacoLoop);
+		this.time.events.remove(this.moneyLoop);
+		this.time.events.remove(this.addingLoop);
+		this.tacoRate = (this.tacoRate - this.tacoEndRate) * Math.pow(0.8, this.waveNumber) + this.tacoEndRate;
+		this.moneyRate = (this.moneyRate - this.moneyEndRate) * Math.pow(0.8, this.waveNumber) + this.moneyEndRate;
+		this.moneyTimeOut = (this.moneyTimeOut - this.tacoEndRate) * Math.pow(0.8, this.waveNumber) + this.tacoEndRate;
+		//console.log("taco rate: " + this.tacoRate);
+		//console.log("money rate: " + this.moneyRate);
+		//console.log("moneytime: " + this.moneyTimeOut);
+		this.labelWave = this.game.add.text(this.world.centerX, this.world.centerY, "NEXT WAVE", this.scoreLabelStyle);
+		this.labelWave.anchor.set(0.5);
 
-        this.waveNumber ++;
-        this.time.events.add(Phaser.Timer.SECOND * 1.5, this.deleteLabel, this, this.labelWave);
-        this.tacoLoop = this.time.events.loop(Phaser.Timer.SECOND * this.tacoRate, this.addProjectile, this); 
-        this.moneyLoop = this.time.events.loop(Phaser.Timer.SECOND * this.moneyRate, this.addCash, this); 
-        this.addingLoop = this.time.events.loop(Phaser.Timer.SECOND * this.moneyTimeOut, this.addMoney, this, 1); 
+		this.waveNumber++;
+		this.time.events.add(Phaser.Timer.SECOND * 1.5, this.deleteLabel, this, this.labelWave);
+		this.tacoLoop = this.time.events.loop(Phaser.Timer.SECOND * this.tacoRate, this.addProjectile, this);
+		this.moneyLoop = this.time.events.loop(Phaser.Timer.SECOND * this.moneyRate, this.addCash, this);
+		this.addingLoop = this.time.events.loop(Phaser.Timer.SECOND * this.moneyTimeOut, this.addMoney, this, 1);
 
-        /////// ALEX FIX DIT ////////////////////////////////
-        quote = game.add.audio('quote1');
-        this.trumphead.visible = true;
-        quote.play();
-        quote.onStop.add(quoteStopped, this);
-        function quoteStopped(quote){
-        this.trumphead.animations.stop(null, true);
-    	}
-
-        ////////////////////////////////////////////////////////
-    },
+		/////// ALEX FIX DIT ////////////////////////////////
+		quote = game.add.audio('quote1');
+		this.trumphead.visible = true;
+		quote.play();
+		quote.onStop.add(quoteStopped, this);
+		function quoteStopped(quote)
+		{
+			this.trumphead.animations.stop(null, true);
+			////////////////////////////////////////////////////////
+		}
+	},
     deleteLabel: function(label){
         label.destroy();
     }
