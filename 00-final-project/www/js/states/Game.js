@@ -445,9 +445,14 @@ Trump.Game.prototype = {
 		// check trump health
 		if (this.trump.health <= 0)
 		{
-			// trump died :(
-			this.destroyHealthbar(this.trump.healthBar);
-			this.trump.destroy(); // for now
+			// trump died :(  
+            var sound = this.add.audio('dead');
+            sound.play();
+
+            // wait until going to gameover
+            
+			//this.destroyHealthbar(this.trump.healthBar);
+			// this.trump.destroy(); // for now
 		}
 
 		// update trump health bar

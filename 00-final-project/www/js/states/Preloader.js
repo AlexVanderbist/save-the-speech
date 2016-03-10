@@ -54,7 +54,7 @@ Trump.Preloader.prototype = {
 
 		this.load.audio('ouch1', 'assets/sounds/trumpdamage/ouch1.mp3');
 		this.load.audio('ouch2', 'assets/sounds/trumpdamage/ouch2.mp3');
-		//this.load.audio('ouch3', 'assets/sounds/trumpdamage/ouch3.mp3');
+		this.load.audio('dead', 'assets/sounds/trumpdamage/dead.mp3');
 
 		this.load.audio('money1', 'assets/sounds/trumpmoney/money1.mp3');
 		this.load.audio('money2', 'assets/sounds/trumpmoney/money2.mp3');
