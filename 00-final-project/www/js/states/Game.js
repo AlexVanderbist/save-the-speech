@@ -258,7 +258,7 @@ Trump.Game.prototype = {
 	{
 		// play first quote
 
-		quote = this.add.audio('quote1');
+		quote = this.add.audio('quote3');
 
 		this.trumphead.visible = true;
 		quote.play();
