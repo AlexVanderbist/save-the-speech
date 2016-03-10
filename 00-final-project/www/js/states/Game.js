@@ -720,7 +720,24 @@ Trump.Game.prototype = {
 		{
 			bodies[ 0 ].parent.sprite.followPath.isActive = true;
 			guards.activeGuard = bodies[ 0 ].parent.sprite;
-		}
+		} else {
+            // we didnt directly hit a guard, but maybe he's near
+            
+            var triggerDistance = 70;
+            var closestDistanceSoFar = triggerDistance;
+            guards.forEachAlive(function(guard) {
+                var distanceToGuard = Phaser.Math.distance(guard.x, guard.y, object.position.x, object.position.y);
+                if (distanceToGuard <= triggerDistance) {
+                    // do something to this guard, as it lies within the trigger distance
+                    if(distanceToGuard < closestDistanceSoFar) {
+                        closestDistanceSoFar = distanceToGuard;
+                        // make this guard active
+                        guard.followPath.isActive = true;
+                        guards.activeGuard = guard;
+                    }
+                }
+            }); 
+        }
 	},
 
 	regenerate: function(healthRegenerateValue)
