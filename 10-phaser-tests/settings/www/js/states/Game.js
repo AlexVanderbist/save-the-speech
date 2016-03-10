@@ -1,15 +1,15 @@
 Trump.Game = function (game)
 {
+	this.defaultValues = {};
 
-	this.PriceGuard = 10;
-	this.moneyTimeOut = 2; // om de twee seconden 1 muntje
-	this.tacoDamage = 30;
-	this.defaultGuardHealth = 100.0;
-	this.defaultPresidentHealth = 160.0;
+	this.defaultValues.PriceGuard = 10;
+	this.defaultValues.moneyTimeOut = 2; // om de twee seconden 1 muntje
+	this.defaultValues.tacoDamage = 30;
+	this.defaultValues.defaultGuardHealth = 100.0;
+	this.defaultValues.defaultPresidentHealth = 160.0;
 
-	// this.adding = false; // later ID ofzo
-	// this.money = 15;
- //    this.score = 0;
+	this.adding = false; // later ID ofzo
+	this.defaultValues.money = 15;
 
 	this.maxLineLength = 1000;
 	this.guardFreeZoneRadius = 60;
@@ -22,14 +22,14 @@ Trump.Game = function (game)
 	this.moneyhit = null;
 	this.tacohit = null;
 
-	this.moneyValue = 5;
-	this.moneyRate = 6;
-	this.tacoRate = 2;
-	this.healthRegenerate = 4;
+	this.defaultValues.moneyValue = 5;
+	this.defaultValues.moneyRate = 6;
+	this.defaultValues.tacoRate = 2;
+	this.defaultValues.healthRegenerate = 2;
 
 	this.projectileDespawnTime = 7;
 
-	this.triggerDistance = 70;
+	this.defaultValues.triggerDistance = 70;
 
 	this.guardColors = [
 		"000000",
@@ -43,17 +43,32 @@ Trump.Game = function (game)
 		"897192",
 		"525a26"
 	];
+	this.defaultValues.speedGuard = 250;
 };
 
 Trump.Game.prototype = {
-
+	returnTrueValue: function (variable, defaultValue)
+	{
+		if(variable === undefined)
+		{
+			return defaultValue;
+		}
+		else
+		{
+			return variable;
+		}
+	},
+	setDefaultsValues: function()
+	{
+		var defaultValues = this.defaultValues;
+		for(defaultValue in defaultValues)
+		{
+			this[defaultValue] = this.returnTrueValue(game[defaultValue], this.defaultValues[defaultValue]);
+		}
+	},
 	create: function ()
 	{
-        // Reset Game
-        this.adding = false; // later ID ofzo
-        this.money = 15;
-        game.score = 0;
-
+		this.setDefaultsValues();
 		//put sounds in array
 		this.stupidquote.push(
 			this.add.audio('quote1'),
@@ -129,7 +144,6 @@ Trump.Game.prototype = {
 
 		this.time.events.loop(Phaser.Timer.SECOND * this.tacoRate, this.addProjectile, this);
 		this.time.events.loop(Phaser.Timer.SECOND * this.moneyRate, this.addCash, this);
-		this.time.events.loop(Phaser.Timer.SECOND, this.addScore, this);
 
 		// create trump
 
@@ -184,12 +198,6 @@ Trump.Game.prototype = {
 		this.labelMoney.stroke = "#000000";
 		this.labelMoney.strokeThickness = 6;
 
-		var scoreLabelStyle = {font: "40px Arial", fill: "#ffffff", align: "center"}; ////////////////////////////////////////
-        this.labelScore = this.add.text(game.world.centerX, 50, game.score, scoreLabelStyle); ///////////////////////////// V
-        this.labelScore.anchor.setTo(0.5,0.5);
-        this.labelScore.stroke = "#000000"; 
-        this.labelScore.strokeThickness = 6;
-
 		// draw a circle around president
 		guardFreeZone = this.add.graphics(0, 0);
 		guardFreeZone.lineStyle(1, 0xFF0000, 1);
@@ -198,7 +206,7 @@ Trump.Game.prototype = {
 		// Give money every x seconds
 
 		this.time.events.loop(Phaser.Timer.SECOND * this.moneyTimeOut, this.addMoney, this, 1);
-		this.time.events.loop(Phaser.Timer.SECOND, this.regenerateHealth, this);
+		this.time.events.loop(Phaser.Timer.SECOND, this.regenerate, this, this.healthRegenerate);
 
 		// Start waves
 		this.startWave(1);
@@ -223,7 +231,6 @@ Trump.Game.prototype = {
 
 		this.labelGuards.setText(Math.floor(this.money / this.PriceGuard)); // update this
 		this.labelMoney.setText("$" + this.money);
-		this.labelScore.setText(game.score);
 
 		// If adding, place guard
 
@@ -294,7 +301,7 @@ Trump.Game.prototype = {
 
 	},
 
-	startWave: function (waveNumber)
+	startWave        : function (waveNumber)
 	{
 		// play first quote
 
@@ -310,7 +317,7 @@ Trump.Game.prototype = {
 
 		console.log(waveNumber);
 	},
-	quitGame: function ()
+	quitGame         : function ()
 	{
 		this.state.start('MainMenu');
 	},
@@ -393,8 +400,8 @@ Trump.Game.prototype = {
 			if (curGuardFollowPath.path != null && curGuardFollowPath.path.length > 0 && curGuardFollowPath.pathSpriteIndex < curGuardFollowPath.pathIndex)
 			{
 				curGuardFollowPath.pathSpriteIndex = Math.min(curGuardFollowPath.pathSpriteIndex, curGuardFollowPath.path.length - 1);
-				this.physics.arcade.moveToXY(guards.children[ guard ], curGuardFollowPath.newPath[ 0 ].x, curGuardFollowPath.newPath[ 0 ].y, 250);
-				this.physics.arcade.moveToXY(guards.children[ guard ].bodyBack, curGuardFollowPath.newPath[ 0 ].x, curGuardFollowPath.newPath[ 0 ].y, 250);
+				this.physics.arcade.moveToXY(guards.children[ guard ], curGuardFollowPath.newPath[ 0 ].x, curGuardFollowPath.newPath[ 0 ].y, this.speedGuard);
+				this.physics.arcade.moveToXY(guards.children[ guard ].bodyBack, curGuardFollowPath.newPath[ 0 ].x, curGuardFollowPath.newPath[ 0 ].y, this.speedGuard);
 
 				if (this.physics.arcade.distanceToXY(guards.children[ guard ], curGuardFollowPath.path[ curGuardFollowPath.pathSpriteIndex ].x, curGuardFollowPath.path[ curGuardFollowPath.pathSpriteIndex ].y) < 20)
 				{
@@ -492,22 +499,8 @@ Trump.Game.prototype = {
             this.trump.died = true;
             this.trump.body.setCollisionGroup(this.collidedCollisionGroup);
 
-            if(localStorage) {
-                game.bestScore = localStorage.getItem('bestScore');
-
-                if(!game.bestScore || game.bestScore < game.score) {
-                  game.bestScore = game.score;
-                  localStorage.setItem('bestScore', game.bestScore);
-                  //console.log("beste score: " + this.bestScore)
-                }
-            } 
-            else {
-                // Fallback
-                game.bestScore = 'N/A';
-            }
-
             // wait until going to gameover
-            this.time.events.add(Phaser.Timer.SECOND * 2, this.gameOverState, this);
+            this.time.events.add(Phaser.Timer.SECOND * 3, this.gameOverState, this);
             
 			//this.destroyHealthbar(this.trump.healthBar);
 			// this.trump.destroy(); // for now
@@ -838,24 +831,16 @@ Trump.Game.prototype = {
 		}
 	},
 
-	regenerateHealth: function() {
-		// for guards
+	regenerate: function (healthRegenerateValue)
+	{
 		guards.forEachExists(function (guard)
 		{
-            if (guard.health < 100)
-            {
-                guard.health += this.healthRegenerate;
-            }
-		}, this);	
+			if (guard.health < 100)
+			{
+				guard.health += healthRegenerateValue;
+				this.checkHealth();
+			}
 
-		// for trump
-		if(this.trump.health < 50) this.trump.health += this.healthRegenerate;	
-
-		this.checkHealth();
-	},
-    addScore: function(){ 
-        game.score ++;
-        //console.log("score:" + this.score);
-        //console.log("beste score: " + this.bestScore)
-    }
+		}, this);
+	}
 };

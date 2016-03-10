@@ -31,6 +31,8 @@ var moneyhitguard = null;
 var moneyhit = null;
 var tacohit = null;
 
+var explosionsound = null;
+
 var loadGame = function ()
 {
 
@@ -71,8 +73,9 @@ preload.prototype = {
 		// and sprites
 		game.load.spritesheet('trumpsprite', 'assets/trumpsprite.png', 353, 624, 6);
 		game.load.spritesheet('bodyguard', 'assets/bodyguardSprite.png', 64, 64);
-        game.load.spritesheet('trump', 'assets/trumpWalk.png', 64, 64); /////////////////////////////////
-
+        game.load.spritesheet('trump', 'assets/trumpWalk.png', 64, 64);/////////////////////////////////
+        game.load.spritesheet('bomber', 'assets/bomberSprite.png', 64, 64);
+        game.load.spritesheet('explosion', 'assets/explosion.png', 128, 128);
 		// Preload sounds
         // Preload sounds
 
@@ -100,6 +103,9 @@ preload.prototype = {
         game.load.audio('guardmoneyhit', 'assets/sounds/guardmoney/money1.mp3');
 
         game.load.audio('moneyhit', 'assets/sounds/moneyhit/kaching1.mp3');
+        game.load.audio('explosionfx', 'assets/sounds/explosions/soundexplosion.mp3');
+
+
 
 		// preload physics
 		game.load.physics('tacoPhysics', 'assets/physics/taco.json');
@@ -110,6 +116,7 @@ preload.prototype = {
         game.PriceFence = 10;
 		game.moneyTimeOut = 2; // om de twee seconden 1 muntje
 		game.tacoDamage = 30;
+        game.bomberDamage = 100;
 		game.defaultGuardHealth = 100.0;
 		game.defaultPresidentHealth = 160.0;
         game.defaultFenceHealth = 300;
@@ -121,7 +128,8 @@ preload.prototype = {
 
         game.moneyValue = 5; ///////////////////////////////////////////////////////////////////////////////////////
         game.moneyRate = 6; ////////////////////////////////////////////////////////////
-        game.tacoRate = 2; ////////////////////////////////////////////////////////////////////////////////////
+        game.tacoRate = 2;
+        game.bomberRate = 3;////////////////////////////////////////////////////////////////////////////////////
         game.healthRegenerate = 2; ////////////////////////////////////////////////////////////////////////////////////
 
 	},
@@ -140,6 +148,8 @@ playgame = function (game)
 playgame.prototype = {
 	create: function ()
 	{
+        //add explosion to game
+
         //putsounds in array
         stupidquote[0] = game.add.audio('quote1');
         stupidquote[1] = game.add.audio('quote2');
@@ -166,6 +176,8 @@ playgame.prototype = {
 
         moneyhit = game.add.audio('moneyhit');
 
+        explosionsound = game.add.audio('explosionfx');
+
 		// Create BG
 		game.add.sprite(0, 0, 'concrete');
 		var stand = game.add.sprite(game.world.centerX, game.world.centerY, 'stand');
@@ -181,12 +193,17 @@ playgame.prototype = {
 
 		guards = game.add.group();
         fences = game.add.group();
+        bombers = game.add.group();
+
 		guards.enableBody = true;
 		guards.physicsBodyType = Phaser.Physics.P2JS;
 		guards.someOneIsActive = false;
 
         fences.enableBody = true;
         fences.physicsBodyType = Phaser.Physics.P2JS;
+
+        bombers.enableBody = true;
+        bombers.physicsBodyType = Phaser.Physics.P2JS;
 
 		projectiles = game.add.group();
 		projectiles.enableBody = true;
@@ -204,6 +221,7 @@ playgame.prototype = {
 		game.guardCollisionGroup = game.physics.p2.createCollisionGroup();
         game.cashCollisionGroup = game.physics.p2.createCollisionGroup(); /////////////////////////////////////////////////////
         game.fencesCollisionGroup = game.physics.p2.createCollisionGroup();
+        game.bombersCollisionGroup = game.physics.p2.createCollisionGroup();
 		game.physics.p2.updateBoundsCollisionGroup();
 
 
@@ -216,7 +234,7 @@ playgame.prototype = {
 		//keyW.onDown.add(this.addCash, this); 
 
 		game.time.events.loop(Phaser.Timer.SECOND * game.tacoRate, this.addProjectile, this); ///////////////////////////////
-
+        game.time.events.loop(Phaser.Timer.SECOND * game.bomberRate, this.addSuicideBomber,this);
         game.time.events.loop(Phaser.Timer.SECOND * game.moneyRate, this.addCash, this); //////////////////////////////////////////
 
 		// create trump
@@ -238,7 +256,8 @@ playgame.prototype = {
 		game.trump.body.static = true;
 		game.trump.body.setCollisionGroup(game.trumpCollisionGroup);
 		game.trump.body.collides(game.projectileCollisionGroup, this.onProjectileHitTrump, this);
-        game.trump.body.collides(game.cashCollisionGroup, this.onCashHitTrump, this); /////////////////////////////////////////////////////////////
+        game.trump.body.collides(game.cashCollisionGroup, this.onCashHitTrump, this);
+        game.trump.body.collides(game.bombersCollisionGroup); /////////////////////////////////////////////////////////////
         this.trumpIntro(); ////////////////////////////////////////////////////////////
 
         // trumpheads
@@ -459,6 +478,22 @@ playgame.prototype = {
             fence.body.rotation = Math.atan(lengthY / lengthX) + Math.PI / 2 + correctingAngle;
 
     },
+    rotateBomber: function (bomber)
+    {
+
+        console.log("rot");
+        var lengthX = game.world.centerX - bomber.position.x;
+        var lengthY = game.world.centerY - bomber.position.y;
+        var correctingAngle = 0;
+
+        if (lengthX < 0)
+        {
+            correctingAngle = Math.PI;
+        }
+
+        bomber.body.rotation = Math.atan(lengthY / lengthX) + Math.PI / 2 + correctingAngle;
+
+    },
     drawLine: function(guard)
     {
         guard.newPath.splice(0, 1);
@@ -500,6 +535,26 @@ playgame.prototype = {
                 this.destroyHealthbar(guard.healthBar);
             }
         }, this);
+
+        // check & update health bars for guards
+        fences.forEachExists(function(fence) {
+            fence.healthBar.setPercent((fence.health/game.defaultFenceHealth)*100);
+
+            if(fence.health <= 0) {
+                fence.body.angularVelocity = 10;
+                fence.kill = true;
+                this.destroyHealthbar(fence.healthBar);
+            }
+        }, this);
+
+
+    },
+    checkHealthOnCollision: function(body){
+
+        if(body.sprite.health <= 0) {
+           body.sprite.destroy();
+            //this.destroyHealthbar(body.healthBar);
+        }
     },
     getRandomPositionOffScreen: function() {
         var radius = Math.sqrt(Math.pow(game.world.width/2, 2) + Math.pow(game.world.height/2, 2));
@@ -559,6 +614,23 @@ playgame.prototype = {
         // var sound = game.add.audio('drop');
         // sound.play();
     },
+    addSuicideBomber: function()
+    {
+        var randomPos = this.getRandomPositionOffScreen();
+        var bomber = game.add.sprite(randomPos.x, randomPos.y, 'bomber');
+        bombers.add(bomber);
+        bomber.animations.add('walk', [1,2], 5, true);
+        bomber.animations.play('walk');
+        bomber.body.clearShapes();
+        bomber.body.loadPolygon('personPhysics', 'person');
+        bomber.body.setCollisionGroup(game.bombersCollisionGroup);
+        bomber.body.collideWorldBounds = false;
+        bomber.body.collides([game.trumpCollisionGroup, game.fencesCollisionGroup, game.guardCollisionGroup], this.onBomberCollide, this);
+
+        this.throwProjectileToObj(bomber,game.trump, 60);
+        this.rotateBomber(bomber);
+
+    },
     addCash: function () { ////////////////////////////////////////////////////////////////////////////////
         var randomPos = this.getRandomPositionOffScreen();
         var cash = game.add.sprite(randomPos.x, randomPos.y, 'money');
@@ -594,11 +666,34 @@ playgame.prototype = {
         body2.sprite.body.setCollisionGroup(game.collidedCollisionGroup);
         body2.sprite.kill = true;
     },
+    onBomberCollide: function(bomber, collisionbody)
+    {
+       var explosion = game.add.sprite(bomber.sprite.position.x, bomber.sprite.position.y, 'explosion');
+        explosion.anchor.setTo(0.5, 0.5);
+        explosion.scale.setTo(2,2);
+        var explode = explosion.animations.add('explode');
+        explosion.animations.play('explode', 20, false);
+        explosionsound.play();
+        bomber.sprite.destroy();
+        //collision.sprite.health -= game.bomberDamage;
+        console.log(collisionbody.sprite.key);
+       // if(collision.sprite.)
+       // collision.sprite.healthBar.setPercent(10);
+        //this.checkHealthOnCollision(collision);
+
+
+            collisionbody.sprite.health -= game.bomberDamage;
+
+
+    },
     stopProjectile: function (projectileSprite) {
-        projectileSprite.body.damping = 0.8;
-        projectileSprite.body.angularDamping = 0.7;
-        projectileSprite.body.setCollisionGroup(game.collidedCollisionGroup);
-        projectileSprite.kill = true;
+       if(projectileSprite.body)
+       {
+            projectileSprite.body.damping = 0.8;
+            projectileSprite.body.angularDamping = 0.7;
+            projectileSprite.body.setCollisionGroup(game.collidedCollisionGroup);
+            projectileSprite.kill = true;
+       }
     },
     throwProjectileToObj: function (obj1, obj2, speed) { 
         if (typeof speed === 'undefined') { speed = 60; }
@@ -643,7 +738,7 @@ playgame.prototype = {
         guard.body.setCollisionGroup(game.guardCollisionGroup);
         guard.body.collides(game.projectileCollisionGroup, this.onProjectileHitGuard, this);
         guard.body.collides(game.cashCollisionGroup, this.onCashHitGuard, this); ////////////////////////////////////////////////////
-
+        guard.body.collides(game.bombersCollisionGroup);
         guard.animations.add('walk', [1,2], 5, true);
 
         guard.followPath = {};
@@ -663,7 +758,8 @@ playgame.prototype = {
 
         fence.body.static = true;
         fence.body.setCollisionGroup(game.fencesCollisionGroup);
-        fence.body.collides(game.projectileCollisionGroup, this.onProjectileHitFence, this);
+        fence.body.collides([game.projectileCollisionGroup], this.onProjectileHitFence, this);
+        fence.body.collides([game.bombersCollisionGroup]);
         this.rotateFence(fence);
         fence.health = game.defaultFenceHealth;
         fence.healthBar = new HealthBar(this.game, {x: fence.position.x, y: fence.position.y - 40, width: 60, height: 10});
@@ -682,22 +778,13 @@ playgame.prototype = {
         }
     },
     onProjectileHitFence: function(fenceBody, projectileBody) {
+
+
+        tacohit.play();
+       // this.checkHealth();
+        fenceBody.sprite.health -= game.tacoDamage;
+        fenceBody.sprite.healthBar.setPercent(fenceBody.sprite.health/game.defaultFenceHealth*100);
         this.stopProjectile(projectileBody.sprite);
-
-        // take guard health
-        if(projectileBody.sprite.key == 'taco') {
-            //guardBody.sprite.health -= game.tacoDamage;
-            tacohit.play();
-           // this.checkHealth();
-            fenceBody.sprite.health -= game.tacoDamage;
-            fenceBody.sprite.healthBar.setPercent(fenceBody.sprite.health/game.defaultFenceHealth*100);
-        }
-        if(fenceBody.sprite.health < 1)
-        {
-            this.destroyHealthbar(fenceBody.sprite.healthBar);
-            fenceBody.sprite.kill();
-        }
-
     },
     onCashHitGuard: function(guardBody, cashBody) { //////////////////////////////////////////////////////////////////////////
         cashBody.sprite.body.setCollisionGroup(game.collidedCollisionGroup);
@@ -736,9 +823,10 @@ playgame.prototype = {
             if (guard.health < 100) 
             {
                 guard.health += healthRegenerateValue;
-                this.checkHealth();
+
             }
             
         }, this);
+        this.checkHealth();
     }
 }
