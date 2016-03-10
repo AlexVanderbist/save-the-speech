@@ -152,8 +152,8 @@ Trump.Game.prototype = {
 		var btnCountStyle = {font: "25px Arial", fill: "#ffffff", align: "right", stroke: "#000000", strokeThickness: "3"};
 		this.labelGuards = this.add.text(50, this.world.height - 45, this.numberguards, btnCountStyle);
 		
-        var btnCountStyle = {font: "25px Arial", fill: "#ffffff", align: "right", stroke: "#000000", strokeThickness: "3"};
-        this.labelMoney = this.add.text(80, 15, "money:" + this.money, style);
+        var moneyLabelStyle = {font: "40px Arial", fill: "#ffffff", stroke: "#000000", strokeThickness: "6"};
+        this.labelMoney = this.add.text(80, 15, "money:" + this.money, moneyLabelStyle);
 
 		// draw a circle around president
 		guardFreeZone = this.add.graphics(0, 0);
