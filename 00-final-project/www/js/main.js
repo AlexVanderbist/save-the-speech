@@ -10,6 +10,7 @@ function loadGame ()
 	game.state.add("Boot", Trump.Boot);
 	game.state.add("Preloader", Trump.Preloader);
 	game.state.add("MainMenu", Trump.MainMenu);
+	game.state.add("GameOver", Trump.GameOver);
 	game.state.add("Game", Trump.Game);
 
 	// Start the "Boot" state
