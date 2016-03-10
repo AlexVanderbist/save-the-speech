@@ -28,7 +28,7 @@ Trump.Game = function (game)
 	this.moneyRate = 6;
 	this.moneyEndRate = 4;
 	this.tacoRate = 2;
-	
+
 	this.bomberRate = 4;
 	this.tacoEndRate = 1.7;
 	this.healthRegenerate = 4;
@@ -698,6 +698,27 @@ Trump.Game.prototype = {
 
     },
 
+    onBomberCollide: function(bomber, collisionbody)
+    {
+       var explosion = this.add.sprite(bomber.sprite.position.x, bomber.sprite.position.y, 'explosion');
+        explosion.anchor.setTo(0.5, 0.5);
+        explosion.scale.setTo(2,2);
+        var explode = explosion.animations.add('explode');
+        explosion.animations.play('explode', 20, false);
+        explosionsound.play();
+        bomber.sprite.destroy();
+        //collision.sprite.health -= this.bomberDamage;
+        console.log(collisionbody.sprite.key);
+       // if(collision.sprite.)
+       // collision.sprite.healthBar.setPercent(10);
+        //this.checkHealthOnCollision(collision);
+
+
+            collisionbody.sprite.health -= this.bomberDamage;
+
+
+    },
+
 	addCash: function ()
 	{
 		var randomPos = this.getRandomPositionOffScreen();
@@ -1022,7 +1043,8 @@ Trump.Game.prototype = {
         quote.play();
         quote.onStop.add(quoteStopped, this);
         function quoteStopped(quote){
-        this.trumphead.animations.stop(null, true);
+        	this.trumphead.animations.stop(null, true);
+        }
         ////////////////////////////////////////////////////////
     },
     deleteLabel: function(label){
