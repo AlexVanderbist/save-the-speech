@@ -7,9 +7,10 @@ Trump.Game = function (game)
 	this.defaultGuardHealth = 100.0;
 	this.defaultPresidentHealth = 160.0;
 
+	// moved to create
 	// this.adding = false; // later ID ofzo
 	// this.money = 15;
- //    this.score = 0;
+ 	// this.score = 0;
 
 	this.maxLineLength = 1000;
 	this.guardFreeZoneRadius = 60;
