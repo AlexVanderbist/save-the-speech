@@ -12,6 +12,8 @@ Trump.Boot.prototype = {
 
         // load only the preloadbar for the next state
         this.load.image('preloaderBar', 'assets/preload.png');
+        this.load.image('menuBackground', 'assets/menubg.png');
+        this.load.image('instructions', 'assets/instructions.png');
 
     },
 
