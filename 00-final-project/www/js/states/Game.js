@@ -8,7 +8,7 @@ Trump.Game = function (game)
 	this.tacoDamage = 30;
     this.bomberDamage = 100;
 	this.defaultGuardHealth = 100.0;
-	this.defaultPresidentHealth = 1600.0;
+	this.defaultPresidentHealth = 160.0;
 	this.defaultFenceHealth = 200.0;
 
 	// moved to create
@@ -308,7 +308,7 @@ Trump.Game.prototype =
 
         if (this.input.activePointer.isDown && this.addingGuard)
         {
-              this.placeGuard();
+            this.placeGuard();
         }
         if (this.input.activePointer.isDown && this.addingFence)
         {
@@ -382,7 +382,14 @@ Trump.Game.prototype =
 			}
 		}, this);
 
+		// Trump stuff
 		this.trump.healthBar.setPosition(this.trump.position.x, this.trump.position.y - 60);
+
+		if(this.trump.died) {
+			// this.trump.alpha -= 0.04;
+			// this.trump.scale.setTo(this.trump.alpha, this.trump.alpha);
+		}
+
 		if (this.trump.walking && this.physics.arcade.distanceToXY(this.trump, this.world.centerX, this.world.centerY) < 10)
 		{
 			this.trump.animations.stop(null, true);
