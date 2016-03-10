@@ -450,6 +450,7 @@ Trump.Game.prototype = {
             sound.play();
 
             // wait until going to gameover
+            this.time.events.add(Phaser.Timer.SECOND * 3, this.state.start, this, 'MainMenu');
             
 			//this.destroyHealthbar(this.trump.healthBar);
 			// this.trump.destroy(); // for now
