@@ -145,13 +145,15 @@ Trump.Game.prototype = {
 
 		// Add buttons
 
-		button = this.add.button(this.world.width - 100, 10, 'addGuard', this.addGuard, this);
+		this.addGuardButton = this.add.button(10, this.world.height - 10 - 64, 'addGuard', this.addGuard, this);
 
 		// Add labels
 
-		var style = {font: "40px Arial", fill: "#ffffff"};
-		this.labelGuards = this.add.text(this.world.width - 80, 28, this.numberguards, style);
-		this.labelMoney = this.add.text(80, 15, "money:" + this.money, style);
+		var btnCountStyle = {font: "25px Arial", fill: "#ffffff", align: "right", stroke: "#000000", strokeThickness: "3"};
+		this.labelGuards = this.add.text(50, this.world.height - 45, this.numberguards, btnCountStyle);
+		
+        var btnCountStyle = {font: "25px Arial", fill: "#ffffff", align: "right", stroke: "#000000", strokeThickness: "3"};
+        this.labelMoney = this.add.text(80, 15, "money:" + this.money, style);
 
 		// draw a circle around president
 		guardFreeZone = this.add.graphics(0, 0);
@@ -624,7 +626,8 @@ Trump.Game.prototype = {
 		if (this.money >= this.PriceGuard)
 		{
 			this.adding = true;
-			this.addingGuard = this.add.sprite(this.world.width - 100, 10, 'addingGuard');
+            this.addGuardButton.loadTexture("addingGuard");
+			// this.addingGuard = this.add.sprite(this.world.width - 100, 10, 'addingGuard');
 		}
 
 	},
@@ -644,7 +647,8 @@ Trump.Game.prototype = {
 		{
 			var guard = this.add.sprite(inputX, inputY, 'bodyguard');
 			guards.add(guard);
-			this.addingGuard.destroy();
+            this.addGuardButton.loadTexture('addGuard');
+			//this.addingGuard.destroy();
 			this.money -= this.PriceGuard;
 			this.adding = false;
 			guard.healthBar = new HealthBar(this.game, {
