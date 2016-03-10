@@ -59,6 +59,8 @@ preload.prototype = {
 		game.load.image("taco", "assets/taco.png");
 		game.load.image("addGuard", "assets/addGuard.png");
 		game.load.image("addingGuard", "assets/addingGuard.png");
+        game.load.image("addFence", "assets/addFence.png");
+        game.load.image("addingFence", "assets/addingFence.png");
 		game.load.image("trumprage", 'assets/trumprage.png');
 		game.load.image("concrete", 'assets/concrete.png');
 		game.load.image("stand", 'assets/stand.png');
@@ -110,7 +112,7 @@ preload.prototype = {
 		game.tacoDamage = 30;
 		game.defaultGuardHealth = 100.0;
 		game.defaultPresidentHealth = 160.0;
-        game.defaultFenceHealth = 50;
+        game.defaultFenceHealth = 300;
 
 		game.addGuard = false; // later ID ofzo
         game.addFence = false;
@@ -256,7 +258,7 @@ playgame.prototype = {
         // Add buttons
 
         button = game.add.button(game.world.width - 100, 10, 'addGuard', this.addGuard, this);
-        button = game.add.button(game.world.width - 164, 10, 'addGuard', this.addFence, this);
+        button = game.add.button(game.world.width - 164, 10, 'addFence', this.addFence, this);
 
         // Add labels 
 
@@ -618,7 +620,7 @@ playgame.prototype = {
         if (game.money >= game.PriceFence && game.money > 0)
         {
             game.addFence = true;
-            game.addingFence = game.add.sprite(game.world.width - 164, 10, 'addingGuard');
+            game.addingFence = game.add.sprite(game.world.width - 164, 10, 'addingFence');
         }
 
     },
@@ -688,7 +690,12 @@ playgame.prototype = {
             tacohit.play();
            // this.checkHealth();
             fenceBody.sprite.health -= game.tacoDamage;
-            fenceBody.sprite.healthBar.setPercent(fenceBody.sprite.health);
+            fenceBody.sprite.healthBar.setPercent(fenceBody.sprite.health/game.defaultFenceHealth*100);
+        }
+        if(fenceBody.sprite.health < 1)
+        {
+            this.destroyHealthbar(fenceBody.sprite.healthBar);
+            fenceBody.sprite.kill();
         }
 
     },
