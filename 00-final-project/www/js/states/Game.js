@@ -827,7 +827,7 @@ Trump.Game.prototype = {
 		}, this);	
 
 		// for trump
-		if(this.trump.health < 100) this.trump.health += this.healthRegenerate;	
+		if(this.trump.health < 50) this.trump.health += this.healthRegenerate;	
 
 		this.checkHealth();
 	}
