@@ -82,7 +82,7 @@ Trump.MainMenu.prototype = {
 		this.instructionBackground = this.add.sprite(0, 0, 'settings');
 		this.instructionBackground.scale.setTo(0.3333);
 
-		this.backButton = game.add.button(game.world.centerX, game.world.centerY + 290, 'backButton', this.showMain, this, 0, 0, 1);
+		this.backButton = this.add.button(this.world.centerX, this.world.centerY + 290, 'backButton', this.showMain, this, 0, 0, 1);
 		this.backButton.scale.setTo(0.5);
 		this.backButton.anchor.setTo(0.5);
 		this.buttons.push(this.backButton);
@@ -90,9 +90,35 @@ Trump.MainMenu.prototype = {
 		this.settingsStyle = {font: "20px Arial", fill: "#858080"};
 		this.add.text(20, 180, "Set speed guard:", this.settingsStyle);
 
-		game.speedGuard = 5;
+		this.plusButtonGuardSpeed = this.add.button(175, 175, 'plusButton', this.addSetting, this, 0,0,1);
+		this.plusButtonGuardSpeed.forObject = "plusButtonGuardSpeed";
+		var valueSpeed = Trump.Game.prototype.returnTrueValue(game.speedGuard, game.defaultValues.speedGuard);
+		game.speedGuard = valueSpeed;
+		this.textGuard = this.add.text(225, 180, valueSpeed/50, this.settingsStyle);
+		this.minButtonGuardSpeed = this.add.button(255, 175, 'minButton', this.minSetting, this, 0,0,1);
+		this.minButtonGuardSpeed.forObject = "minButtonGuardSpeed";
 	},
 
+	addSetting: function(object)
+	{
+		switch(object.forObject)
+		{
+			case "plusButtonGuardSpeed":
+				game.speedGuard += 50;
+				this.textGuard.setText(game.speedGuard/50);
+				break;
+		}
+	},
+	minSetting: function(object)
+	{
+		switch(object.forObject)
+		{
+			case "minButtonGuardSpeed":
+				game.speedGuard -= 50;
+				this.textGuard.setText(game.speedGuard/50);
+				break;
+		}
+	},
 	startGame: function (pointer)
 	{
 		//	And start the actual game
