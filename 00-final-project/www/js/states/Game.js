@@ -5,8 +5,10 @@ Trump.Game = function (game)
 	this.PriceFence = 15;
 	this.moneyTimeOut = 2; // om de twee seconden 1 muntje
 	this.tacoDamage = 30;
+    this.bomberDamage = 100;
 	this.defaultGuardHealth = 100.0;
 	this.defaultPresidentHealth = 160.0;
+	this.defaultFenceHealth = 20.0;
 
 	// moved to create
 	// this.adding = false; // later ID ofzo
@@ -319,6 +321,23 @@ Trump.Game.prototype = {
 			}
 		}, this);
 
+		// loop over fences
+		fences.forEachExists(function (fence)
+		{
+
+			// kill guard with fade
+			if (fence.kill)
+			{
+				fence.alpha -= 0.04;
+				fence.scale.setTo(fence.alpha, fence.alpha);
+				if (fence.alpha < 0)
+				{
+					//remove the fence
+					fence.destroy();
+				}
+			}
+		}, this);
+
 		this.trump.healthBar.setPosition(this.trump.position.x, this.trump.position.y - 60);
 		if (this.trump.walking && this.physics.arcade.distanceToXY(this.trump, this.world.centerX, this.world.centerY) < 10)
 		{
@@ -503,8 +522,10 @@ Trump.Game.prototype = {
 	{
 
 		// check trump health
+            	console.log(this.trump.health, this.trump.died);
 		if (this.trump.health <= 0 && this.trump.died == false)
 		{
+
 			// trump died :(  
             var sound = this.add.audio('dead');
             sound.play();
@@ -700,21 +721,18 @@ Trump.Game.prototype = {
 
     onBomberCollide: function(bomber, collisionbody)
     {
-       var explosion = this.add.sprite(bomber.sprite.position.x, bomber.sprite.position.y, 'explosion');
-        explosion.anchor.setTo(0.5, 0.5);
-        explosion.scale.setTo(2,2);
-        var explode = explosion.animations.add('explode');
-        explosion.animations.play('explode', 20, false);
-        explosionsound.play();
-        bomber.sprite.destroy();
-        //collision.sprite.health -= this.bomberDamage;
-        console.log(collisionbody.sprite.key);
-       // if(collision.sprite.)
-       // collision.sprite.healthBar.setPercent(10);
-        //this.checkHealthOnCollision(collision);
+		var explosion = this.add.sprite(bomber.sprite.position.x, bomber.sprite.position.y, 'explosion');
+		explosion.anchor.setTo(0.5, 0.5);
+		explosion.scale.setTo(2,2);
+		var explode = explosion.animations.add('explode');
+		explosion.animations.play('explode', 20, false);
+		this.explosionsound.play();
+		bomber.sprite.destroy();
+
+		this.checkHealth();
 
 
-            collisionbody.sprite.health -= this.bomberDamage;
+		collisionbody.sprite.health -= this.bomberDamage;
 
 
     },
@@ -922,6 +940,7 @@ Trump.Game.prototype = {
 	        fence.body.collides([this.bombersCollisionGroup]);
 	        this.rotateFence(fence);
 	        fence.health = this.defaultFenceHealth;
+	        fence.kill = false;
 	        fence.healthBar = new HealthBar(this.game, {x: fence.position.x, y: fence.position.y - 40, width: 60, height: 10});
 	    }
     },
