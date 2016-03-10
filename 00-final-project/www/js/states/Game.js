@@ -32,7 +32,7 @@ Trump.Game = function (game)
 	this.defaultValues.moneyEndRate = 4;
 	this.defaultValues.tacoRate = 2;
 	
-	this.defaultValues.bomberRate = 4;
+	this.defaultValues.bomberRate = 15;
 	this.defaultValues.tacoEndRate = 1.7;
 	this.defaultValues.healthRegenerate = 4;
 	this.defaultValues.waveLength = 16;
