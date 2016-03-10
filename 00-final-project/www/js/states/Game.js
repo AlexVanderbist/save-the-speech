@@ -1004,7 +1004,7 @@ Trump.Game.prototype = {
         this.tacoRate = (this.tacoRate - this.tacoEndRate)*Math.pow(0.8,this.waveNumber)+this.tacoEndRate;
         this.moneyRate = (this.moneyRate - this.moneyEndRate)*Math.pow(0.8,this.waveNumber)+this.moneyEndRate;
         this.moneyTimeOut = (this.moneyTimeOut - this.tacoEndRate)*Math.pow(0.8,this.waveNumber)+this.tacoEndRate;
-        //console.log("taco rate: " + this.tacoRate);
+        console.log("wave " + this.waveNumber + ", rate: " + this.tacoRate);
         //console.log("money rate: " + this.moneyRate);
         //console.log("moneytime: " + this.moneyTimeOut);
         this.labelWave = this.game.add.text(this.world.centerX, this.world.centerY, "NEXT WAVE", this.scoreLabelStyle);
@@ -1023,6 +1023,8 @@ Trump.Game.prototype = {
         quote.onStop.add(quoteStopped, this);
         function quoteStopped(quote){
         this.trumphead.animations.stop(null, true);
+    	}
+
         ////////////////////////////////////////////////////////
     },
     deleteLabel: function(label){

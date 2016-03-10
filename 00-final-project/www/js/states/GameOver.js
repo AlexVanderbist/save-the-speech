@@ -16,7 +16,7 @@ Trump.GameOver.prototype = {
 		this.labelOver.anchor.set(0.5);
 
 		var scorestyle = {font: "40px Arial", fill: "#ffffff", align: "center"};
-		this.labelShowScore = this.add.text(this.world.centerX, this.world.centerY + 135, "SCORE\n" + game.score, scorestyle); 
+		this.labelShowScore = this.add.text(this.world.centerX, this.world.centerY + 135, "SCORE\n" + (game.score -2), scorestyle); 
 		this.labelShowScore.anchor.set(0.5);
 
 		this.labelShowScore = this.add.text(this.world.centerX, this.world.centerY + 235, "HIGHSCORE\n" + game.bestScore, scorestyle); 
