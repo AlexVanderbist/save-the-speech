@@ -2,14 +2,14 @@ Trump.Game = function (game)
 {
 	this.defaultValues = {};
 
-	this.defaultValues.PriceGuard = 10;
-	this.defaultValues.PriceFence = 15;
-	this.defaultValues.moneyTimeOut = 2; // om de twee seconden 1 muntje
-	this.defaultValues.tacoDamage = 30;
-	this.defaultValues.defaultGuardHealth = 100.0;
-	this.defaultValues.defaultPresidentHealth = 160.0;
-	this.defaultValues.bomberDamage = 100;
-	this.defaultValues.defaultFenceHealth = 20.0;
+	this.PriceGuard = 10;
+	this.PriceFence = 15;
+	this.moneyTimeOut = 2; // om de twee seconden 1 muntje
+	this.tacoDamage = 30;
+    this.bomberDamage = 100;
+	this.defaultGuardHealth = 100.0;
+	this.defaultPresidentHealth = 160.0;
+	this.defaultFenceHealth = 200.0;
 
 	// moved to create
 	// this.adding = false; // later ID ofzo
@@ -32,7 +32,7 @@ Trump.Game = function (game)
 	this.defaultValues.moneyEndRate = 4;
 	this.defaultValues.tacoRate = 2;
 	
-	this.defaultValues.bomberRate = 4;
+	this.defaultValues.bomberRate = 15;
 	this.defaultValues.tacoEndRate = 1.7;
 	this.defaultValues.healthRegenerate = 4;
 	this.defaultValues.waveLength = 16;
@@ -1042,7 +1042,7 @@ Trump.Game.prototype =
 						guards.activeGuard = guard;
 					}
 				}
-			});
+			}, this);
 		}
 	},
 
@@ -1066,7 +1066,6 @@ Trump.Game.prototype =
         //console.log("score:" + this.score);
         //console.log("beste score: " + this.bestScore)
     },
-
 	nextWave: function()
 	{
 		this.time.events.remove(this.tacoLoop);
@@ -1087,16 +1086,15 @@ Trump.Game.prototype =
 		this.moneyLoop = this.time.events.loop(Phaser.Timer.SECOND * this.moneyRate, this.addCash, this);
 		this.addingLoop = this.time.events.loop(Phaser.Timer.SECOND * this.moneyTimeOut, this.addMoney, this, 1);
 
-		/////// ALEX FIX DIT ////////////////////////////////
-		quote = game.add.audio('quote1');
-		this.trumphead.visible = true;
-		quote.play();
-		quote.onStop.add(quoteStopped, this);
-		function quoteStopped(quote)
-		{
-			this.trumphead.animations.stop(null, true);
-			////////////////////////////////////////////////////////
-		}
+		// play random quote
+        var rndquote = Math.floor(Math.random() * stupidquote.length);
+        var quotestart = stupidquote[rndquote];
+        this.trumphead.visible = true;
+        quotestart.play();
+        quotestart.onStop.add(quoteStopped, this);
+        function quoteStopped(){
+            this.trumphead.animations.stop(null, true);
+        }
 	},
     deleteLabel: function(label){
         label.destroy();

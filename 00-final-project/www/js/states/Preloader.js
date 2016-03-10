@@ -34,6 +34,7 @@ Trump.Preloader.prototype = {
 		this.load.image("defaultGuard", 'assets/bodyguard.png');
         game.load.image("addFence", "assets/addFence.png");
         game.load.image("addingFence", "assets/addingFence.png");
+        game.load.image("credits", "assets/credits.png");
 
 		/* Start Siebe Add */
 		this.load.image('settings', 'assets/settings.png');

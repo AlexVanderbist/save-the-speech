@@ -53,6 +53,10 @@ Trump.MainMenu.prototype = {
 	update: function ()
 	{
 
+        this.creditButton = game.add.button(game.world.width - 40, 30, 'credits', this.showCredits, this, 0, 0, 1);
+        this.creditButton.scale.setTo(0.18);
+        this.creditButton.anchor.setTo(0.5);
+
 	},
 	showInstructions: function ()
 	{
@@ -150,6 +154,9 @@ Trump.MainMenu.prototype = {
 
 		//	And start the actual game
 		this.state.start('Game');
+
+	},
+	showCredits: function () {
 
 	}
 
