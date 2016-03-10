@@ -1086,16 +1086,15 @@ Trump.Game.prototype =
 		this.moneyLoop = this.time.events.loop(Phaser.Timer.SECOND * this.moneyRate, this.addCash, this);
 		this.addingLoop = this.time.events.loop(Phaser.Timer.SECOND * this.moneyTimeOut, this.addMoney, this, 1);
 
-		/////// ALEX FIX DIT ////////////////////////////////
-		quote = game.add.audio('quote1');
-		this.trumphead.visible = true;
-		quote.play();
-		quote.onStop.add(quoteStopped, this);
-		function quoteStopped(quote)
-		{
-			this.trumphead.animations.stop(null, true);
-			////////////////////////////////////////////////////////
-		}
+		// play random quote
+        var rndquote = Math.floor(Math.random() * stupidquote.length);
+        var quotestart = stupidquote[rndquote];
+        this.trumphead.visible = true;
+        quotestart.play();
+        quotestart.onStop.add(quoteStopped, this);
+        function quoteStopped(){
+            this.trumphead.animations.stop(null, true);
+        }
 	},
     deleteLabel: function(label){
         label.destroy();
