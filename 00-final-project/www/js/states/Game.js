@@ -128,6 +128,7 @@ Trump.Game.prototype = {
 		this.trump.animations.add('trumpwalk', [ 1, 2 ], 5, true);
 		this.trump.health = this.defaultPresidentHealth;
 		this.trump.walking = false;
+        this.trump.died = false;
 		this.trump.healthBar = new HealthBar(this, {
 			x     : this.trump.position.x,
 			y     : this.trump.position.y - 40,
@@ -458,15 +459,28 @@ Trump.Game.prototype = {
 		//console.log("oki");
 	},
 
+    gameOverState: function () {
+        this.state.start('MainMenu');
+    },
+
 	checkHealth: function ()
 	{
 
 		// check trump health
-		if (this.trump.health <= 0)
+		if (this.trump.health <= 0 && this.trump.died == false)
 		{
-			// trump died :(
-			this.destroyHealthbar(this.trump.healthBar);
-			this.trump.destroy(); // for now
+			// trump died :(  
+            var sound = this.add.audio('dead');
+            sound.play();
+
+            this.trump.died = true;
+            this.trump.body.setCollisionGroup(this.collidedCollisionGroup);
+
+            // wait until going to gameover
+            this.time.events.add(Phaser.Timer.SECOND * 3, this.gameOverState, this);
+            
+			//this.destroyHealthbar(this.trump.healthBar);
+			// this.trump.destroy(); // for now
 		}
 
 		// update trump health bar
