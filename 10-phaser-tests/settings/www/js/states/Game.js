@@ -44,6 +44,8 @@ Trump.Game = function (game)
 		"525a26"
 	];
 	this.defaultValues.speedGuard = 250;
+
+	game.defaultValues = this.defaultValues
 };
 
 Trump.Game.prototype = {

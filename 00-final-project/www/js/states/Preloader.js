@@ -28,10 +28,12 @@ Trump.Preloader.prototype = {
 		this.load.image("trumprage", 'assets/trumprage.png');
 		this.load.image("concrete", 'assets/concrete.png');
 		this.load.image("stand", 'assets/stand.png');
-		this.load.image("fence", 'assets/fence.png'); ////////////////////////////
+		this.load.image("fence", 'assets/fence.png');
 		this.load.image("money", 'assets/money.png');
 		this.load.image("happytrump", 'assets/happytrump.png');
 		this.load.image("defaultGuard", 'assets/bodyguard.png');
+        game.load.image("addFence", "assets/addFence.png");
+        game.load.image("addingFence", "assets/addingFence.png");
 
         
 		// and sprites
@@ -40,6 +42,8 @@ Trump.Preloader.prototype = {
 		this.load.spritesheet("trump", 'assets/trumpWalk.png', 64, 64);
 		this.load.spritesheet('playButton', 'assets/play.png', 686, 207);
 		this.load.spritesheet('instructionButton', 'assets/instrucBtn.png', 686, 207);
+	    game.load.spritesheet('bomber', 'assets/bomberSprite.png', 64, 64);
+        game.load.spritesheet('explosion', 'assets/explosion.png', 128, 128);
 
 		// Preload sounds
 		this.load.audio('quote1', 'assets/sounds/stupidquote/stupidquote1.mp3');
@@ -66,6 +70,7 @@ Trump.Preloader.prototype = {
 		this.load.audio('guardmoneyhit', 'assets/sounds/guardmoney/money1.mp3');
 
 		this.load.audio('moneyhit', 'assets/sounds/moneyhit/kaching1.mp3');
+        game.load.audio('explosionfx', 'assets/sounds/explosions/soundexplosion.mp3');
 
 		// preload physics
 		this.load.physics('tacoPhysics', 'assets/physics/taco.json');
