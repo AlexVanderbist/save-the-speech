@@ -441,7 +441,7 @@ Trump.Game.prototype = {
 	},
 
     gameOverState: function () {
-        this.state.start('MainMenu');
+        this.state.start('GameOver');
     },
 
 	checkHealth: function ()
