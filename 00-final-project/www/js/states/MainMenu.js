@@ -47,15 +47,16 @@ Trump.MainMenu.prototype = {
 		this.settingsButton.scale.setTo(0.3333);
 		this.settingsButton.anchor.setTo(0.5);
 		this.buttons.push(this.settingsButton);
+
+		this.creditButton = game.add.button(game.world.width - 40, 30, 'credits', this.showCredits, this, 0, 0, 1);
+        this.creditButton.scale.setTo(0.18);
+        this.creditButton.anchor.setTo(0.5);
 	},
 	/* End Siebe Add */
 
 	update: function ()
 	{
 
-        this.creditButton = game.add.button(game.world.width - 40, 30, 'credits', this.showCredits, this, 0, 0, 1);
-        this.creditButton.scale.setTo(0.18);
-        this.creditButton.anchor.setTo(0.5);
 
 	},
 	showInstructions: function ()
@@ -154,7 +155,21 @@ Trump.MainMenu.prototype = {
 
 	},
 	showCredits: function () {
+		this.clear();
+		this.menuBackground = this.add.sprite(0, 0, 'menuBackground');
+		this.menuBackground.scale.setTo(0.3333);
 
+		this.creditStyle = {font: "30px Arial", fill: "#ffffff", align: "center"};
+		this.creditsButton = this.game.add.text(this.world.centerX, this.world.centerY + 200, "Siebe Vanden Eynde\nRowan Van Ekeren\nRuben De Swaef\nAlex Vanderbist", this.creditStyle);
+		this.creditsButton.anchor.setTo(0.5);
+
+		this.developerStyle = {font: "50px Arial", fill: "#858080", align: "center"};
+		this.developButton = this.game.add.text(this.world.centerX, 80, "DEVELOPERS", this.developerStyle);
+		this.developButton.anchor.setTo(0.5);
+
+		this.backButton = this.add.button(this.world.centerX, game.world.centerY + 330, 'backButton', this.showMain, this, 0, 0, 1);
+		this.backButton.scale.setTo(0.3333);
+		this.backButton.anchor.setTo(0.5);
 	}
 
 };
