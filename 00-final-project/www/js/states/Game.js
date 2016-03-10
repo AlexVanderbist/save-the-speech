@@ -145,13 +145,20 @@ Trump.Game.prototype = {
 
 		// Add buttons
 
-		button = this.add.button(this.world.width - 100, 10, 'addGuard', this.addGuard, this);
+		this.addGuardButton = this.add.button(10, this.world.height - 10 - 64, 'addGuard', this.addGuard, this);
 
 		// Add labels
 
-		var style = {font: "40px Arial", fill: "#ffffff"};
-		this.labelGuards = this.add.text(this.world.width - 80, 28, this.numberguards, style);
-		this.labelMoney = this.add.text(80, 15, "money:" + this.money, style);
+		var btnCountStyle = {font: "25px Arial", fill: "#ffffff", align: "right"};
+		this.labelGuards = this.add.text(50, this.world.height - 45, this.numberguards, btnCountStyle);
+        this.labelGuards.stroke = "#000000";
+        this.labelGuards.strokeThickness = 3;
+		
+        var moneyLabelStyle = {font: "40px Arial", fill: "#ffffff", align: "right"};
+        this.labelMoney = this.add.text(this.game.width - 15, 60, "$" + this.money, moneyLabelStyle);
+        this.labelMoney.anchor.setTo(1,1);
+        this.labelMoney.stroke = "#000000";
+        this.labelMoney.strokeThickness = 6;
 
 		// draw a circle around president
 		guardFreeZone = this.add.graphics(0, 0);
@@ -185,7 +192,7 @@ Trump.Game.prototype = {
 		// Update labels
 
 		this.labelGuards.setText(Math.floor(this.money / this.PriceGuard)); // update this
-		this.labelMoney.setText(this.money);
+		this.labelMoney.setText("$" + this.money);
 
 		// If adding, place guard
 
@@ -258,7 +265,7 @@ Trump.Game.prototype = {
 	{
 		// play first quote
 
-		quote = this.add.audio('quote1');
+		quote = this.add.audio('quote3');
 
 		this.trumphead.visible = true;
 		quote.play();
@@ -467,8 +474,9 @@ Trump.Game.prototype = {
         var isValidAngle = function (angle) {
             var degrees = angle * (180/Math.PI);
             var valid = true;
-            if(degrees > 160 && degrees < 200) valid = false;
-            if(degrees > 340 && degrees < 20) valid = false;
+            var offset = 30;
+            if(degrees > (180 - offset) && degrees < (180 + offset)) valid = false;
+            if(degrees > (360 - offset) && degrees < offset) valid = false;
 
             return valid;
         }
@@ -599,9 +607,9 @@ Trump.Game.prototype = {
 		}
 		var angle = Math.atan2(obj2.y - obj1.y, obj2.x - obj1.x);
 
-        if(Math.random() < 0.35) {
+        if(Math.random() < 0.2) {
 
-            console.log("miss");
+            //console.log("miss");
 
             // miss amount
             var missAmount = Math.random() * 0.2 + 0.1;
@@ -623,7 +631,8 @@ Trump.Game.prototype = {
 		if (this.money >= this.PriceGuard)
 		{
 			this.adding = true;
-			this.addingGuard = this.add.sprite(this.world.width - 100, 10, 'addingGuard');
+            this.addGuardButton.loadTexture("addingGuard");
+			// this.addingGuard = this.add.sprite(this.world.width - 100, 10, 'addingGuard');
 		}
 
 	},
@@ -643,7 +652,8 @@ Trump.Game.prototype = {
 		{
 			var guard = this.add.sprite(inputX, inputY, 'bodyguard');
 			guards.add(guard);
-			this.addingGuard.destroy();
+            this.addGuardButton.loadTexture('addGuard');
+			//this.addingGuard.destroy();
 			this.money -= this.PriceGuard;
 			this.adding = false;
 			guard.healthBar = new HealthBar(this.game, {

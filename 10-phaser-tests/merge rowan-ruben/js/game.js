@@ -59,11 +59,14 @@ preload.prototype = {
 		game.load.image("taco", "assets/taco.png");
 		game.load.image("addGuard", "assets/addGuard.png");
 		game.load.image("addingGuard", "assets/addingGuard.png");
+        game.load.image("addFence", "assets/addFence.png");
+        game.load.image("addingFence", "assets/addingFence.png");
 		game.load.image("trumprage", 'assets/trumprage.png');
 		game.load.image("concrete", 'assets/concrete.png');
 		game.load.image("stand", 'assets/stand.png');
         game.load.image("money", 'assets/money.png'); ////////////////////////////////////////////////////////////////
         game.load.image("happytrump", 'assets/happytrump.png');
+        game.load.image("fence", 'assets/fence.png');
 
 		// and sprites
 		game.load.spritesheet('trumpsprite', 'assets/trumpsprite.png', 353, 624, 6);
@@ -104,12 +107,15 @@ preload.prototype = {
 
 		// Vars
 		game.PriceGuard = 10;
+        game.PriceFence = 10;
 		game.moneyTimeOut = 2; // om de twee seconden 1 muntje
 		game.tacoDamage = 30;
 		game.defaultGuardHealth = 100.0;
 		game.defaultPresidentHealth = 160.0;
+        game.defaultFenceHealth = 300;
 
-		game.adding = false; // later ID ofzo
+		game.addGuard = false; // later ID ofzo
+        game.addFence = false;
 		game.money = 15;
 
 
@@ -174,9 +180,13 @@ playgame.prototype = {
 		// Create Groups
 
 		guards = game.add.group();
+        fences = game.add.group();
 		guards.enableBody = true;
 		guards.physicsBodyType = Phaser.Physics.P2JS;
 		guards.someOneIsActive = false;
+
+        fences.enableBody = true;
+        fences.physicsBodyType = Phaser.Physics.P2JS;
 
 		projectiles = game.add.group();
 		projectiles.enableBody = true;
@@ -193,6 +203,7 @@ playgame.prototype = {
 		game.collidedCollisionGroup = game.physics.p2.createCollisionGroup();
 		game.guardCollisionGroup = game.physics.p2.createCollisionGroup();
         game.cashCollisionGroup = game.physics.p2.createCollisionGroup(); /////////////////////////////////////////////////////
+        game.fencesCollisionGroup = game.physics.p2.createCollisionGroup();
 		game.physics.p2.updateBoundsCollisionGroup();
 
 
@@ -247,6 +258,7 @@ playgame.prototype = {
         // Add buttons
 
         button = game.add.button(game.world.width - 100, 10, 'addGuard', this.addGuard, this);
+        button = game.add.button(game.world.width - 164, 10, 'addFence', this.addFence, this);
 
         // Add labels 
 
@@ -272,13 +284,13 @@ playgame.prototype = {
     },
     startWave: function(waveNumber) {
         // play first quote
-
-        quote = game.add.audio('quote1');
-
+        var rndquote = Math.floor(Math.random() * stupidquote.length);
+        var quotestart = stupidquote[rndquote];
+        console.log("rndquote= " + rndquote);
         game.trumphead.visible = true;
-        quote.play();
-        quote.onStop.add(quoteStopped, this);
-        function quoteStopped(quote){
+        quotestart.play();
+        quotestart.onStop.add(quoteStopped, this);
+        function quoteStopped(){
             game.trumphead.animations.stop(null, true);
         }
 
@@ -298,10 +310,17 @@ playgame.prototype = {
 
         // If adding, place guard
 
-        if (game.input.activePointer.isDown && game.adding) 
+        if (game.input.activePointer.isDown && game.addGuard)
         {
-            this.placeGuard();
+
+              this.placeGuard();
         }
+        if (game.input.activePointer.isDown && game.addFence)
+        {
+
+            this.placeFence();
+        }
+
 
         // Fade out projectiles and slow down when hit
 
@@ -409,11 +428,27 @@ playgame.prototype = {
     },
     rotateGuard: function (guard)
     {
-        if (guard.followPath.newPath.length > 0)
+    if (guard.followPath.newPath.length > 0)
+    {
+        console.log("rot");
+        var lengthX = guard.followPath.newPath[ 0 ].x - guard.position.x;
+        var lengthY = guard.followPath.newPath[ 0 ].y - guard.position.y;
+        var correctingAngle = 0;
+
+        if (lengthX < 0)
         {
+            correctingAngle = Math.PI;
+        }
+
+        guard.body.rotation = Math.atan(lengthY / lengthX) + Math.PI / 2 + correctingAngle;
+    }
+},
+    rotateFence: function (fence)
+    {
+
             console.log("rot");
-            var lengthX = guard.followPath.newPath[ 0 ].x - guard.position.x;
-            var lengthY = guard.followPath.newPath[ 0 ].y - guard.position.y;
+            var lengthX = game.world.centerX - fence.position.x;
+            var lengthY = game.world.centerY - fence.position.y;
             var correctingAngle = 0;
 
             if (lengthX < 0)
@@ -421,8 +456,8 @@ playgame.prototype = {
                 correctingAngle = Math.PI;
             }
 
-            guard.body.rotation = Math.atan(lengthY / lengthX) + Math.PI / 2 + correctingAngle;
-        }
+            fence.body.rotation = Math.atan(lengthY / lengthX) + Math.PI / 2 + correctingAngle;
+
     },
     drawLine: function(guard)
     {
@@ -517,7 +552,7 @@ playgame.prototype = {
         taco.body.clearShapes();
         taco.body.loadPolygon('tacoPhysics', 'taco');
         taco.body.setCollisionGroup(game.projectileCollisionGroup);
-        taco.body.collides([game.trumpCollisionGroup, game.projectileCollisionGroup, game.guardCollisionGroup]);
+        taco.body.collides([game.trumpCollisionGroup, game.projectileCollisionGroup, game.guardCollisionGroup, game.fencesCollisionGroup]);
         taco.body.collideWorldBounds = false;
         this.throwProjectileToObj(taco,game.trump, 160);
 
@@ -575,21 +610,30 @@ playgame.prototype = {
     addGuard: function () {
         if (game.money >= game.PriceGuard) 
         {
-            game.adding = true;
+
+            game.addGuard = true;
             game.addingGuard = game.add.sprite(game.world.width - 100, 10, 'addingGuard');
         }
         
+    },
+    addFence: function () {
+        if (game.money >= game.PriceFence && game.money > 0)
+        {
+            game.addFence = true;
+            game.addingFence = game.add.sprite(game.world.width - 164, 10, 'addingFence');
+        }
+
     },
     destroyHealthbar: function (healthbar) {
         healthbar.barSprite.destroy();
         healthbar.bgSprite.destroy();
     },
-    placeGuard: function () { 
+    placeGuard: function () {
         var guard = game.add.sprite(game.input.x, game.input.y, 'bodyguard');
         guards.add(guard);
         game.addingGuard.destroy();
         game.money -= game.PriceGuard;
-        game.adding = false;
+        game.addGuard = false;
         guard.healthBar = new HealthBar(this.game, {x: guard.position.x, y: guard.position.y - 40, width: 60, height: 10});
         guard.health = game.defaultGuardHealth;
         guard.kill = false;
@@ -611,6 +655,22 @@ playgame.prototype = {
         guard.followPath.pathSpriteIndex = -1;
         guard.followPath.greenLine = game.add.graphics(0, 0);
     },
+    placeFence: function () {
+        var fence = game.add.sprite(game.input.x, game.input.y, 'fence');
+        fences.add(fence);
+        game.money -= game.PriceFence;
+        game.addFence = false;
+
+        fence.body.static = true;
+        fence.body.setCollisionGroup(game.fencesCollisionGroup);
+        fence.body.collides(game.projectileCollisionGroup, this.onProjectileHitFence, this);
+        this.rotateFence(fence);
+        fence.health = game.defaultFenceHealth;
+        fence.healthBar = new HealthBar(this.game, {x: fence.position.x, y: fence.position.y - 40, width: 60, height: 10});
+
+
+
+    },
     onProjectileHitGuard: function(guardBody, projectileBody) {
         this.stopProjectile(projectileBody.sprite);
 
@@ -620,6 +680,24 @@ playgame.prototype = {
             tacohit.play();
             this.checkHealth();
         }
+    },
+    onProjectileHitFence: function(fenceBody, projectileBody) {
+        this.stopProjectile(projectileBody.sprite);
+
+        // take guard health
+        if(projectileBody.sprite.key == 'taco') {
+            //guardBody.sprite.health -= game.tacoDamage;
+            tacohit.play();
+           // this.checkHealth();
+            fenceBody.sprite.health -= game.tacoDamage;
+            fenceBody.sprite.healthBar.setPercent(fenceBody.sprite.health/game.defaultFenceHealth*100);
+        }
+        if(fenceBody.sprite.health < 1)
+        {
+            this.destroyHealthbar(fenceBody.sprite.healthBar);
+            fenceBody.sprite.kill();
+        }
+
     },
     onCashHitGuard: function(guardBody, cashBody) { //////////////////////////////////////////////////////////////////////////
         cashBody.sprite.body.setCollisionGroup(game.collidedCollisionGroup);
