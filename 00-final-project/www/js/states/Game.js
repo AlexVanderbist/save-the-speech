@@ -1,5 +1,6 @@
 Trump.Game = function (game)
 {
+	this.defaultValues = {};
 
 	this.PriceGuard = 10;
 	this.PriceFence = 15;
@@ -26,19 +27,22 @@ Trump.Game = function (game)
 	this.moneyhit = null;
 	this.tacohit = null;
 
-	this.moneyValue = 5;
-	this.moneyRate = 6;
-	this.moneyEndRate = 4;
-	this.tacoRate = 2;
-
-	this.bomberRate = 4;
-	this.tacoEndRate = 1.7;
-	this.healthRegenerate = 4;
-	this.waveLength = 16;
+	this.defaultValues.moneyValue = 5;
+	this.defaultValues.moneyRate = 6;
+	this.defaultValues.moneyEndRate = 4;
+	this.defaultValues.tacoRate = 2;
+	
+	this.defaultValues.bomberRate = 4;
+	this.defaultValues.tacoEndRate = 1.7;
+	this.defaultValues.healthRegenerate = 4;
+	this.defaultValues.waveLength = 16;
 
 	this.projectileDespawnTime = 7;
 
-	this.triggerDistance = 70;
+	this.defaultValues.triggerDistance = 70;
+	this.defaultValues.waveNumber = 1;
+
+	this.defaultValues.speedGuard = 250;
 
 	this.guardColors = [
 		"000000",
@@ -52,18 +56,43 @@ Trump.Game = function (game)
 		"897192",
 		"525a26"
 	];
+
+	game.defaultValues = this.defaultValues;
 };
 
-Trump.Game.prototype = {
+Trump.Game.prototype =
+{
+	/* Start Siebe Add */
+	returnTrueValue: function (variable, defaultValue)
+	{
+		if(variable === undefined)
+		{
+			return defaultValue;
+		}
+		else
+		{
+			return variable;
+		}
+	},
+	setDefaultsValues: function()
+	{
+		var defaultValues = this.defaultValues;
+		for(defaultValue in defaultValues)
+		{
+			this[defaultValue] = this.returnTrueValue(game[defaultValue], this.defaultValues[defaultValue]);
+		}
+	},
+	/* End Siebe Add */
 
 	create: function ()
 	{
-        // Reset Game
+		this.setDefaultsValues();
+    // Reset Game
 		game.addingGuard = false; // later ID ofzo
-        game.addingFence = false;
-        this.money = 15;
-        game.score = 0;
-		this.waveNumber = 1;
+		game.addingFence = false;
+		this.money = 15;
+		game.score = 0;
+		//this.waveNumber = 1; wordt gedaan in setDefaultValues zodat we da in settings kunnen veranderen
 
 		//put sounds in array
 		this.stupidquote.push(
@@ -432,8 +461,8 @@ Trump.Game.prototype = {
 			if (curGuardFollowPath.path != null && curGuardFollowPath.path.length > 0 && curGuardFollowPath.pathSpriteIndex < curGuardFollowPath.pathIndex)
 			{
 				curGuardFollowPath.pathSpriteIndex = Math.min(curGuardFollowPath.pathSpriteIndex, curGuardFollowPath.path.length - 1);
-				this.physics.arcade.moveToXY(guards.children[ guard ], curGuardFollowPath.newPath[ 0 ].x, curGuardFollowPath.newPath[ 0 ].y, 250);
-				this.physics.arcade.moveToXY(guards.children[ guard ].bodyBack, curGuardFollowPath.newPath[ 0 ].x, curGuardFollowPath.newPath[ 0 ].y, 250);
+				this.physics.arcade.moveToXY(guards.children[ guard ], curGuardFollowPath.newPath[ 0 ].x, curGuardFollowPath.newPath[ 0 ].y, this.speedGuard);
+				this.physics.arcade.moveToXY(guards.children[ guard ].bodyBack, curGuardFollowPath.newPath[ 0 ].x, curGuardFollowPath.newPath[ 0 ].y, this.speedGuard);
 
 				if (this.physics.arcade.distanceToXY(guards.children[ guard ], curGuardFollowPath.path[ curGuardFollowPath.pathSpriteIndex ].x, curGuardFollowPath.path[ curGuardFollowPath.pathSpriteIndex ].y) < 20)
 				{

@@ -35,6 +35,12 @@ Trump.Preloader.prototype = {
         game.load.image("addFence", "assets/addFence.png");
         game.load.image("addingFence", "assets/addingFence.png");
 
+		/* Start Siebe Add */
+		this.load.image('settings', 'assets/settings.png');
+		this.load.image('plusButton', 'assets/plusButton.png');
+		this.load.image('minButton', 'assets/minButton.png');
+		/* End Siebe Add */
+
         
 		// and sprites
 		this.load.spritesheet('trumpsprite', 'assets/trumpsprite.png', 353, 624, 6);
@@ -44,6 +50,12 @@ Trump.Preloader.prototype = {
 		this.load.spritesheet('instructionButton', 'assets/instrucBtn.png', 686, 207);
 	    game.load.spritesheet('bomber', 'assets/bomberSprite.png', 64, 64);
         game.load.spritesheet('explosion', 'assets/explosion.png', 128, 128);
+
+		/* Start Siebe Add */
+		this.load.spritesheet('backButton', 'assets/backBtn.png', 686, 207);
+		this.load.spritesheet('settingsButton', 'assets/settingsBtn.png', 686, 207);
+		/* End Siebe Add */
+
 
 		// Preload sounds
 		this.load.audio('quote1', 'assets/sounds/stupidquote/stupidquote1.mp3');
