@@ -46,17 +46,17 @@ Trump.MainMenu.prototype = {
 
 		game.instrucStyle = { font: "20px Arial", fill: "#858080" };  
         this.game.add.text(20, 180, "Save Trump's speech from the angry crowd by \nbuying bodyguards or fences to block the \nthrown taco's.", game.instrucStyle);
-        var instrucTaco = game.add.sprite(10, 250, 'taco');
+        var instrucTaco = game.add.sprite(8, 250, 'taco');
         instrucTaco.scale.setTo(1.5, 1.5);
         this.game.add.text(100, 275, "Does damage to Trump, bodyguard \nand fences.", game.instrucStyle);
-        var instrucMoney = game.add.sprite(32, 355, 'money');
+        var instrucMoney = game.add.sprite(29, 355, 'money');
         instrucMoney.scale.setTo(1.2, 1.2);
         this.game.add.text(100, 340, "Does damage to bodyguards, but \nTrump will gain money.", game.instrucStyle);
         var instrucGuard = game.add.sprite(22, 395, 'bodyguard');
         instrucGuard.scale.setTo(0.9, 0.9);
         this.game.add.text(100, 410, "Click and drag to move and block taco's.", game.instrucStyle);
-        var instrucFence = game.add.sprite(22, 455, 'fence');
-        this.game.add.text(100, 455, "Place the fence and block taco's.", game.instrucStyle);
+        var instrucFence = game.add.sprite(20, 464, 'fence');
+        this.game.add.text(100, 455, "Place the fence to block taco's.", game.instrucStyle);
 	},
 
 	startGame: function (pointer) {
