@@ -27,7 +27,7 @@ Trump.Game = function (game)
 	this.moneyValue = 5;
 	this.moneyRate = 6;
 	this.tacoRate = 2;
-	this.bomberRate = 15;
+	this.bomberRate = 4;
 	this.healthRegenerate = 4;
 
 	this.projectileDespawnTime = 7;
@@ -53,8 +53,8 @@ Trump.Game.prototype = {
 	create: function ()
 	{
         // Reset Game
-		game.addGuard = false; // later ID ofzo
-        game.addFence = false;
+		game.addingGuard = false; // later ID ofzo
+        game.addingFence = false;
         this.money = 15;
         game.score = 0;
 
@@ -118,6 +118,8 @@ Trump.Game.prototype = {
         fences.physicsBodyType = Phaser.Physics.P2JS;
 
         bombers = this.add.group();
+        bombers.enableBody = true;
+        bombers.physicsBodyType = Phaser.Physics.P2JS;
 
 		// Create collision groups
 
@@ -233,7 +235,6 @@ Trump.Game.prototype = {
 
 	update: function ()
 	{
-		this.trump.angle += 1;
 
 		// Check for clicks on guards
 		this.guardClickHandler();
@@ -246,11 +247,17 @@ Trump.Game.prototype = {
 		this.labelScore.setText(game.score);
 
 		// If adding, place guard
+		
+		//console.log(this.addGuard);
 
-		if (this.input.activePointer.isDown && this.adding)
-		{
-			this.placeGuard();
-		}
+        if (this.input.activePointer.isDown && this.addingGuard)
+        {
+              this.placeGuard();
+        }
+        if (this.input.activePointer.isDown && this.addingFence)
+        {
+            this.placeFence();
+        }
 
 		// Fade out projectiles and slow down when hit
 
@@ -436,7 +443,7 @@ Trump.Game.prototype = {
 			}
 		}
 	},
-	rotateGuard      : function (guard)
+	rotateGuard: function (guard)
 	{
 		if (guard.followPath.newPath.length > 0)
 		{
@@ -549,6 +556,17 @@ Trump.Game.prototype = {
 				this.destroyHealthbar(guard.healthBar);
 			}
 		}, this);
+
+        // check & update health bars for fences
+        fences.forEachExists(function(fence) {
+            fence.healthBar.setPercent((fence.health/this.defaultFenceHealth)*100);
+
+            if(fence.health <= 0) {
+                fence.body.angularVelocity = 10;
+                fence.kill = true;
+                this.destroyHealthbar(fence.healthBar);
+            }
+        }, this);
 	},
 
 	getRandomPositionOffScreen: function ()
@@ -614,6 +632,40 @@ Trump.Game.prototype = {
 		this.trumphappy.visible = false;
 	},
 
+    rotateFence: function (fence)
+    {
+
+        // console.log("rot");
+        var lengthX = this.world.centerX - fence.position.x;
+        var lengthY = this.world.centerY - fence.position.y;
+        var correctingAngle = 0;
+
+        if (lengthX < 0)
+        {
+            correctingAngle = Math.PI;
+        }
+
+        fence.body.rotation = Math.atan(lengthY / lengthX) + Math.PI / 2 + correctingAngle;
+
+    },
+
+    rotateBomber: function (bomber)
+    {
+
+        // console.log("rot");
+        var lengthX = this.world.centerX - bomber.position.x;
+        var lengthY = this.world.centerY - bomber.position.y;
+        var correctingAngle = 0;
+
+        if (lengthX < 0)
+        {
+            correctingAngle = Math.PI;
+        }
+
+        bomber.body.rotation = Math.atan(lengthY / lengthX) + Math.PI / 2 + correctingAngle;
+
+    },
+
 	addProjectile: function ()
 	{
 		var randomPos = this.getRandomPositionOffScreen();
@@ -627,13 +679,31 @@ Trump.Game.prototype = {
 		taco.body.clearShapes();
 		taco.body.loadPolygon('tacoPhysics', 'taco');
 		taco.body.setCollisionGroup(this.projectileCollisionGroup);
-		taco.body.collides([ this.cashCollisionGroup, this.trumpCollisionGroup, this.projectileCollisionGroup, this.guardCollisionGroup ]);
+		taco.body.collides([ this.cashCollisionGroup, this.trumpCollisionGroup, this.projectileCollisionGroup, this.guardCollisionGroup, this.fencesCollisionGroup ]);
 		taco.body.collideWorldBounds = false;
 		this.throwProjectileToObj(taco, this.trump, 160);
 
 		// var sound = this.add.audio('drop');
 		// sound.play();
 	},
+
+    addSuicideBomber: function()
+    {
+        var randomPos = this.getRandomPositionOffScreen();
+        var bomber = this.add.sprite(randomPos.x, randomPos.y, 'bomber');
+        bombers.add(bomber);
+        bomber.animations.add('walk', [1,2], 5, true);
+        bomber.animations.play('walk');
+        bomber.body.clearShapes();
+        bomber.body.loadPolygon('personPhysics', 'person');
+        bomber.body.setCollisionGroup(this.bombersCollisionGroup);
+        bomber.body.collideWorldBounds = false;
+        bomber.body.collides([this.trumpCollisionGroup, this.fencesCollisionGroup, this.guardCollisionGroup], this.onBomberCollide, this);
+
+        this.throwProjectileToObj(bomber,this.trump, 60);
+        this.rotateBomber(bomber);
+
+    },
 
 	addCash: function ()
 	{
@@ -729,12 +799,29 @@ Trump.Game.prototype = {
 	{
 		if (this.money >= this.PriceGuard)
 		{
-			this.adding = true;
+			this.addingGuard = true;
 			this.addGuardButton.loadTexture("addingGuard");
-			// this.addingGuard = this.add.sprite(this.world.width - 100, 10, 'addingGuard');
+
+        	// add fence
+            this.addingFence = false;
+			this.addFenceButton.loadTexture("addFence");
 		}
 
 	},
+
+    addFence: function () {
+        if (this.money >= this.PriceFence && this.money > 0)
+        {
+        	// add fence
+            this.addingFence = true;
+			this.addFenceButton.loadTexture("addingFence");
+
+            // stop adding guard
+			this.addingGuard = false;
+			this.addGuardButton.loadTexture("addGuard");
+        }
+
+    },
 
 	destroyHealthbar: function (healthbar)
 	{
@@ -761,10 +848,12 @@ Trump.Game.prototype = {
 			this.world.moveUp(backGuard);
 
 			guards.add(guard);
+
 			this.addGuardButton.loadTexture('addGuard');
+			this.addingGuard = false;
+
 			//this.addingGuard.destroy();
 			this.money -= this.PriceGuard;
-			this.adding = false;
 			guard.healthBar = new HealthBar(this.game, {
 				x     : guard.position.x,
 				y     : guard.position.y - 40,
@@ -779,6 +868,7 @@ Trump.Game.prototype = {
 			guard.body.setCollisionGroup(this.guardCollisionGroup);
 			guard.body.collides(this.projectileCollisionGroup, this.onProjectileHitGuard, this);
 			guard.body.collides(this.cashCollisionGroup, this.onCashHitGuard, this);
+			guard.body.collides(this.bombersCollisionGroup);
 
 			guard.animations.add('walk', [ 1, 2 ], 5, true);
 
@@ -799,6 +889,29 @@ Trump.Game.prototype = {
 		}
 	},
 
+    placeFence: function () {
+   		var inputX = this.input.x;
+		var inputY = this.input.y;
+
+		if (this.calculateDistance(inputX, inputY, this.world.centerX, this.world.centerY) > this.guardFreeZoneRadius)
+		{
+	        var fence = this.add.sprite(this.input.x, this.input.y, 'fence');
+	        fences.add(fence);
+	        this.money -= this.PriceFence;
+
+			this.addFenceButton.loadTexture('addFence');
+	        this.addingFence = false;
+
+	        fence.body.static = true;
+	        fence.body.setCollisionGroup(this.fencesCollisionGroup);
+	        fence.body.collides([this.projectileCollisionGroup], this.onProjectileHitFence, this);
+	        fence.body.collides([this.bombersCollisionGroup]);
+	        this.rotateFence(fence);
+	        fence.health = this.defaultFenceHealth;
+	        fence.healthBar = new HealthBar(this.game, {x: fence.position.x, y: fence.position.y - 40, width: 60, height: 10});
+	    }
+    },
+
 	onProjectileHitGuard: function (guardBody, projectileBody)
 	{
 		this.stopProjectile(projectileBody.sprite);
@@ -807,9 +920,18 @@ Trump.Game.prototype = {
 		if (projectileBody.sprite.key == 'taco')
 		{
 			guardBody.sprite.health -= this.tacoDamage;
+            this.tacohit.play();
 			this.checkHealth();
 		}
 	},
+
+    onProjectileHitFence: function(fenceBody, projectileBody) {
+        this.tacohit.play();
+       	this.checkHealth();
+        fenceBody.sprite.health -= this.tacoDamage;
+        fenceBody.sprite.healthBar.setPercent(fenceBody.sprite.health/this.defaultFenceHealth*100);
+        this.stopProjectile(projectileBody.sprite);
+    },
 
 	onCashHitGuard: function (guardBody, cashBody)
 	{
@@ -826,16 +948,20 @@ Trump.Game.prototype = {
 		this.money += amount;
 	},
 
+	isAdding: function () {
+		return this.addingGuard || this.addingFence;
+	},
+
 	click: function (object)
 	{
 		var bodies = this.physics.p2.hitTest(object.position, guards.children);
 
-		if (bodies.length !== 0 && !this.adding)
+		if (bodies.length !== 0 && !this.isAdding())
 		{
 			bodies[ 0 ].parent.sprite.followPath.isActive = true;
 			guards.activeGuard = bodies[ 0 ].parent.sprite;
 		}
-		else if (!this.adding)
+		else if (!this.isAdding())
 		{
 			// we didnt directly hit a guard, but maybe he's near
 
