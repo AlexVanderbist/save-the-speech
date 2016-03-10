@@ -8,7 +8,7 @@ Trump.Game = function (game)
 	this.tacoDamage = 30;
     this.bomberDamage = 100;
 	this.defaultGuardHealth = 100.0;
-	this.defaultPresidentHealth = 160.0;
+	this.defaultPresidentHealth = 1600.0;
 	this.defaultFenceHealth = 200.0;
 
 	// moved to create
@@ -27,12 +27,14 @@ Trump.Game = function (game)
 	this.moneyhit = null;
 	this.tacohit = null;
 
+	this.bomberTimeoutWhenHit = 1;
+
 	this.defaultValues.moneyValue = 5;
 	this.defaultValues.moneyRate = 6;
 	this.defaultValues.moneyEndRate = 4;
 	this.defaultValues.tacoRate = 2;
 	
-	this.defaultValues.bomberRate = 15;
+	this.defaultValues.bomberRate = 5; // 15
 	this.defaultValues.tacoEndRate = 1.7;
 	this.defaultValues.healthRegenerate = 4;
 	this.defaultValues.waveLength = 16;
@@ -87,7 +89,7 @@ Trump.Game.prototype =
 	create: function ()
 	{
 		// debug
-		game.time.advancedTiming = true;
+		//game.time.advancedTiming = true;
 
 		this.setDefaultsValues();
     	
@@ -287,7 +289,7 @@ Trump.Game.prototype =
 	update: function ()
 	{
 		// Debug
-		game.debug.text(game.time.fps, 100, 100, "000000");
+		//game.debug.text(game.time.fps, 100, 100, "000000");
 
 		// Check for clicks on guards
 		this.guardClickHandler();
@@ -709,12 +711,12 @@ Trump.Game.prototype =
 
     },
 
-    rotateBomber: function (bomber)
+    rotateSpriteTowardsCenter: function (sprite)
     {
 
         // console.log("rot");
-        var lengthX = this.world.centerX - bomber.position.x;
-        var lengthY = this.world.centerY - bomber.position.y;
+        var lengthX = this.world.centerX - sprite.position.x;
+        var lengthY = this.world.centerY - sprite.position.y;
         var correctingAngle = 0;
 
         if (lengthX < 0)
@@ -722,7 +724,7 @@ Trump.Game.prototype =
             correctingAngle = Math.PI;
         }
 
-        bomber.body.rotation = Math.atan(lengthY / lengthX) + Math.PI / 2 + correctingAngle;
+        sprite.body.rotation = Math.atan(lengthY / lengthX) + Math.PI / 2 + correctingAngle;
 
     },
 
@@ -739,7 +741,7 @@ Trump.Game.prototype =
 		taco.body.clearShapes();
 		taco.body.loadPolygon('tacoPhysics', 'taco');
 		taco.body.setCollisionGroup(this.projectileCollisionGroup);
-		taco.body.collides([ this.cashCollisionGroup, this.trumpCollisionGroup, this.projectileCollisionGroup, this.guardCollisionGroup, this.fencesCollisionGroup ]);
+		taco.body.collides([ this.bombersCollisionGroup, this.cashCollisionGroup, this.trumpCollisionGroup, this.projectileCollisionGroup, this.guardCollisionGroup, this.fencesCollisionGroup ]);
 		taco.body.collideWorldBounds = false;
 		this.throwProjectileToObj(taco, this.trump, 160);
 
@@ -759,10 +761,27 @@ Trump.Game.prototype =
         bomber.body.setCollisionGroup(this.bombersCollisionGroup);
         bomber.body.collideWorldBounds = false;
         bomber.body.collides([this.trumpCollisionGroup, this.fencesCollisionGroup, this.guardCollisionGroup], this.onBomberCollide, this);
+        bomber.body.collides([this.projectileCollisionGroup, this.cashCollisionGroup ], this.bomberProjectileCollision, this);
 
-        this.throwProjectileToObj(bomber,this.trump, 70, false);
-        this.rotateBomber(bomber);
+        //this.throwProjectileToObj(bomber,this.trump, 70, false);
+        this.moveSpriteTowardsCenter(bomber);
 
+    },
+
+    moveSpriteTowardsCenter: function (sprite) {
+    	if(sprite.body) {
+			this.physics.arcade.moveToXY(sprite, this.world.centerX, this.world.centerY, 70);
+			// reset velocity
+			sprite.body.angularVelocity = 0;        
+	        this.rotateSpriteTowardsCenter(sprite);
+    	}
+    },
+
+    bomberProjectileCollision: function (bomberBody, projectileBody) {
+    	// keep moving towards target after 1 sec
+		this.time.events.add(Phaser.Timer.SECOND * this.bomberTimeoutWhenHit, this.moveSpriteTowardsCenter, this, bomberBody.sprite);       
+        //this.moveSpriteTowardsCenter(bomberBody.sprite);
+        this.stopProjectile(projectileBody.sprite);
     },
 
     onBomberCollide: function(bomber, collisionbody)
@@ -791,7 +810,7 @@ Trump.Game.prototype =
 		cashgroup.add(cash);
 		cash.kill = false;
 		cash.body.setCollisionGroup(this.cashCollisionGroup);
-		cash.body.collides([ this.trumpCollisionGroup, this.guardCollisionGroup, this.projectileCollisionGroup ]);
+		cash.body.collides([ this.trumpCollisionGroup, this.guardCollisionGroup, this.bombersCollisionGroup, this.projectileCollisionGroup ]);
 		cash.body.collideWorldBounds = false;
 		this.throwProjectileToObj(cash, this.trump, 160);
 
