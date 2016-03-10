@@ -458,7 +458,7 @@ Trump.Game.prototype = {
             this.trump.body.setCollisionGroup(this.collidedCollisionGroup);
 
             // wait until going to gameover
-            this.time.events.add(Phaser.Timer.SECOND * 4, this.gameOverState, this);
+            this.time.events.add(Phaser.Timer.SECOND * 3, this.gameOverState, this);
             
 			//this.destroyHealthbar(this.trump.healthBar);
 			// this.trump.destroy(); // for now
