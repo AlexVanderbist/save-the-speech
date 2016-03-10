@@ -77,7 +77,7 @@ Trump.Game.prototype =
 	setDefaultsValues: function()
 	{
 		var defaultValues = this.defaultValues;
-		for(defaultValue in defaultValues)
+		for(var defaultValue in defaultValues)
 		{
 			this[defaultValue] = this.returnTrueValue(game[defaultValue], this.defaultValues[defaultValue]);
 		}
@@ -414,7 +414,7 @@ Trump.Game.prototype =
 
 			if (distanceToCenter > this.guardFreeZoneRadius)
 			{
-				if (guardFollowPath.pathIndex != 0)
+				if (guardFollowPath.pathIndex !== 0)
 				{
 					//console.log("okid");
 					var fromX = guardFollowPath.path[ guardFollowPath.pathIndex - 1 ].x;
@@ -465,7 +465,7 @@ Trump.Game.prototype =
 		{
 			var curGuard = guards.children[ guard ];
 			var curGuardFollowPath = curGuard.followPath;
-			if (curGuardFollowPath.path != null && curGuardFollowPath.path.length > 0 && curGuardFollowPath.pathSpriteIndex < curGuardFollowPath.pathIndex)
+			if (curGuardFollowPath.path !== null && curGuardFollowPath.path.length > 0 && curGuardFollowPath.pathSpriteIndex < curGuardFollowPath.pathIndex)
 			{
 				curGuardFollowPath.pathSpriteIndex = Math.min(curGuardFollowPath.pathSpriteIndex, curGuardFollowPath.path.length - 1);
 				this.physics.arcade.moveToXY(guards.children[ guard ], curGuardFollowPath.newPath[ 0 ].x, curGuardFollowPath.newPath[ 0 ].y, this.speedGuard);
@@ -559,7 +559,7 @@ Trump.Game.prototype =
 
 		// check trump health
             	console.log(this.trump.health, this.trump.died);
-		if (this.trump.health <= 0 && this.trump.died == false)
+		if (this.trump.health <= 0 && this.trump.died === false)
 		{
 
 			// trump died :(  
