@@ -33,6 +33,8 @@ Trump.Preloader.prototype = {
 		this.load.image("happytrump", 'assets/happytrump.png');
 
 		this.load.image('settings', 'assets/settings.png');
+		this.load.image('plusButton', 'assets/plusButton.png');
+		this.load.image('minButton', 'assets/minButton.png');
 
         
 		// and sprites
