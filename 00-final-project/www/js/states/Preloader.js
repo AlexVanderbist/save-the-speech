@@ -28,7 +28,7 @@ Trump.Preloader.prototype = {
 		this.load.image("trumprage", 'assets/trumprage.png');
 		this.load.image("concrete", 'assets/concrete.png');
 		this.load.image("stand", 'assets/stand.png');
-
+		this.load.image("fence", 'assets/fence.png'); ////////////////////////////
 		this.load.image("money", 'assets/money.png');
 		this.load.image("happytrump", 'assets/happytrump.png');
 
