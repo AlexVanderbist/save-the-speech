@@ -467,8 +467,9 @@ Trump.Game.prototype = {
         var isValidAngle = function (angle) {
             var degrees = angle * (180/Math.PI);
             var valid = true;
-            if(degrees > 160 && degrees < 200) valid = false;
-            if(degrees > 340 && degrees < 20) valid = false;
+            var offset = 30;
+            if(degrees > (180 - offset) && degrees < (180 + offset)) valid = false;
+            if(degrees > (360 - offset) && degrees < offset) valid = false;
 
             return valid;
         }

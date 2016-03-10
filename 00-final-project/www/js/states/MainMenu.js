@@ -30,7 +30,7 @@ Trump.MainMenu.prototype = {
 	showInstructions: function () {
 		this.instructionBackground = this.add.sprite(0,0, 'instructions');
 		this.instructionBackground.scale.setTo(0.3333);
-		//this.input.onDown.addOnce(this.startGame, this);
+		this.input.onDown.addOnce(this.startGame, this);
 
 		game.instrucStyle = { font: "20px Arial", fill: "#858080" };  
         this.game.add.text(20, 200, "Save Trump's speech from the angry crowd by \nbuying bodyguards or fences to block the \nthrown taco's.", game.instrucStyle);
