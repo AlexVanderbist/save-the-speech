@@ -8,7 +8,7 @@ Trump.Game = function (game)
     this.bomberDamage = 100;
 	this.defaultGuardHealth = 100.0;
 	this.defaultPresidentHealth = 160.0;
-	this.defaultFenceHealth = 20.0;
+	this.defaultFenceHealth = 200.0;
 
 	// moved to create
 	// this.adding = false; // later ID ofzo
@@ -1013,7 +1013,7 @@ Trump.Game.prototype = {
 						guards.activeGuard = guard;
 					}
 				}
-			});
+			}, this);
 		}
 	},
 
