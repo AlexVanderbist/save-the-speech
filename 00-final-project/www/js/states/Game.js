@@ -2,6 +2,7 @@ Trump.Game = function (game)
 {
 
 	this.PriceGuard = 10;
+	this.PriceFence = 15;
 	this.moneyTimeOut = 2; // om de twee seconden 1 muntje
 	this.tacoDamage = 30;
 	this.defaultGuardHealth = 100.0;
@@ -26,6 +27,7 @@ Trump.Game = function (game)
 	this.moneyValue = 5;
 	this.moneyRate = 6;
 	this.tacoRate = 2;
+	this.bomberRate = 15;
 	this.healthRegenerate = 4;
 
 	this.projectileDespawnTime = 7;
@@ -51,7 +53,8 @@ Trump.Game.prototype = {
 	create: function ()
 	{
         // Reset Game
-        this.adding = false; // later ID ofzo
+		game.addGuard = false; // later ID ofzo
+        game.addFence = false;
         this.money = 15;
         game.score = 0;
 
@@ -83,6 +86,7 @@ Trump.Game.prototype = {
 		this.tacohit = this.add.audio('tacohit');
 		this.moneyhitguard = this.add.audio('guardmoneyhit');
 		this.moneyhit = this.add.audio('moneyhit');
+		this.explosionsound = game.add.audio('explosionfx');
 
 		// Create BG
 		this.add.sprite(0, 0, 'concrete');
@@ -109,6 +113,12 @@ Trump.Game.prototype = {
 		cashgroup.enableBody = true;
 		cashgroup.physicsBodyType = Phaser.Physics.P2JS;
 
+        fences = this.add.group();
+        fences.enableBody = true;
+        fences.physicsBodyType = Phaser.Physics.P2JS;
+
+        bombers = this.add.group();
+
 		// Create collision groups
 
 		this.trumpCollisionGroup = this.physics.p2.createCollisionGroup();
@@ -116,6 +126,8 @@ Trump.Game.prototype = {
 		this.collidedCollisionGroup = this.physics.p2.createCollisionGroup();
 		this.guardCollisionGroup = this.physics.p2.createCollisionGroup();
 		this.cashCollisionGroup = this.physics.p2.createCollisionGroup();
+        this.fencesCollisionGroup = this.physics.p2.createCollisionGroup();
+        this.bombersCollisionGroup = this.physics.p2.createCollisionGroup();
 
 		this.physics.p2.updateBoundsCollisionGroup();
 
@@ -131,6 +143,7 @@ Trump.Game.prototype = {
 		this.time.events.loop(Phaser.Timer.SECOND * this.tacoRate, this.addProjectile, this);
 		this.time.events.loop(Phaser.Timer.SECOND * this.moneyRate, this.addCash, this);
 		this.time.events.loop(Phaser.Timer.SECOND, this.addScore, this);
+		this.time.events.loop(Phaser.Timer.SECOND * this.bomberRate, this.addSuicideBomber,this);
 
 		// create trump
 
@@ -152,7 +165,8 @@ Trump.Game.prototype = {
 		this.trump.body.static = true;
 		this.trump.body.setCollisionGroup(this.trumpCollisionGroup);
 		this.trump.body.collides(this.projectileCollisionGroup, this.onProjectileHitTrump, this);
-		this.trump.body.collides(this.cashCollisionGroup, this.onCashHitTrump, this)
+		this.trump.body.collides(this.cashCollisionGroup, this.onCashHitTrump, this);
+		this.trump.body.collides(this.bombersCollisionGroup);
 		this.trumpIntro();
 
 		// trumpheads
@@ -171,13 +185,17 @@ Trump.Game.prototype = {
 		// Add buttons
 
 		this.addGuardButton = this.add.button(10, this.world.height - 10 - 64, 'addGuard', this.addGuard, this);
+        this.addFenceButton = this.add.button(84, this.world.height - 10 - 64, 'addFence', this.addFence, this);
 
 		// Add labels
 
 		var btnCountStyle = {font: "25px Arial", fill: "#ffffff", align: "right"};
-		this.labelGuards = this.add.text(50, this.world.height - 45, this.numberguards, btnCountStyle);
+		this.labelGuards = this.add.text(50, this.world.height - 45, "0", btnCountStyle);
 		this.labelGuards.stroke = "#000000";
 		this.labelGuards.strokeThickness = 3;
+		this.labelFences = this.add.text(124, this.world.height - 45, "0", btnCountStyle);
+		this.labelFences.stroke = "#000000";
+		this.labelFences.strokeThickness = 3;
 
 		var moneyLabelStyle = {font: "40px Arial", fill: "#ffffff", align: "right"};
 		this.labelMoney = this.add.text(this.game.width - 15, 60, "$" + this.money, moneyLabelStyle);
@@ -222,7 +240,8 @@ Trump.Game.prototype = {
 
 		// Update labels
 
-		this.labelGuards.setText(Math.floor(this.money / this.PriceGuard)); // update this
+		this.labelGuards.setText(Math.floor(this.money / this.PriceGuard)); 
+		this.labelFences.setText(Math.floor(this.money / this.PriceFence)); 
 		this.labelMoney.setText("$" + this.money);
 		this.labelScore.setText(game.score);
 
