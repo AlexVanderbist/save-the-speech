@@ -2,14 +2,16 @@ Trump.Game = function (game)
 {
 
 	this.PriceGuard = 10;
+	this.PriceFence = 15;
 	this.moneyTimeOut = 2; // om de twee seconden 1 muntje
 	this.tacoDamage = 30;
 	this.defaultGuardHealth = 100.0;
 	this.defaultPresidentHealth = 160.0;
 
+	// moved to create
 	// this.adding = false; // later ID ofzo
 	// this.money = 15;
- //    this.score = 0;
+ 	// this.score = 0;
 
 	this.maxLineLength = 1000;
 	this.guardFreeZoneRadius = 60;
@@ -25,6 +27,7 @@ Trump.Game = function (game)
 	this.moneyValue = 5;
 	this.moneyRate = 6;
 	this.tacoRate = 2;
+	this.bomberRate = 15;
 	this.healthRegenerate = 4;
 
 	this.projectileDespawnTime = 7;
@@ -50,9 +53,10 @@ Trump.Game.prototype = {
 	create: function ()
 	{
         // Reset Game
-        this.adding = false; // later ID ofzo
+		game.addGuard = false; // later ID ofzo
+        game.addFence = false;
         this.money = 15;
-        this.score = 0;
+        game.score = 0;
 
 		//put sounds in array
 		this.stupidquote.push(
@@ -82,6 +86,7 @@ Trump.Game.prototype = {
 		this.tacohit = this.add.audio('tacohit');
 		this.moneyhitguard = this.add.audio('guardmoneyhit');
 		this.moneyhit = this.add.audio('moneyhit');
+		this.explosionsound = game.add.audio('explosionfx');
 
 		// Create BG
 		this.add.sprite(0, 0, 'concrete');
@@ -108,6 +113,12 @@ Trump.Game.prototype = {
 		cashgroup.enableBody = true;
 		cashgroup.physicsBodyType = Phaser.Physics.P2JS;
 
+        fences = this.add.group();
+        fences.enableBody = true;
+        fences.physicsBodyType = Phaser.Physics.P2JS;
+
+        bombers = this.add.group();
+
 		// Create collision groups
 
 		this.trumpCollisionGroup = this.physics.p2.createCollisionGroup();
@@ -115,6 +126,8 @@ Trump.Game.prototype = {
 		this.collidedCollisionGroup = this.physics.p2.createCollisionGroup();
 		this.guardCollisionGroup = this.physics.p2.createCollisionGroup();
 		this.cashCollisionGroup = this.physics.p2.createCollisionGroup();
+        this.fencesCollisionGroup = this.physics.p2.createCollisionGroup();
+        this.bombersCollisionGroup = this.physics.p2.createCollisionGroup();
 
 		this.physics.p2.updateBoundsCollisionGroup();
 
@@ -129,6 +142,8 @@ Trump.Game.prototype = {
 
 		this.time.events.loop(Phaser.Timer.SECOND * this.tacoRate, this.addProjectile, this);
 		this.time.events.loop(Phaser.Timer.SECOND * this.moneyRate, this.addCash, this);
+		this.time.events.loop(Phaser.Timer.SECOND, this.addScore, this);
+		this.time.events.loop(Phaser.Timer.SECOND * this.bomberRate, this.addSuicideBomber,this);
 
 		// create trump
 
@@ -150,7 +165,8 @@ Trump.Game.prototype = {
 		this.trump.body.static = true;
 		this.trump.body.setCollisionGroup(this.trumpCollisionGroup);
 		this.trump.body.collides(this.projectileCollisionGroup, this.onProjectileHitTrump, this);
-		this.trump.body.collides(this.cashCollisionGroup, this.onCashHitTrump, this)
+		this.trump.body.collides(this.cashCollisionGroup, this.onCashHitTrump, this);
+		this.trump.body.collides(this.bombersCollisionGroup);
 		this.trumpIntro();
 
 		// trumpheads
@@ -169,19 +185,29 @@ Trump.Game.prototype = {
 		// Add buttons
 
 		this.addGuardButton = this.add.button(10, this.world.height - 10 - 64, 'addGuard', this.addGuard, this);
+        this.addFenceButton = this.add.button(84, this.world.height - 10 - 64, 'addFence', this.addFence, this);
 
 		// Add labels
 
 		var btnCountStyle = {font: "25px Arial", fill: "#ffffff", align: "right"};
-		this.labelGuards = this.add.text(50, this.world.height - 45, this.numberguards, btnCountStyle);
+		this.labelGuards = this.add.text(50, this.world.height - 45, "0", btnCountStyle);
 		this.labelGuards.stroke = "#000000";
 		this.labelGuards.strokeThickness = 3;
+		this.labelFences = this.add.text(124, this.world.height - 45, "0", btnCountStyle);
+		this.labelFences.stroke = "#000000";
+		this.labelFences.strokeThickness = 3;
 
 		var moneyLabelStyle = {font: "40px Arial", fill: "#ffffff", align: "right"};
 		this.labelMoney = this.add.text(this.game.width - 15, 60, "$" + this.money, moneyLabelStyle);
 		this.labelMoney.anchor.setTo(1, 1);
 		this.labelMoney.stroke = "#000000";
 		this.labelMoney.strokeThickness = 6;
+
+		var scoreLabelStyle = {font: "40px Arial", fill: "#ffffff", align: "center"}; ////////////////////////////////////////
+        this.labelScore = this.add.text(game.world.centerX, 50, game.score, scoreLabelStyle); ///////////////////////////// V
+        this.labelScore.anchor.setTo(0.5,0.5);
+        this.labelScore.stroke = "#000000"; 
+        this.labelScore.strokeThickness = 6;
 
 		// draw a circle around president
 		guardFreeZone = this.add.graphics(0, 0);
@@ -214,8 +240,10 @@ Trump.Game.prototype = {
 
 		// Update labels
 
-		this.labelGuards.setText(Math.floor(this.money / this.PriceGuard)); // update this
+		this.labelGuards.setText(Math.floor(this.money / this.PriceGuard)); 
+		this.labelFences.setText(Math.floor(this.money / this.PriceFence)); 
 		this.labelMoney.setText("$" + this.money);
+		this.labelScore.setText(game.score);
 
 		// If adding, place guard
 
@@ -484,8 +512,22 @@ Trump.Game.prototype = {
             this.trump.died = true;
             this.trump.body.setCollisionGroup(this.collidedCollisionGroup);
 
+            if(localStorage) {
+                game.bestScore = localStorage.getItem('bestScore');
+
+                if(!game.bestScore || game.bestScore < game.score) {
+                  game.bestScore = game.score;
+                  localStorage.setItem('bestScore', game.bestScore);
+                  //console.log("beste score: " + this.bestScore)
+                }
+            } 
+            else {
+                // Fallback
+                game.bestScore = 'N/A';
+            }
+
             // wait until going to gameover
-            this.time.events.add(Phaser.Timer.SECOND * 3, this.gameOverState, this);
+            this.time.events.add(Phaser.Timer.SECOND * 2, this.gameOverState, this);
             
 			//this.destroyHealthbar(this.trump.healthBar);
 			// this.trump.destroy(); // for now
@@ -827,8 +869,13 @@ Trump.Game.prototype = {
 		}, this);	
 
 		// for trump
-		if(this.trump.health < 100) this.trump.health += this.healthRegenerate;	
+		if(this.trump.health < 50) this.trump.health += this.healthRegenerate;	
 
 		this.checkHealth();
-	}
+	},
+    addScore: function(){ 
+        game.score ++;
+        //console.log("score:" + this.score);
+        //console.log("beste score: " + this.bestScore)
+    }
 };
