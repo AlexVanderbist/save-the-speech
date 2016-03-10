@@ -560,15 +560,19 @@ Trump.Game.prototype =
         this.state.start('GameOver');
     },
 
+    stopAllQuotes: function() {
+    	this.sound.stopAll();
+    },
+
 	checkHealth: function ()
 	{
 
 		// check trump health
-            	console.log(this.trump.health, this.trump.died);
 		if (this.trump.health <= 0 && this.trump.died === false)
 		{
 
-			// trump died :(  
+			// trump died :( 
+			this.stopAllQuotes();
             var sound = this.add.audio('dead');
             sound.play();
 
@@ -841,12 +845,11 @@ Trump.Game.prototype =
 		}
 	},
 
-	throwProjectileToObj: function (obj1, obj2, speed, allowMisses = false)
+	throwProjectileToObj: function (obj1, obj2, speed, allowMisses)
 	{
-		if (typeof speed === 'undefined')
-		{
-			speed = 60;
-		}
+		allowMisses = typeof allowMisses !== 'undefined' ? allowMisses : true;
+		speed = typeof speed !== 'undefined' ? speed : 60;
+
 		var angle = Math.atan2(obj2.y - obj1.y, obj2.x - obj1.x);
 
 		if (Math.random() < 0.2 && allowMisses)
