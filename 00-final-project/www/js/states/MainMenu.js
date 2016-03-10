@@ -47,15 +47,16 @@ Trump.MainMenu.prototype = {
 		this.settingsButton.scale.setTo(0.3333);
 		this.settingsButton.anchor.setTo(0.5);
 		this.buttons.push(this.settingsButton);
+
+		this.creditButton = game.add.button(game.world.width - 40, 30, 'credits', this.showCredits, this, 0, 0, 1);
+        this.creditButton.scale.setTo(0.18);
+        this.creditButton.anchor.setTo(0.5);
 	},
 	/* End Siebe Add */
 
 	update: function ()
 	{
 
-        this.creditButton = game.add.button(game.world.width - 40, 30, 'credits', this.showCredits, this, 0, 0, 1);
-        this.creditButton.scale.setTo(0.18);
-        this.creditButton.anchor.setTo(0.5);
 
 	},
 	showInstructions: function ()
@@ -110,14 +111,13 @@ Trump.MainMenu.prototype = {
 		this.minButtonGuardSpeed = this.add.button(255, 175, 'minButton', this.minSetting, this, 0,0,1);
 		this.minButtonGuardSpeed.forObject = "minButtonGuardSpeed";
 
-		this.add.text(20, 180, "Set speed guard:", this.settingsStyle);
-
-		this.plusWave = this.add.button(175, 175, 'plusButton', this.addSetting, this, 0,0,1);
+		this.add.text(20, 220, "Set wave:", this.settingsStyle);
+		this.plusWave = this.add.button(175, 215, 'plusButton', this.addSetting, this, 0,0,1);
 		this.plusWave.forObject = "plusWave";
 		var wave = Trump.Game.prototype.returnTrueValue(game.waveNumber, game.defaultValues.waveNumber);
 		game.waveNumber = wave;
-		this.textGuard = this.add.text(225, 180, wave, this.settingsStyle);
-		this.minButtonGuardSpeed = this.add.button(255, 175, 'minButton', this.minSetting, this, 0,0,1);
+		this.textWave = this.add.text(225, 220, wave, this.settingsStyle);
+		this.minButtonGuardSpeed = this.add.button(255, 215, 'minButton', this.minSetting, this, 0,0,1);
 		this.minButtonGuardSpeed.forObject = "minWave";
 	},
 
@@ -131,7 +131,7 @@ Trump.MainMenu.prototype = {
 				break;
 			case "plusWave":
 				game.waveNumber++;
-				this.textGuard.setText(game.waveNumber);
+				this.textWave.setText(game.waveNumber);
 				break;
 		}
 	},
@@ -142,6 +142,10 @@ Trump.MainMenu.prototype = {
 			case "minButtonGuardSpeed":
 				game.speedGuard -= 50;
 				this.textGuard.setText(game.speedGuard/50);
+				break;
+			case "minWave":
+				game.waveNumber--;
+				this.textWave.setText(game.waveNumber);
 				break;
 		}
 	},
@@ -154,7 +158,21 @@ Trump.MainMenu.prototype = {
 
 	},
 	showCredits: function () {
+		this.clear();
+		this.menuBackground = this.add.sprite(0, 0, 'menuBackground');
+		this.menuBackground.scale.setTo(0.3333);
 
+		this.creditStyle = {font: "30px Arial", fill: "#ffffff", align: "center"};
+		this.creditsButton = this.game.add.text(this.world.centerX, this.world.centerY + 200, "Siebe Vanden Eynde\nRowan Van Ekeren\nRuben De Swaef\nAlex Vanderbist", this.creditStyle);
+		this.creditsButton.anchor.setTo(0.5);
+
+		this.developerStyle = {font: "50px Arial", fill: "#858080", align: "center"};
+		this.developButton = this.game.add.text(this.world.centerX, 80, "DEVELOPERS", this.developerStyle);
+		this.developButton.anchor.setTo(0.5);
+
+		this.backButton = this.add.button(this.world.centerX, game.world.centerY + 330, 'backButton', this.showMain, this, 0, 0, 1);
+		this.backButton.scale.setTo(0.3333);
+		this.backButton.anchor.setTo(0.5);
 	}
 
 };
