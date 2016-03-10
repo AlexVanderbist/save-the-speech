@@ -26,8 +26,20 @@ Trump.Game = function (game)
 	this.tacoRate = 2;
 	this.healthRegenerate = 2;
 
-    this.projectileDespawnTime = 7;
+	this.projectileDespawnTime = 7;
 
+	this.guardColors = [
+		"000000",
+		"b4b4b4",
+		"e7e7e7",
+		"b2a4a4",
+		"584141",
+		"80708d",
+		"014532",
+		"1a2d28",
+		"897192",
+		"525a26"
+	];
 };
 
 Trump.Game.prototype = {
@@ -113,7 +125,7 @@ Trump.Game.prototype = {
 		// create trump
 
 		this.trump = this.add.sprite(this.world.centerX, this.world.height, 'trump');
-		this.trump.animations.add('trumpwalk', [1,2], 5, true);
+		this.trump.animations.add('trumpwalk', [ 1, 2 ], 5, true);
 		this.trump.health = this.defaultPresidentHealth;
 		this.trump.walking = false;
 		this.trump.healthBar = new HealthBar(this, {
@@ -135,14 +147,14 @@ Trump.Game.prototype = {
 		// trumpheads
 		this.trumphead = this.add.sprite(10, 10, 'trumpsprite');
 		this.trumprage = this.add.sprite(10, 10, 'trumprage');
-		this.trumphappy = this.add.sprite(10,10, 'happytrump');
+		this.trumphappy = this.add.sprite(10, 10, 'happytrump');
 		this.trumphappy.visible = false;
 		this.trumprage.visible = false;
 		this.trumphead.visible = false;
-		this.trumphead.animations.add('speak',[0,1,2,3,4,5,4,3,2,1,0], true);
+		this.trumphead.animations.add('speak', [ 0, 1, 2, 3, 4, 5, 4, 3, 2, 1, 0 ], true);
 		this.trumphead.scale.setTo(0.17, 0.17);
-		this.trumprage.scale.setTo(0.06,0.06);
-		this.trumphappy.scale.setTo(0.06,0.06);
+		this.trumprage.scale.setTo(0.06, 0.06);
+		this.trumphappy.scale.setTo(0.06, 0.06);
 		this.trumphead.animations.play('speak', 40, true);
 
 		// Add buttons
@@ -153,19 +165,19 @@ Trump.Game.prototype = {
 
 		var btnCountStyle = {font: "25px Arial", fill: "#ffffff", align: "right"};
 		this.labelGuards = this.add.text(50, this.world.height - 45, this.numberguards, btnCountStyle);
-        this.labelGuards.stroke = "#000000";
-        this.labelGuards.strokeThickness = 3;
-		
-        var moneyLabelStyle = {font: "40px Arial", fill: "#ffffff", align: "right"};
-        this.labelMoney = this.add.text(this.game.width - 15, 60, "$" + this.money, moneyLabelStyle);
-        this.labelMoney.anchor.setTo(1,1);
-        this.labelMoney.stroke = "#000000";
-        this.labelMoney.strokeThickness = 6;
+		this.labelGuards.stroke = "#000000";
+		this.labelGuards.strokeThickness = 3;
+
+		var moneyLabelStyle = {font: "40px Arial", fill: "#ffffff", align: "right"};
+		this.labelMoney = this.add.text(this.game.width - 15, 60, "$" + this.money, moneyLabelStyle);
+		this.labelMoney.anchor.setTo(1, 1);
+		this.labelMoney.stroke = "#000000";
+		this.labelMoney.strokeThickness = 6;
 
 		// draw a circle around president
 		guardFreeZone = this.add.graphics(0, 0);
 		guardFreeZone.lineStyle(1, 0xFF0000, 1);
-		guardFreeZone.drawCircle(this.world.centerX, this.world.centerY, this.guardFreeZoneRadius*2);
+		guardFreeZone.drawCircle(this.world.centerX, this.world.centerY, this.guardFreeZoneRadius * 2);
 
 		// Give money every x seconds
 
@@ -176,7 +188,7 @@ Trump.Game.prototype = {
 		this.startWave(1);
 	},
 
-	trumpIntro: function()
+	trumpIntro: function ()
 	{
 		console.log("ok");
 		this.trump.animations.play('trumpwalk');
@@ -218,9 +230,9 @@ Trump.Game.prototype = {
 			}
 		}, this);
 
-		cashgroup.forEachExists(function(cash)
+		cashgroup.forEachExists(function (cash)
 		{
-			if(cash.kill)
+			if (cash.kill)
 			{
 				cash.destroy();
 			}
@@ -240,19 +252,21 @@ Trump.Game.prototype = {
 
 				guard.alpha -= 0.04;
 				path.alpha -= 0.04;
+				guard.bodyBack.alpha -= 0.04;
 				guard.scale.setTo(guard.alpha, guard.alpha);
+				guard.bodyBack.scale.setTo(guard.bodyBack.alpha, guard.bodyBack.alpha);
 				if (guard.alpha < 0)
 				{
 					//remove the guard
 					guard.destroy();
-
+					guard.bodyBack.destroy();
 					path.destroy();
 				}
 			}
 		}, this);
 
 		this.trump.healthBar.setPosition(this.trump.position.x, this.trump.position.y - 60);
-		if(this.trump.walking && this.physics.arcade.distanceToXY(this.trump, this.world.centerX, this.world.centerY) < 10)
+		if (this.trump.walking && this.physics.arcade.distanceToXY(this.trump, this.world.centerX, this.world.centerY) < 10)
 		{
 			this.trump.animations.stop(null, true);
 			this.trump.frame = 0;
@@ -263,7 +277,7 @@ Trump.Game.prototype = {
 
 	},
 
-	startWave: function (waveNumber)
+	startWave        : function (waveNumber)
 	{
 		// play first quote
 
@@ -276,9 +290,10 @@ Trump.Game.prototype = {
 		{
 			this.trumphead.animations.stop(null, true);
 		}
+
 		console.log(waveNumber);
 	},
-	quitGame: function ()
+	quitGame         : function ()
 	{
 		this.state.start('MainMenu');
 	},
@@ -305,7 +320,7 @@ Trump.Game.prototype = {
 			}
 			var distanceToCenter = this.calculateDistance(gameX, gameY, this.world.centerX, this.world.centerY);
 
-			if(distanceToCenter > this.guardFreeZoneRadius)
+			if (distanceToCenter > this.guardFreeZoneRadius)
 			{
 				if (guardFollowPath.pathIndex != 0)
 				{
@@ -315,9 +330,9 @@ Trump.Game.prototype = {
 					//console.log("van x:"+fromX+" van y: "+fromY);
 					//console.log("game x:"+gameX+" game y: "+gameY);
 
-					if(fromX != gameX || fromY != gameY)
+					if (fromX != gameX || fromY != gameY)
 					{
-						if(guardFollowPath.lengthLine < this.maxLineLength)
+						if (guardFollowPath.lengthLine < this.maxLineLength)
 						{
 							guardFollowPath.path[ guardFollowPath.pathIndex ] = new Phaser.Point(gameX, gameY);
 							guardFollowPath.newPath.push(new Phaser.Point(gameX, gameY));
@@ -352,16 +367,17 @@ Trump.Game.prototype = {
 
 		this.guardMoveHandler();
 	},
-	guardMoveHandler: function ()
+	guardMoveHandler : function ()
 	{
 		for (var guard = 0; guard < guards.children.length; guard++)
 		{
-			var curGuard = guards.children[guard];
+			var curGuard = guards.children[ guard ];
 			var curGuardFollowPath = curGuard.followPath;
 			if (curGuardFollowPath.path != null && curGuardFollowPath.path.length > 0 && curGuardFollowPath.pathSpriteIndex < curGuardFollowPath.pathIndex)
 			{
 				curGuardFollowPath.pathSpriteIndex = Math.min(curGuardFollowPath.pathSpriteIndex, curGuardFollowPath.path.length - 1);
 				this.physics.arcade.moveToXY(guards.children[ guard ], curGuardFollowPath.newPath[ 0 ].x, curGuardFollowPath.newPath[ 0 ].y, 250);
+				this.physics.arcade.moveToXY(guards.children[ guard ].bodyBack, curGuardFollowPath.newPath[ 0 ].x, curGuardFollowPath.newPath[ 0 ].y, 250);
 
 				if (this.physics.arcade.distanceToXY(guards.children[ guard ], curGuardFollowPath.path[ curGuardFollowPath.pathSpriteIndex ].x, curGuardFollowPath.path[ curGuardFollowPath.pathSpriteIndex ].y) < 20)
 				{
@@ -371,17 +387,19 @@ Trump.Game.prototype = {
 					{
 						//console.log("stop");
 						curGuard.body.velocity.destination[ 0 ] = 0;
+						curGuard.bodyBack.body.velocity.destination[ 0 ] = 0;
 						curGuard.body.velocity.destination[ 1 ] = 0;
+						curGuard.bodyBack.body.velocity.destination[ 1 ] = 0;
 						curGuard.animations.stop(null, true);
 						curGuard.frame = 0;
 					}
-					this.drawLine(curGuardFollowPath);
+					this.drawLine(curGuard);
 					this.rotateGuard(curGuard);
 				}
 			}
 		}
 	},
-	rotateGuard: function (guard)
+	rotateGuard      : function (guard)
 	{
 		if (guard.followPath.newPath.length > 0)
 		{
@@ -394,19 +412,20 @@ Trump.Game.prototype = {
 			{
 				correctingAngle = Math.PI;
 			}
-
+			guard.bodyBack.body.rotation = Math.atan(lengthY / lengthX) + Math.PI / 2 + correctingAngle;
 			guard.body.rotation = Math.atan(lengthY / lengthX) + Math.PI / 2 + correctingAngle;
 		}
 	},
-	calculateDistance: function(x1, y1, x2, y2)
+	calculateDistance: function (x1, y1, x2, y2)
 	{
 		var lengthX = parseInt(x1) - parseInt(x2);
 		var lengthY = parseInt(y1) - parseInt(y2);
 
 		return Math.sqrt((lengthX * lengthX) + (lengthY * lengthY));
 	},
-	drawLine: function (guard)
+	drawLine: function (guardAll)
 	{
+		guard = guardAll.followPath;
 		this.world.sendToBack(guard.followLine);
 		this.world.moveUp(guard.followLine);
 
@@ -414,7 +433,7 @@ Trump.Game.prototype = {
 		guard.newPath.splice(0, 1);
 
 		guard.followLine.clear();
-		guard.followLine.lineStyle(15, 0x00FF00, 1);
+		guard.followLine.lineStyle(5,parseInt(guardAll.bodyColor, 16), 1);
 
 		guard.lengthLine = 0;
 
@@ -473,20 +492,22 @@ Trump.Game.prototype = {
 		var radius = Math.sqrt(Math.pow(this.world.width / 2, 2) + Math.pow(this.world.height / 2, 2));
 		radius += 40; // make sure nothing is visible when spawning
 
-        var isValidAngle = function (angle) {
-            var degrees = angle * (180/Math.PI);
-            var valid = true;
-            var offset = 30;
-            if(degrees > (180 - offset) && degrees < (180 + offset)) valid = false;
-            if(degrees > (360 - offset) && degrees < offset) valid = false;
+		var isValidAngle = function (angle)
+		{
+			var degrees = angle * (180 / Math.PI);
+			var valid = true;
+			var offset = 30;
+			if (degrees > (180 - offset) && degrees < (180 + offset)) valid = false;
+			if (degrees > (360 - offset) && degrees < offset) valid = false;
 
-            return valid;
-        }
+			return valid;
+		}
 
-        var angle;
-        do {
-            angle = Math.random() * Math.PI * 2;
-        } while (! isValidAngle(angle))
+		var angle;
+		do {
+			angle = Math.random() * Math.PI * 2;
+		}
+		while (!isValidAngle(angle))
 
 		var pos = {
 			x: Math.cos(angle) * radius + this.world.centerX,
@@ -512,18 +533,18 @@ Trump.Game.prototype = {
 		this.time.events.add(Phaser.Timer.SECOND, this.presidentRageStop, this);
 	},
 
-	presidentRageStop: function ()
+	presidentRageStop  : function ()
 	{
 		this.trumphead.visible = true;
 		this.trumprage.visible = false;
 	},
-	presidentHappyStart: function()
+	presidentHappyStart: function ()
 	{
 		this.trumphead.visible = false;
 		this.trumphappy.visible = true;
 		this.time.events.add(Phaser.Timer.SECOND, this.presidentHappyStop, this);
 	},
-	presidentHappyStop: function()
+	presidentHappyStop : function ()
 	{
 		this.trumphead.visible = true;
 		this.trumphappy.visible = false;
@@ -533,10 +554,10 @@ Trump.Game.prototype = {
 	{
 		var randomPos = this.getRandomPositionOffScreen();
 		var taco = this.add.sprite(randomPos.x, randomPos.y, 'taco');
-        projectiles.add(taco);
+		projectiles.add(taco);
 
-        // add despawn time
-        this.time.events.add(Phaser.Timer.SECOND * this.projectileDespawnTime, this.stopProjectile, this, taco);
+		// add despawn time
+		this.time.events.add(Phaser.Timer.SECOND * this.projectileDespawnTime, this.stopProjectile, this, taco);
 
 		taco.kill = false;
 		taco.body.clearShapes();
@@ -550,7 +571,7 @@ Trump.Game.prototype = {
 		// sound.play();
 	},
 
-	addCash: function()
+	addCash: function ()
 	{
 		var randomPos = this.getRandomPositionOffScreen();
 		var cash = this.add.sprite(randomPos.x, randomPos.y, 'money');
@@ -558,12 +579,12 @@ Trump.Game.prototype = {
 		cashgroup.add(cash);
 		cash.kill = false;
 		cash.body.setCollisionGroup(this.cashCollisionGroup);
-		cash.body.collides([this.trumpCollisionGroup, this.guardCollisionGroup, this.projectileCollisionGroup]);
+		cash.body.collides([ this.trumpCollisionGroup, this.guardCollisionGroup, this.projectileCollisionGroup ]);
 		cash.body.collideWorldBounds = false;
-		this.throwProjectileToObj(cash,this.trump, 160);
+		this.throwProjectileToObj(cash, this.trump, 160);
 
-        // add despawn timer
-        this.time.events.add(Phaser.Timer.SECOND * this.projectileDespawnTime, this.stopProjectile, this, cash);
+		// add despawn timer
+		this.time.events.add(Phaser.Timer.SECOND * this.projectileDespawnTime, this.stopProjectile, this, cash);
 	},
 
 	onProjectileHitTrump: function (body1, body2)
@@ -578,7 +599,7 @@ Trump.Game.prototype = {
 		{
 			this.trump.health -= this.tacoDamage;
 			this.tacohit.play();
-			this.ouch[rndouch].play();
+			this.ouch[ rndouch ].play();
 			this.checkHealth();
 		}
 
@@ -586,28 +607,30 @@ Trump.Game.prototype = {
 		this.presidentRageStart();
 	},
 
-	onCashHitTrump: function(body1, body2) {
+	onCashHitTrump: function (body1, body2)
+	{
 		// stop the cash
 		var rndouch = Math.floor(Math.random() * this.moneyhittrump.length);
-		this.moneyhittrump[rndouch].play();
+		this.moneyhittrump[ rndouch ].play();
 		this.moneyhit.play();
 		this.presidentHappyStart();
 		this.money += this.moneyValue;
 
-        // kill the projectile
-        this.stopProjectile(body2.sprite);
+		// kill the projectile
+		this.stopProjectile(body2.sprite);
 		//body2.sprite.kill = true;
-        //body2.sprite.body.setCollisionGroup(this.collidedCollisionGroup);
+		//body2.sprite.body.setCollisionGroup(this.collidedCollisionGroup);
 	},
 
 	stopProjectile: function (projectileSprite)
 	{
-        if(projectileSprite.body) {
-            projectileSprite.body.damping = 0.8;
-            projectileSprite.body.angularDamping = 0.7;
-            projectileSprite.body.setCollisionGroup(this.collidedCollisionGroup);
-            projectileSprite.kill = true;
-        }
+		if (projectileSprite.body)
+		{
+			projectileSprite.body.damping = 0.8;
+			projectileSprite.body.angularDamping = 0.7;
+			projectileSprite.body.setCollisionGroup(this.collidedCollisionGroup);
+			projectileSprite.kill = true;
+		}
 	},
 
 	throwProjectileToObj: function (obj1, obj2, speed)
@@ -618,19 +641,20 @@ Trump.Game.prototype = {
 		}
 		var angle = Math.atan2(obj2.y - obj1.y, obj2.x - obj1.x);
 
-        if(Math.random() < 0.2) {
+		if (Math.random() < 0.2)
+		{
 
-            //console.log("miss");
+			//console.log("miss");
 
-            // miss amount
-            var missAmount = Math.random() * 0.2 + 0.1;
+			// miss amount
+			var missAmount = Math.random() * 0.2 + 0.1;
 
-            // left or right?
-            if(Math.random() >= 0.5) missAmount = - missAmount;
+			// left or right?
+			if (Math.random() >= 0.5) missAmount = -missAmount;
 
-            // add to angle
-            angle += missAmount;
-        }
+			// add to angle
+			angle += missAmount;
+		}
 
 		obj1.body.rotation = angle + this.math.degToRad(-20);  // correct angle of angry bullets (depends on the sprite used)
 		obj1.body.velocity.x = Math.cos(angle) * speed;    // accelerateToObject
@@ -642,7 +666,7 @@ Trump.Game.prototype = {
 		if (this.money >= this.PriceGuard)
 		{
 			this.adding = true;
-            this.addGuardButton.loadTexture("addingGuard");
+			this.addGuardButton.loadTexture("addingGuard");
 			// this.addingGuard = this.add.sprite(this.world.width - 100, 10, 'addingGuard');
 		}
 
@@ -659,11 +683,21 @@ Trump.Game.prototype = {
 		var inputX = this.input.x;
 		var inputY = this.input.y;
 
-		if(this.calculateDistance(inputX, inputY, this.world.centerX, this.world.centerY) > this.guardFreeZoneRadius)
+		if (this.calculateDistance(inputX, inputY, this.world.centerX, this.world.centerY) > this.guardFreeZoneRadius)
 		{
+			var backGuard = this.add.graphics(inputX, inputY);
 			var guard = this.add.sprite(inputX, inputY, 'bodyguard');
+
+			var randomIndex = Math.floor(Math.random() * (this.guardColors.length-1));
+			var randomColor = this.guardColors[randomIndex];
+
+			backGuard.beginFill(parseInt(randomColor,16));
+			backGuard.drawEllipse(0,0,27,22);
+			this.world.sendToBack(backGuard);
+			this.world.moveUp(backGuard);
+
 			guards.add(guard);
-            this.addGuardButton.loadTexture('addGuard');
+			this.addGuardButton.loadTexture('addGuard');
 			//this.addingGuard.destroy();
 			this.money -= this.PriceGuard;
 			this.adding = false;
@@ -685,14 +719,19 @@ Trump.Game.prototype = {
 			guard.animations.add('walk', [ 1, 2 ], 5, true);
 
 			guard.followPath = {
-				isActive: false,
-				path: [],
-				newPath: [],
-				pathIndex : -1,
+				isActive       : false,
+				path           : [],
+				newPath        : [],
+				pathIndex      : -1,
 				pathSpriteIndex: -1,
-				lengthLine: 0,
-				followLine: this.add.graphics(0, 0)
+				lengthLine     : 0,
+				followLine     : this.add.graphics(0, 0)
 			};
+
+			guard.bodyColor = randomColor;
+			guard.bodyBack = backGuard;
+			this.physics.p2.enable(backGuard, false);
+			backGuard.body.clearCollision(true);
 		}
 	},
 
@@ -708,7 +747,7 @@ Trump.Game.prototype = {
 		}
 	},
 
-	onCashHitGuard: function(guardBody, cashBody)
+	onCashHitGuard: function (guardBody, cashBody)
 	{
 		cashBody.sprite.body.setCollisionGroup(this.collidedCollisionGroup);
 		cashBody.sprite.kill = true;
@@ -727,33 +766,39 @@ Trump.Game.prototype = {
 	{
 		var bodies = this.physics.p2.hitTest(object.position, guards.children);
 
-		if (bodies.length !== 0)
+		if (bodies.length !== 0 && !this.adding)
 		{
 			bodies[ 0 ].parent.sprite.followPath.isActive = true;
 			guards.activeGuard = bodies[ 0 ].parent.sprite;
-		} else {
-            // we didnt directly hit a guard, but maybe he's near
-            
-            var triggerDistance = 70;
-            var closestDistanceSoFar = triggerDistance;
-            guards.forEachAlive(function(guard) {
-                var distanceToGuard = Phaser.Math.distance(guard.x, guard.y, object.position.x, object.position.y);
-                if (distanceToGuard <= triggerDistance) {
-                    // do something to this guard, as it lies within the trigger distance
-                    if(distanceToGuard < closestDistanceSoFar) {
-                        closestDistanceSoFar = distanceToGuard;
-                        // make this guard active
-                        guard.followPath.isActive = true;
-                        guards.activeGuard = guard;
-                    }
-                }
-            }); 
-        }
+		}
+		else if (!this.adding)
+		{
+			// we didnt directly hit a guard, but maybe he's near
+
+			var triggerDistance = 70;
+			var closestDistanceSoFar = triggerDistance;
+			guards.forEachAlive(function (guard)
+			{
+				var distanceToGuard = Phaser.Math.distance(guard.x, guard.y, object.position.x, object.position.y);
+				if (distanceToGuard <= triggerDistance)
+				{
+					// do something to this guard, as it lies within the trigger distance
+					if (distanceToGuard < closestDistanceSoFar)
+					{
+						closestDistanceSoFar = distanceToGuard;
+						// make this guard active
+						guard.followPath.isActive = true;
+						guards.activeGuard = guard;
+					}
+				}
+			});
+		}
 	},
 
-	regenerate: function(healthRegenerateValue)
+	regenerate: function (healthRegenerateValue)
 	{
-		guards.forEachExists(function(guard) {
+		guards.forEachExists(function (guard)
+		{
 			if (guard.health < 100)
 			{
 				guard.health += healthRegenerateValue;
