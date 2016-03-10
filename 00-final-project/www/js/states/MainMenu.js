@@ -106,14 +106,13 @@ Trump.MainMenu.prototype = {
 		this.minButtonGuardSpeed = this.add.button(255, 175, 'minButton', this.minSetting, this, 0,0,1);
 		this.minButtonGuardSpeed.forObject = "minButtonGuardSpeed";
 
-		this.add.text(20, 180, "Set speed guard:", this.settingsStyle);
-
-		this.plusWave = this.add.button(175, 175, 'plusButton', this.addSetting, this, 0,0,1);
+		this.add.text(20, 220, "Set wave:", this.settingsStyle);
+		this.plusWave = this.add.button(175, 215, 'plusButton', this.addSetting, this, 0,0,1);
 		this.plusWave.forObject = "plusWave";
 		var wave = Trump.Game.prototype.returnTrueValue(game.waveNumber, game.defaultValues.waveNumber);
 		game.waveNumber = wave;
-		this.textGuard = this.add.text(225, 180, wave, this.settingsStyle);
-		this.minButtonGuardSpeed = this.add.button(255, 175, 'minButton', this.minSetting, this, 0,0,1);
+		this.textWave = this.add.text(225, 220, wave, this.settingsStyle);
+		this.minButtonGuardSpeed = this.add.button(255, 215, 'minButton', this.minSetting, this, 0,0,1);
 		this.minButtonGuardSpeed.forObject = "minWave";
 	},
 
@@ -127,7 +126,7 @@ Trump.MainMenu.prototype = {
 				break;
 			case "plusWave":
 				game.waveNumber++;
-				this.textGuard.setText(game.waveNumber);
+				this.textWave.setText(game.waveNumber);
 				break;
 		}
 	},
@@ -138,6 +137,10 @@ Trump.MainMenu.prototype = {
 			case "minButtonGuardSpeed":
 				game.speedGuard -= 50;
 				this.textGuard.setText(game.speedGuard/50);
+				break;
+			case "minWave":
+				game.waveNumber--;
+				this.textWave.setText(game.waveNumber);
 				break;
 		}
 	},
