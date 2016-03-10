@@ -52,7 +52,7 @@ Trump.Game.prototype = {
         // Reset Game
         this.adding = false; // later ID ofzo
         this.money = 15;
-        this.score = 0;
+        game.score = 0;
 
 		//put sounds in array
 		this.stupidquote.push(
@@ -129,6 +129,7 @@ Trump.Game.prototype = {
 
 		this.time.events.loop(Phaser.Timer.SECOND * this.tacoRate, this.addProjectile, this);
 		this.time.events.loop(Phaser.Timer.SECOND * this.moneyRate, this.addCash, this);
+		this.time.events.loop(Phaser.Timer.SECOND, this.addScore, this);
 
 		// create trump
 
@@ -183,6 +184,12 @@ Trump.Game.prototype = {
 		this.labelMoney.stroke = "#000000";
 		this.labelMoney.strokeThickness = 6;
 
+		var scoreLabelStyle = {font: "40px Arial", fill: "#ffffff", align: "center"}; ////////////////////////////////////////
+        this.labelScore = this.add.text(game.world.centerX, 50, game.score, scoreLabelStyle); ///////////////////////////// V
+        this.labelScore.anchor.setTo(0.5,0.5);
+        this.labelScore.stroke = "#000000"; 
+        this.labelScore.strokeThickness = 6;
+
 		// draw a circle around president
 		guardFreeZone = this.add.graphics(0, 0);
 		guardFreeZone.lineStyle(1, 0xFF0000, 1);
@@ -216,6 +223,7 @@ Trump.Game.prototype = {
 
 		this.labelGuards.setText(Math.floor(this.money / this.PriceGuard)); // update this
 		this.labelMoney.setText("$" + this.money);
+		this.labelScore.setText(game.score);
 
 		// If adding, place guard
 
@@ -484,8 +492,22 @@ Trump.Game.prototype = {
             this.trump.died = true;
             this.trump.body.setCollisionGroup(this.collidedCollisionGroup);
 
+            if(localStorage) {
+                game.bestScore = localStorage.getItem('bestScore');
+
+                if(!game.bestScore || game.bestScore < game.score) {
+                  game.bestScore = game.score;
+                  localStorage.setItem('bestScore', game.bestScore);
+                  //console.log("beste score: " + this.bestScore)
+                }
+            } 
+            else {
+                // Fallback
+                game.bestScore = 'N/A';
+            }
+
             // wait until going to gameover
-            this.time.events.add(Phaser.Timer.SECOND * 3, this.gameOverState, this);
+            this.time.events.add(Phaser.Timer.SECOND * 2, this.gameOverState, this);
             
 			//this.destroyHealthbar(this.trump.healthBar);
 			// this.trump.destroy(); // for now
@@ -830,5 +852,10 @@ Trump.Game.prototype = {
 		if(this.trump.health < 50) this.trump.health += this.healthRegenerate;	
 
 		this.checkHealth();
-	}
+	},
+    addScore: function(){ 
+        game.score ++;
+        //console.log("score:" + this.score);
+        //console.log("beste score: " + this.bestScore)
+    }
 };
