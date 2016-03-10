@@ -28,6 +28,8 @@ Trump.Game = function (game)
 
 	this.projectileDespawnTime = 7;
 
+	this.triggerDistance = 70;
+
 	this.guardColors = [
 		"000000",
 		"b4b4b4",
@@ -789,12 +791,11 @@ Trump.Game.prototype = {
 		{
 			// we didnt directly hit a guard, but maybe he's near
 
-			var triggerDistance = 70;
-			var closestDistanceSoFar = triggerDistance;
+			var closestDistanceSoFar = this.triggerDistance;
 			guards.forEachAlive(function (guard)
 			{
 				var distanceToGuard = Phaser.Math.distance(guard.x, guard.y, object.position.x, object.position.y);
-				if (distanceToGuard <= triggerDistance)
+				if (distanceToGuard <= this.triggerDistance)
 				{
 					// do something to this guard, as it lies within the trigger distance
 					if (distanceToGuard < closestDistanceSoFar)
