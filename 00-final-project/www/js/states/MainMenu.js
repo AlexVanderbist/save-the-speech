@@ -103,21 +103,21 @@ Trump.MainMenu.prototype = {
 		this.settingsStyle = {font: "20px Arial", fill: "#858080"};
 		this.add.text(20, 180, "Set speed guard:", this.settingsStyle);
 
-		this.plusButtonGuardSpeed = this.add.button(175, 175, 'plusButton', this.addSetting, this, 0,0,1);
+		this.plusButtonGuardSpeed = this.add.button(255, 175, 'plusButton', this.addSetting, this, 0,0,1);
 		this.plusButtonGuardSpeed.forObject = "plusButtonGuardSpeed";
 		var valueSpeed = Trump.Game.prototype.returnTrueValue(game.speedGuard, game.defaultValues.speedGuard);
 		game.speedGuard = valueSpeed;
 		this.textGuard = this.add.text(225, 180, valueSpeed/50, this.settingsStyle);
-		this.minButtonGuardSpeed = this.add.button(255, 175, 'minButton', this.minSetting, this, 0,0,1);
+		this.minButtonGuardSpeed = this.add.button(175, 175, 'minButton', this.minSetting, this, 0,0,1);
 		this.minButtonGuardSpeed.forObject = "minButtonGuardSpeed";
 
 		this.add.text(20, 220, "Set wave:", this.settingsStyle);
-		this.plusWave = this.add.button(175, 215, 'plusButton', this.addSetting, this, 0,0,1);
+		this.plusWave = this.add.button(255, 215, 'plusButton', this.addSetting, this, 0,0,1);
 		this.plusWave.forObject = "plusWave";
 		var wave = Trump.Game.prototype.returnTrueValue(game.waveNumber, game.defaultValues.waveNumber);
 		game.waveNumber = wave;
-		this.textWave = this.add.text(225, 220, wave, this.settingsStyle);
-		this.minButtonGuardSpeed = this.add.button(255, 215, 'minButton', this.minSetting, this, 0,0,1);
+		this.textWave = this.add.text(225, 220, (wave+1), this.settingsStyle);
+		this.minButtonGuardSpeed = this.add.button(175, 215, 'minButton', this.minSetting, this, 0,0,1);
 		this.minButtonGuardSpeed.forObject = "minWave";
 	},
 
@@ -126,12 +126,15 @@ Trump.MainMenu.prototype = {
 		switch(object.forObject)
 		{
 			case "plusButtonGuardSpeed":
-				game.speedGuard += 50;
-				this.textGuard.setText(game.speedGuard/50);
+				if((game.speedGuard/50) < 10)
+				{
+					game.speedGuard += 50;
+					this.textGuard.setText(game.speedGuard / 50);
+				}
 				break;
 			case "plusWave":
 				game.waveNumber++;
-				this.textWave.setText(game.waveNumber);
+				this.textWave.setText(game.waveNumber+1);
 				break;
 		}
 	},
@@ -140,12 +143,18 @@ Trump.MainMenu.prototype = {
 		switch(object.forObject)
 		{
 			case "minButtonGuardSpeed":
-				game.speedGuard -= 50;
-				this.textGuard.setText(game.speedGuard/50);
+				if((game.speedGuard-50) > 0)
+				{
+					game.speedGuard -= 50;
+					this.textGuard.setText(game.speedGuard / 50);
+				}
 				break;
 			case "minWave":
-				game.waveNumber--;
-				this.textWave.setText(game.waveNumber);
+				if(game.waveNumber != 0)
+				{
+					game.waveNumber--;
+					this.textWave.setText(game.waveNumber + 1);
+				}
 				break;
 		}
 	},
@@ -163,7 +172,7 @@ Trump.MainMenu.prototype = {
 		this.menuBackground.scale.setTo(0.3333);
 
 		this.creditStyle = {font: "30px Arial", fill: "#ffffff", align: "center"};
-		this.creditsButton = this.game.add.text(this.world.centerX, this.world.centerY + 200, "Siebe Vanden Eynde\nRowan Van Ekeren\nRuben De Swaef\nAlex Vanderbist", this.creditStyle);
+		this.creditsButton = this.game.add.text(this.world.centerX, this.world.centerY + 200, "Siebe Vanden Eynden\nRowan Van Ekeren\nRuben De Swaef\nAlex Vanderbist", this.creditStyle);
 		this.creditsButton.anchor.setTo(0.5);
 
 		this.developerStyle = {font: "50px Arial", fill: "#858080", align: "center"};
