@@ -26,6 +26,8 @@ Trump.Game = function (game)
 	this.tacoRate = 2;
 	this.healthRegenerate = 2;
 
+    this.projectileDespawnTime = 7;
+
 };
 
 Trump.Game.prototype = {
@@ -531,7 +533,11 @@ Trump.Game.prototype = {
 	{
 		var randomPos = this.getRandomPositionOffScreen();
 		var taco = this.add.sprite(randomPos.x, randomPos.y, 'taco');
-		projectiles.add(taco);
+        projectiles.add(taco);
+
+        // add despawn time
+        this.time.events.add(Phaser.Timer.SECOND * this.projectileDespawnTime, this.stopProjectile, this, taco);
+
 		taco.kill = false;
 		taco.body.clearShapes();
 		taco.body.loadPolygon('tacoPhysics', 'taco');
@@ -555,6 +561,9 @@ Trump.Game.prototype = {
 		cash.body.collides([this.trumpCollisionGroup, this.guardCollisionGroup, this.projectileCollisionGroup]);
 		cash.body.collideWorldBounds = false;
 		this.throwProjectileToObj(cash,this.trump, 160);
+
+        // add despawn timer
+        this.time.events.add(Phaser.Timer.SECOND * this.projectileDespawnTime, this.stopProjectile, this, cash);
 	},
 
 	onProjectileHitTrump: function (body1, body2)
@@ -593,10 +602,12 @@ Trump.Game.prototype = {
 
 	stopProjectile: function (projectileSprite)
 	{
-		projectileSprite.body.damping = 0.8;
-		projectileSprite.body.angularDamping = 0.7;
-		projectileSprite.body.setCollisionGroup(this.collidedCollisionGroup);
-		projectileSprite.kill = true;
+        if(projectileSprite.body) {
+            projectileSprite.body.damping = 0.8;
+            projectileSprite.body.angularDamping = 0.7;
+            projectileSprite.body.setCollisionGroup(this.collidedCollisionGroup);
+            projectileSprite.kill = true;
+        }
 	},
 
 	throwProjectileToObj: function (obj1, obj2, speed)
