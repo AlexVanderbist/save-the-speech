@@ -143,7 +143,7 @@ Trump.MainMenu.prototype = {
 		this.buttons.push(this.playButton);
 		/* End Siebe Edit */
 
-		game.instrucStyle = {font: "20px Arial", fill: "#858080"};
+		game.instrucStyle = {font: "20px roboto", fill: "#858080"};
 		this.game.add.text(20, 180, "Save Trump's speech from the angry crowd by \nbuying bodyguards or fences to block the \nthrown taco's.", game.instrucStyle);
 		var instrucTaco = game.add.sprite(8, 250, 'taco');
 		instrucTaco.scale.setTo(1.5, 1.5);
@@ -171,7 +171,7 @@ Trump.MainMenu.prototype = {
 		this.backButton.anchor.setTo(0.5);
 		this.buttons.push(this.backButton);
 
-		this.settingsStyle = {font: "20px Arial", fill: "#858080"};
+		this.settingsStyle = {font: "20px roboto", fill: "#858080"};
 		this.add.text(20, 180, "Set speed guard:", this.settingsStyle);
 
 		this.plusButtonGuardSpeed = this.add.button(255, 175, 'plusButton', this.addSetting, this, 0,0,1);
@@ -246,11 +246,11 @@ Trump.MainMenu.prototype = {
 		this.menuBackground = this.add.sprite(0, 0, 'menuBackground');
 		this.menuBackground.scale.setTo(0.3333);
 
-		this.creditStyle = {font: "30px Arial", fill: "#ffffff", align: "center"};
+		this.creditStyle = {font: "30px roboto", fill: "#ffffff", align: "center"};
 		this.creditsButton = this.game.add.text(this.world.centerX, this.world.centerY + 200, "Siebe Vanden Eynden\nRowan Van Ekeren\nRuben De Swaef\nAlex Vanderbist", this.creditStyle);
 		this.creditsButton.anchor.setTo(0.5);
 
-		this.developerStyle = {font: "50px Arial", fill: "#858080", align: "center"};
+		this.developerStyle = {font: "50px roboto", fill: "#858080", align: "center"};
 		this.developButton = this.game.add.text(this.world.centerX, 80, "DEVELOPERS", this.developerStyle);
 		this.developButton.anchor.setTo(0.5);
 

@@ -241,7 +241,7 @@ Trump.Game.prototype =
 
 		// Add labels
 
-		var btnCountStyle = {font: "25px Arial", fill: "#ffffff", align: "right"};
+		var btnCountStyle = {font: "25px montserrat", fill: "#ffffff", align: "right"};
 		this.labelGuards = this.add.text(50, this.world.height - 45, "0", btnCountStyle);
 		this.labelGuards.stroke = "#000000";
 		this.labelGuards.strokeThickness = 3;
@@ -249,13 +249,13 @@ Trump.Game.prototype =
 		this.labelFences.stroke = "#000000";
 		this.labelFences.strokeThickness = 3;
 
-		var moneyLabelStyle = {font: "40px Arial", fill: "#ffffff", align: "right"};
+		var moneyLabelStyle = {font: "40px montserrat", fill: "#ffffff", align: "right"};
 		this.labelMoney = this.add.text(this.game.width - 15, 60, "$" + this.money, moneyLabelStyle);
 		this.labelMoney.anchor.setTo(1, 1);
 		this.labelMoney.stroke = "#000000";
 		this.labelMoney.strokeThickness = 6;
 
-		var scoreLabelStyle = {font: "40px Arial", fill: "#ffffff", align: "center"}; 
+		var scoreLabelStyle = {font: "40px montserrat", fill: "#ffffff", align: "center"}; 
         this.labelScore = this.add.text(this.world.centerX, 50, game.score, scoreLabelStyle); 
         this.labelScore.anchor.setTo(0.5,0.5);
         this.labelScore.stroke = "#000000"; 
@@ -267,7 +267,7 @@ Trump.Game.prototype =
         this.labelWave.strokeThickness = 6;
         this.labelWave.visible = false;
 
-        var waveLabelStyle = {font: "20px Arial", fill: "#ffffff", align: "center"}; 
+        var waveLabelStyle = {font: "20px montserrat", fill: "#ffffff", align: "center"}; 
         this.labelCurrentWave = this.add.text(this.world.centerX, 80, "wave " + this.waveNumber, waveLabelStyle); 
         this.labelCurrentWave.anchor.setTo(0.5,0.5);
         this.labelCurrentWave.stroke = "#000000"; 

@@ -16,6 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+@font-face {
+    font-family: 'montserrat';
+    src: url('../assets/fonts/montserrat.ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+.fontloader
+{
+    font-family: 'montserrat';
+    position: absolute;
+    left: -100px;
+   
+}
+
 * {
     -webkit-tap-highlight-color: rgba(0,0,0,0); /* make transparent link selection, adjust last value opacity 0 to 1.0 */
 }

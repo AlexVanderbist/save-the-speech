@@ -7,18 +7,18 @@ Trump.GameOver = function (game) {
 Trump.GameOver.prototype = {
 
 	create: function () {
-		
+
         var sound = this.add.audio('dead');
         sound.play();
 
 		this.menuBackground = this.add.sprite(0,0, 'menuBackground');
 		this.menuBackground.scale.setTo(0.3333);
 
-		var overstyle = {font: "50px Arial", fill: "#000000", align: "center"};
+		var overstyle = {font: "50px montserrat", fill: "#000000", align: "center"};
 		this.labelOver = this.add.text(this.world.centerX, 80, "Game Over!", overstyle); 
 		this.labelOver.anchor.set(0.5);
 
-		var scorestyle = {font: "30px Arial", fill: "#ffffff", align: "center"};
+		var scorestyle = {font: "30px montserrat", fill: "#ffffff", align: "center"};
 		this.labelShowScore = this.add.text(this.world.centerX, this.world.centerY + 115, "SCORE: " + (game.score), scorestyle); 
 		this.labelShowScore.anchor.set(0.5);
 		this.labelShowScore.stroke = "#000000";
