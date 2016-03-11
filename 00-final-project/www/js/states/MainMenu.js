@@ -3,31 +3,7 @@ var xVel = null;
 var yVel = null;
 var inMainMenu = true;
 var watchID = null;
-document.addEventListener("deviceready", function(){
-	Accelorometer();
-},true);
 
-function Accelorometer()
-{
-	if (typeof  navigator.accelerometer != "undefined") {
-		watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, {frequency: 50});
-
-
-		function onSuccess(acceleration) {
-			xVel = Math.round(acceleration.x);
-			yVel = Math.round(acceleration.y);
-
-		}
-
-		function onError() {
-			alert('onError!');
-		}
-
-	}else{
-		console.log("function dont exist");
-	}
-
-}
 /////////////////////////////////////////////ROWAN/////////////////////////////////////////////////
 
 Trump.MainMenu = function (game)
@@ -47,12 +23,33 @@ Trump.MainMenu.prototype = {
 	/* Start Siebe Add */
 	create: function ()
 	{
-
 		this.intro = this.add.audio("fuckyeah");
 		this.intro.volume = 0.5;
-        this.intro.play();
+    this.intro.play();
 		this.showMain();
+		this.accelorometer();
+	},
+	accelorometer: function()
+	{
+		if (typeof  navigator.accelerometer != "undefined") {
+			watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, {frequency: 50});
 
+
+			function onSuccess(acceleration) {
+				xVel = Math.round(acceleration.x);
+				yVel = Math.round(acceleration.y);
+
+			}
+
+			function onError() {
+				alert('onError!');
+			}
+
+		}
+		else
+		{
+			console.log("function dont exist");
+		}
 	},
 	clear: function ()
 	{
@@ -122,7 +119,7 @@ Trump.MainMenu.prototype = {
 				navigator.accelerometer.clearWatch(watchID);
 			}
 		}else{
-			//console.log("cant update because function accelerometer doenst exists");
+			console.log("cant update because function accelerometer doenst exists");
 		}
 	},
 	//////////////////////////////////////ROWAN////////////////////////////////////////////
