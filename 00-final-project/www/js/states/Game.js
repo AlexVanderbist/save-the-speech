@@ -191,7 +191,7 @@ Trump.Game.prototype =
 		//this.addingLoop = this.time.events.loop(Phaser.Timer.SECOND * this.moneyTimeOut, this.addMoney, this, 1); // IN NEXTWAVE
 		//this.bomberLoop = this.time.events.loop(Phaser.Timer.SECOND * this.bomberRate, this.addSuicideBomber,this); /////////////////////
 		this.time.events.loop(Phaser.Timer.SECOND, this.regenerateHealth, this);
-		this.time.events.loop(Phaser.Timer.SECOND, this.addScore, this);
+		this.addScoreLoop = this.time.events.loop(Phaser.Timer.SECOND, this.addScore, this);
 		this.time.events.loop(Phaser.Timer.SECOND * this.waveLength, this.nextWave, this);
 
 
@@ -606,12 +606,15 @@ Trump.Game.prototype =
 		{
 
 			// trump died :( 
+			
+			//this.time.events.remove(this.addScoreLoop);
+
 			this.stopAllQuotes();
-            var sound = this.add.audio('dead');
-            sound.play();
+            // var sound = this.add.audio('dead');
+            // sound.play();
 
             this.trump.died = true;
-            this.trump.body.setCollisionGroup(this.collidedCollisionGroup);
+            //this.trump.body.setCollisionGroup(this.collidedCollisionGroup);
 
             if(localStorage) {
                 game.bestScore = localStorage.getItem('bestScore');
@@ -628,7 +631,8 @@ Trump.Game.prototype =
             }
 
             // wait until going to gameover
-            this.time.events.add(Phaser.Timer.SECOND * 2, this.gameOverState, this);
+            //this.time.events.add(Phaser.Timer.SECOND * 2, this.gameOverState, this);
+            this.gameOverState();
             
 			//this.destroyHealthbar(this.trump.healthBar);
 			// this.trump.destroy(); // for now
