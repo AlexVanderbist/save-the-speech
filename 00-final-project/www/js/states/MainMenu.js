@@ -76,6 +76,7 @@ Trump.MainMenu.prototype = {
 	},
 	showMain: function ()
 	{
+		navigator.vibrate(100);
 		this.clear();
 		this.menuBackground = this.add.sprite(0, 0, 'menuBackground');
 		this.menuBackground.scale.setTo(0.3333);
@@ -117,7 +118,7 @@ Trump.MainMenu.prototype = {
 				navigator.accelerometer.clearWatch(watchID);
 			}
 		}else{
-			console.log("cant update because function accelerometer doenst exists");
+			//console.log("cant update because function accelerometer doenst exists");
 		}
 	},
 	//////////////////////////////////////ROWAN////////////////////////////////////////////
@@ -130,6 +131,7 @@ Trump.MainMenu.prototype = {
 	},
 	showInstructions: function ()
 	{
+		navigator.vibrate(100);
 		this.clear();
 		this.instructionBackground = this.add.sprite(0, 0, 'instructions');
 		this.instructionBackground.scale.setTo(0.3333);
@@ -159,8 +161,8 @@ Trump.MainMenu.prototype = {
 	/* Start Siebe Add */
 	showSettings: function()
 	{
+		navigator.vibrate(100);
 		this.clear();
-
 		this.instructionBackground = this.add.sprite(0, 0, 'settings');
 		this.instructionBackground.scale.setTo(0.3333);
 
@@ -239,6 +241,7 @@ Trump.MainMenu.prototype = {
 
 	},
 	showCredits: function () {
+		navigator.vibrate(100);
 		this.clear();
 		this.menuBackground = this.add.sprite(0, 0, 'menuBackground');
 		this.menuBackground.scale.setTo(0.3333);
