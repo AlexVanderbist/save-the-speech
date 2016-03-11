@@ -32,14 +32,15 @@ Trump.Preloader.prototype = {
 		this.load.image("money", 'assets/money.png');
 		this.load.image("happytrump", 'assets/happytrump.png');
 		this.load.image("defaultGuard", 'assets/bodyguard.png');
-        game.load.image("addFence", "assets/addFence.png");
-        game.load.image("addingFence", "assets/addingFence.png");
-        game.load.image("credits", "assets/credits.png");
+		game.load.image("addFence", "assets/addFence.png");
+		game.load.image("addingFence", "assets/addingFence.png");
+		game.load.image("credits", "assets/credits.png");
 
 		/* Start Siebe Add */
 		this.load.image('settings', 'assets/settings.png');
 		this.load.image('plusButton', 'assets/plusButton.png');
 		this.load.image('minButton', 'assets/minButton.png');
+		this.load.image('pauseButton', 'assets/pause.png');
 		/* End Siebe Add */
 
         
@@ -49,12 +50,13 @@ Trump.Preloader.prototype = {
 		this.load.spritesheet("trump", 'assets/trumpWalk.png', 64, 64);
 		this.load.spritesheet('playButton', 'assets/play.png', 686, 207);
 		this.load.spritesheet('instructionButton', 'assets/instrucBtn.png', 686, 207);
-	    game.load.spritesheet('bomber', 'assets/bomberSprite.png', 64, 64);
-        game.load.spritesheet('explosion', 'assets/explosion.png', 128, 128);
+		game.load.spritesheet('bomber', 'assets/bomberSprite.png', 64, 64);
+		game.load.spritesheet('explosion', 'assets/explosion.png', 128, 128);
 
 		/* Start Siebe Add */
 		this.load.spritesheet('backButton', 'assets/backBtn.png', 686, 207);
 		this.load.spritesheet('settingsButton', 'assets/settingsBtn.png', 686, 207);
+		this.load.spritesheet('mainmenuButton', 'assets/mainmenuBtn.png', 686, 207);
 		/* End Siebe Add */
 
 
