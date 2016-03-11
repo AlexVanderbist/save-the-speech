@@ -251,7 +251,7 @@ Trump.MainMenu.prototype = {
 		this.menuBackground = this.add.sprite(0, 0, 'menuBackground');
 		this.menuBackground.scale.setTo(0.3333);
 
-		this.creditStyle = {font: "30px montserrat", fill: "#ffffff", align: "center"};
+		this.creditStyle = {font: "20px montserrat", fill: "#ffffff", align: "center"};
 		this.creditsButton = this.game.add.text(this.world.centerX, this.world.centerY + 200, "Siebe Vanden Eynden\nRowan Van Ekeren\nRuben De Swaef\nAlex Vanderbist", this.creditStyle);
 		this.creditsButton.anchor.setTo(0.5);
 
