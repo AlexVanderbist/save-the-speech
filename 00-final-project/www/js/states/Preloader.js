@@ -2,6 +2,7 @@ Trump.Preloader = function (game) {
 
 	this.preloadBar = null;
 	this.menuBackground = null;
+	this.ready = false;
 
 };
 
@@ -102,11 +103,15 @@ Trump.Preloader.prototype = {
 
 	create: function () {
 
-		this.state.start('MainMenu');
 
 	},
 
 	update: function () {	
+		if (this.cache.isSoundDecoded('fuckyeah') && this.ready == false)
+		{
+			this.ready = true;
+			this.state.start('MainMenu');
+		}
 	}
 
 };

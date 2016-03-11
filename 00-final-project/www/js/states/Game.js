@@ -1186,8 +1186,8 @@ Trump.Game.prototype =
 		this.checkHealth();
 	},
     addScore: function(){ 
-    	if(! trump.died) game.score ++;
-    	
+    	if(! this.trump.died) game.score ++;
+
         //console.log("score:" + this.score);
         //console.log("beste score: " + this.bestScore)
     },
