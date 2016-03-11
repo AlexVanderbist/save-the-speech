@@ -6,7 +6,7 @@ Trump.Game = function (game)
 	this.PriceFence = 15;
 	this.moneyTimeOut = 2; // om de twee seconden 1 muntje
 	this.tacoDamage = 30;
-    this.bomberDamage = 100;
+	this.bomberDamage = 100;
 	this.defaultGuardHealth = 100.0;
 	this.defaultPresidentHealth = 160.0;
 	this.defaultFenceHealth = 200.0;
@@ -234,7 +234,8 @@ Trump.Game.prototype =
 		// Add buttons
 
 		this.addGuardButton = this.add.button(10, this.world.height - 10 - 64, 'addGuard', this.addGuard, this);
-        this.addFenceButton = this.add.button(84, this.world.height - 10 - 64, 'addFence', this.addFence, this);
+		this.addFenceButton = this.add.button(84, this.world.height - 10 - 64, 'addFence', this.addFence, this);
+		this.pauseButton = this.add.button(this.world.width - 60, this.world.height - 60, 'pauseButton', this.pauseMenu, this);
 
 		// Add labels
 
@@ -253,22 +254,22 @@ Trump.Game.prototype =
 		this.labelMoney.strokeThickness = 6;
 
 		var scoreLabelStyle = {font: "40px Arial", fill: "#ffffff", align: "center"}; 
-        this.labelScore = this.add.text(this.world.centerX, 50, game.score, scoreLabelStyle); 
-        this.labelScore.anchor.setTo(0.5,0.5);
-        this.labelScore.stroke = "#000000"; 
-        this.labelScore.strokeThickness = 6; 
+		this.labelScore = this.add.text(this.world.centerX, 50, game.score, scoreLabelStyle);
+		this.labelScore.anchor.setTo(0.5,0.5);
+		this.labelScore.stroke = "#000000";
+		this.labelScore.strokeThickness = 6;
 
-        this.labelWave = this.game.add.text(this.world.centerX, this.world.centerY, "NEXT WAVE", this.scoreLabelStyle);
-        this.labelWave.anchor.setTo(0.5,0.5);
-        this.labelWave.stroke = "#000000"; 
-        this.labelWave.strokeThickness = 6;
-        this.labelWave.visible = false;
+		this.labelWave = this.game.add.text(this.world.centerX, this.world.centerY, "NEXT WAVE", this.scoreLabelStyle);
+		this.labelWave.anchor.setTo(0.5,0.5);
+		this.labelWave.stroke = "#000000";
+		this.labelWave.strokeThickness = 6;
+		this.labelWave.visible = false;
 
-        var waveLabelStyle = {font: "20px Arial", fill: "#ffffff", align: "center"}; 
-        this.labelCurrentWave = this.add.text(this.world.centerX, 80, "wave " + this.waveNumber, waveLabelStyle); 
-        this.labelCurrentWave.anchor.setTo(0.5,0.5);
-        this.labelCurrentWave.stroke = "#000000"; 
-        this.labelCurrentWave.strokeThickness = 6;
+		var waveLabelStyle = {font: "20px Arial", fill: "#ffffff", align: "center"};
+		this.labelCurrentWave = this.add.text(this.world.centerX, 80, "wave " + this.waveNumber, waveLabelStyle);
+		this.labelCurrentWave.anchor.setTo(0.5,0.5);
+		this.labelCurrentWave.stroke = "#000000";
+		this.labelCurrentWave.strokeThickness = 6;
 
 		// draw a circle around president
 		// guardFreeZone = this.add.graphics(0, 0);
@@ -277,6 +278,17 @@ Trump.Game.prototype =
 
 		// start the first wave
 		this.nextWave();
+	},
+	pauseMenu: function()
+	{
+		console.log("pok");
+		//var transBack
+		this.backgroundPause = this.add.graphics(0,0);
+		this.backgroundPause.beginFill(0xFFFFFF, 0.65);
+		this.backgroundPause.lineStyle(0);
+		this.backgroundPause.drawRect(0,0,this.world.width,this.world.height);
+		game.paused = !game.paused;
+		this.world.bringToTop(this.pauseButton);
 	},
 	trumpIntro: function ()
 	{
@@ -992,29 +1004,30 @@ Trump.Game.prototype =
 		}
 	},
 
-    placeFence: function () {
-   		var inputX = this.input.x;
+	placeFence: function ()
+	{
+		var inputX = this.input.x;
 		var inputY = this.input.y;
 
 		if (this.calculateDistance(inputX, inputY, this.world.centerX, this.world.centerY) > this.guardFreeZoneRadius)
 		{
-	        var fence = this.add.sprite(this.input.x, this.input.y, 'fence');
-	        fences.add(fence);
-	        this.money -= this.PriceFence;
+			var fence = this.add.sprite(this.input.x, this.input.y, 'fence');
+			fences.add(fence);
+			this.money -= this.PriceFence;
 
 			this.addFenceButton.loadTexture('addFence');
-	        this.addingFence = false;
+			this.addingFence = false;
 
-	        fence.body.static = true;
-	        fence.body.setCollisionGroup(this.fencesCollisionGroup);
-	        fence.body.collides([this.projectileCollisionGroup], this.onProjectileHitFence, this);
-	        fence.body.collides([this.bombersCollisionGroup]);
-	        this.rotateFence(fence);
-	        fence.health = this.defaultFenceHealth;
-	        fence.kill = false;
-	        fence.healthBar = new HealthBar(this.game, {x: fence.position.x, y: fence.position.y - 40, width: 60, height: 10});
-	    }
-    },
+			fence.body.static = true;
+			fence.body.setCollisionGroup(this.fencesCollisionGroup);
+			fence.body.collides([this.projectileCollisionGroup], this.onProjectileHitFence, this);
+			fence.body.collides([this.bombersCollisionGroup]);
+			this.rotateFence(fence);
+			fence.health = this.defaultFenceHealth;
+			fence.kill = false;
+			fence.healthBar = new HealthBar(this.game, {x: fence.position.x, y: fence.position.y - 40, width: 60, height: 10});
+		}
+	},
 
 	onProjectileHitGuard: function (guardBody, projectileBody)
 	{
@@ -1058,6 +1071,16 @@ Trump.Game.prototype =
 
 	click: function (object)
 	{
+		/* Start Siebe Add */
+		if(game.paused)
+		{
+			console.log("ok");
+			game.paused = false;
+			this.backgroundPause.destroy();
+			//als het spel gepauzeerd is
+		}
+		/* End Siebe Add */
+
 		var bodies = this.physics.p2.hitTest(object.position, guards.children);
 
 		if (bodies.length !== 0 && !this.isAdding())
