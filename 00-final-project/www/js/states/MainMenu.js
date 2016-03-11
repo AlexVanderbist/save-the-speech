@@ -47,6 +47,10 @@ Trump.MainMenu.prototype = {
 	/* Start Siebe Add */
 	create: function ()
 	{
+
+		this.intro = this.add.audio("fuckyeah");
+		this.intro.volume = 0.5;
+        this.intro.play();
 		this.showMain();
 
 	},
@@ -235,6 +239,7 @@ Trump.MainMenu.prototype = {
 		//////////////////////////////////ROWAN/////////////////////////
 		inMainMenu = false;
 		this.acceleroUpdate();
+		this.sound.stopAll();
 		///////////////////////////////////ROWAN/////////////////////////
 		//	And start the actual game
 		this.state.start('Game');
