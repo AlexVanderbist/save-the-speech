@@ -96,8 +96,8 @@ Trump.MainMenu.prototype = {
 		this.buttons.push(this.settingsButton);
 
 		this.creditButton = game.add.button(game.world.width - 40, 30, 'credits', this.showCredits, this, 0, 0, 1);
-        this.creditButton.scale.setTo(0.18);
-        this.creditButton.anchor.setTo(0.5);
+		this.creditButton.scale.setTo(0.18);
+		this.creditButton.anchor.setTo(0.5);
 
 		this.createCash();
 	},
@@ -254,6 +254,7 @@ Trump.MainMenu.prototype = {
 		this.backButton = this.add.button(this.world.centerX, game.world.centerY + 330, 'backButton', this.showMain, this, 0, 0, 1);
 		this.backButton.scale.setTo(0.3333);
 		this.backButton.anchor.setTo(0.5);
+		this.buttons.push(this.backButton);
 	}
 
 };
