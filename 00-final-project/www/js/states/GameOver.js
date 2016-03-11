@@ -12,15 +12,19 @@ Trump.GameOver.prototype = {
 		this.menuBackground.scale.setTo(0.3333);
 
 		var overstyle = {font: "50px Arial", fill: "#000000", align: "center"};
-		this.labelOver = this.add.text(this.world.centerX, 90, "GAME OVER", overstyle); 
+		this.labelOver = this.add.text(this.world.centerX, 80, "Game Over!", overstyle); 
 		this.labelOver.anchor.set(0.5);
 
-		var scorestyle = {font: "40px Arial", fill: "#ffffff", align: "center"};
-		this.labelShowScore = this.add.text(this.world.centerX, this.world.centerY + 135, "SCORE\n" + (game.score -2), scorestyle); 
+		var scorestyle = {font: "30px Arial", fill: "#ffffff", align: "center"};
+		this.labelShowHighScore = this.add.text(this.world.centerX, this.world.centerY + 135, "SCORE: " + (game.score -2), scorestyle); 
 		this.labelShowScore.anchor.set(0.5);
+		this.labelShowScore.stroke = "#000000";
+		this.labelShowScore.strokeThickness = 3;
 
-		this.labelShowScore = this.add.text(this.world.centerX, this.world.centerY + 235, "HIGHSCORE\n" + game.bestScore, scorestyle); 
-		this.labelShowScore.anchor.set(0.5);
+		this.labelShowHighScore = this.add.text(this.world.centerX, this.world.centerY + 185, "HIGHSCORE: " + game.bestScore, scorestyle); 
+		this.labelShowHighScore.anchor.set(0.5);
+		this.labelShowHighScore.stroke = "#000000";
+		this.labelShowHighScore.strokeThickness = 3;
 
         this.playButton = this.add.button(this.world.centerX, this.world.height - 60, 'playButton', this.startGame, this, 0, 0, 1);
         this.playButton.scale.setTo(0.3333);
