@@ -92,7 +92,7 @@ Trump.Preloader.prototype = {
 
 		this.load.audio('moneyhit', 'assets/sounds/moneyhit/kaching1.mp3');
         this.load.audio('explosionfx', 'assets/sounds/explosions/soundexplosion.mp3');
-        this.load.audio("fuckyeah", "assets/sounds/AmericaFuckYeah.mp3");
+        this.load.audio("fuckyeah", "assets/sounds/AmericaFuckYeah.ogg");
 
 		// preload physics
 		this.load.physics('tacoPhysics', 'assets/physics/taco.json');
