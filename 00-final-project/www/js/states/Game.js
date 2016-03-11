@@ -693,6 +693,7 @@ Trump.Game.prototype =
 		// enable rage
 		this.trumphead.visible = false;
 		this.trumprage.visible = true;
+		this.trumphappy.visible = false;
 
 		// stop after 1500ms CHANGE THIS
 		this.time.events.add(Phaser.Timer.SECOND, this.presidentRageStop, this);
@@ -702,17 +703,20 @@ Trump.Game.prototype =
 	{
 		this.trumphead.visible = true;
 		this.trumprage.visible = false;
+		this.trumphappy.visible = false;
 	},
 	presidentHappyStart: function ()
 	{
 		this.trumphead.visible = false;
 		this.trumphappy.visible = true;
+		this.trumprage.visible = false;
 		this.time.events.add(Phaser.Timer.SECOND, this.presidentHappyStop, this);
 	},
 	presidentHappyStop : function ()
 	{
 		this.trumphead.visible = true;
 		this.trumphappy.visible = false;
+		this.trumprage.visible = false;
 	},
 
     rotateFence: function (fence)

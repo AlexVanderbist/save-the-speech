@@ -667,29 +667,45 @@ Trump.Game.prototype =
 
 	presidentRageStart: function ()
 	{
-		// enable rage
+
+		this.trumphappy.visible = false;
 		this.trumphead.visible = false;
 		this.trumprage.visible = true;
 
 		// stop after 1500ms CHANGE THIS
 		this.time.events.add(Phaser.Timer.SECOND, this.presidentRageStop, this);
+
+
+
 	},
 
 	presidentRageStop  : function ()
 	{
+
 		this.trumphead.visible = true;
+
 		this.trumprage.visible = false;
+		this.trumphappy.visible = false;
+
 	},
 	presidentHappyStart: function ()
 	{
+
+		this.trumprage.visible = false;
 		this.trumphead.visible = false;
 		this.trumphappy.visible = true;
 		this.time.events.add(Phaser.Timer.SECOND, this.presidentHappyStop, this);
+
+
+
 	},
 	presidentHappyStop : function ()
 	{
+
 		this.trumphead.visible = true;
+
 		this.trumphappy.visible = false;
+		this.trumprage.visible = false;
 	},
 
     rotateFence: function (fence)
@@ -825,7 +841,9 @@ Trump.Game.prototype =
 		var rndouch = Math.floor(Math.random() * this.moneyhittrump.length);
 		this.moneyhittrump[ rndouch ].play();
 		this.moneyhit.play();
+
 		this.presidentHappyStart();
+
 		this.money += this.moneyValue;
 
 		// kill the projectile
