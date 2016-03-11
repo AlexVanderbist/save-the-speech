@@ -17,5 +17,5 @@ function loadGame ()
 	game.state.start("Boot");
 };
 
-//loadGame();
+loadGame();
 document.addEventListener('deviceready', loadGame, false);
