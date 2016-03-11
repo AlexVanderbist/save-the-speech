@@ -57,6 +57,7 @@ Trump.Preloader.prototype = {
 		this.load.spritesheet('backButton', 'assets/backBtn.png', 686, 207);
 		this.load.spritesheet('settingsButton', 'assets/settingsBtn.png', 686, 207);
 		this.load.spritesheet('mainmenuButton', 'assets/mainmenuBtn.png', 686, 207);
+		this.load.spritesheet('resumeButton', 'assets/resumeBtn.png', 686, 207);
 		/* End Siebe Add */
 
 
