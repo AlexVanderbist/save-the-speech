@@ -1,3 +1,35 @@
+//////////////////////////////////////////ROWAN////////////////////////////////////////////////
+var xVel = null;
+var yVel = null;
+var inMainMenu = true;
+var watchID = null;
+document.addEventListener("deviceready", function(){
+	Accelorometer();
+},true);
+
+function Accelorometer()
+{
+	if (typeof  navigator.accelerometer != "undefined") {
+		watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, {frequency: 50});
+
+
+		function onSuccess(acceleration) {
+			xVel = Math.round(acceleration.x);
+			yVel = Math.round(acceleration.y);
+
+		}
+
+		function onError() {
+			alert('onError!');
+		}
+
+	}else{
+		console.log("function dont exist");
+	}
+
+}
+/////////////////////////////////////////////ROWAN/////////////////////////////////////////////////
+
 Trump.MainMenu = function (game)
 {
 	this.playButton = null;
@@ -16,6 +48,7 @@ Trump.MainMenu.prototype = {
 	create: function ()
 	{
 		this.showMain();
+
 	},
 	clear: function ()
 	{
@@ -25,6 +58,20 @@ Trump.MainMenu.prototype = {
 			console.log(this.buttons[ button ]);
 			this.buttons[ button ].destroy();
 			console.log(this.buttons);
+		}
+	},
+	createCash: function(){
+		if (typeof  navigator.accelerometer != "undefined") {
+			cashgroupmainmenu = this.add.group();
+			cashgroupmainmenu.enableBody = true;
+			cashgroupmainmenu.physicsBodyType = Phaser.Physics.P2JS;
+
+			for (var i = 0; i < 10; i++) {
+				var money = this.add.sprite(i + 30, i + 30, 'money');
+				cashgroupmainmenu.add(money);
+			}
+		}else{
+			console.log("cant create money because accelerometer doesnt exist");
 		}
 	},
 	showMain: function ()
@@ -51,12 +98,34 @@ Trump.MainMenu.prototype = {
 		this.creditButton = game.add.button(game.world.width - 40, 30, 'credits', this.showCredits, this, 0, 0, 1);
         this.creditButton.scale.setTo(0.18);
         this.creditButton.anchor.setTo(0.5);
+
+		this.createCash();
 	},
 	/* End Siebe Add */
+	/////////////////////////////////////ROWAN////////////////////////////////////////////
+	acceleroUpdate: function(){
 
+		if (typeof  navigator.accelerometer != "undefined") {
+			if(inMainMenu){
+				game.physics.p2.gravity.x = -xVel * 50;
+				game.physics.p2.gravity.y = yVel * 50;
+			}else if(!inMainMenu)
+			{
+				game.physics.p2.gravity.x = 0;
+				game.physics.p2.gravity.y =0;
+				//world.gravity = [0, 0];
+				navigator.accelerometer.clearWatch(watchID);
+			}
+		}else{
+			console.log("cant update because function accelerometer doenst exists");
+		}
+	},
+	//////////////////////////////////////ROWAN////////////////////////////////////////////
 	update: function ()
 	{
-
+		///////////////////////////////////////ROWAN///////////////////////////////////
+		this.acceleroUpdate();
+		///////////////////////////////////////ROWAN//////////////////////////////////////
 
 	},
 	showInstructions: function ()
@@ -161,7 +230,10 @@ Trump.MainMenu.prototype = {
 	/* End Siebe Add */
 	startGame: function (pointer)
 	{
-
+		//////////////////////////////////ROWAN/////////////////////////
+		inMainMenu = false;
+		this.acceleroUpdate();
+		///////////////////////////////////ROWAN/////////////////////////
 		//	And start the actual game
 		this.state.start('Game');
 
