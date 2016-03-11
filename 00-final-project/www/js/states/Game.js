@@ -267,7 +267,7 @@ Trump.Game.prototype =
         this.labelWave.strokeThickness = 6;
         this.labelWave.visible = false;
 
-        var waveLabelStyle = {font: "20px montserrat", fill: "#ffffff", align: "center"}; 
+        var waveLabelStyle = {font: "22px montserrat", fill: "#ffffff", align: "center"}; 
         this.labelCurrentWave = this.add.text(this.world.centerX, 80, "wave " + this.waveNumber, waveLabelStyle); 
         this.labelCurrentWave.anchor.setTo(0.5,0.5);
         this.labelCurrentWave.stroke = "#000000"; 
