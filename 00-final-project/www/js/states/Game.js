@@ -290,7 +290,18 @@ Trump.Game.prototype =
 		this.backgroundPause.lineStyle(0);
 		this.backgroundPause.drawRect(0,0,this.world.width,this.world.height);
 		game.paused = !game.paused;
+		this.backButton = this.add.button(this.world.centerX, this.world.centerY + 290, 'mainmenuButton', this.showMain, this, 0, 0, 1);
+		this.backButton.scale.setTo(0.5);
+		this.backButton.anchor.setTo(0.5);
+		this.resumeButton = this.add.button(this.world.centerX, this.world.centerY, 'resumeButton', null, this, 0, 0, 1);
+		this.resumeButton.scale.setTo(0.5);
+		this.resumeButton.anchor.setTo(0.5);
 		this.world.bringToTop(this.pauseButton);
+	},
+	showMain: function()
+	{
+		this.stopAllQuotes();
+		this.state.start('MainMenu');
 	},
 	trumpIntro: function ()
 	{
@@ -1080,10 +1091,48 @@ Trump.Game.prototype =
 		/* Start Siebe Add */
 		if(game.paused)
 		{
-			console.log("ok");
-			game.paused = false;
-			this.backgroundPause.destroy();
-			//als het spel gepauzeerd is
+			var x1 = 0;
+			var x2 = 0;
+			var y1 = 0;
+			var y2 = 0;
+
+			function calculateDimensions(center, width, height)
+			{
+				x1 = center.x - width/4;
+				x2 = center.x + width/4;
+				y1 = center.y - height/4;
+				y2 = center.y + height/4;
+			}
+
+			var backButtonCenter = this.backButton.world;
+			var backButtonDimensionsWidth = this.backButton.texture.crop.width;
+			var backButtonDimensionsHeight = this.backButton.texture.crop.height;
+
+			calculateDimensions(backButtonCenter, backButtonDimensionsWidth, backButtonDimensionsHeight);
+
+			if(object.x > x1 && object.x < x2 && object.y > y1 && object.y < y2)
+			{
+				endPause(this);
+				this.showMain();
+			}
+
+			var resumeButtonCenter = this.resumeButton.world;
+			var resumeButtonDimensionsWidth = this.resumeButton.texture.crop.width;
+			var resumeButtonDimensionsHeight = this.resumeButton.texture.crop.height;
+			calculateDimensions(resumeButtonCenter, resumeButtonDimensionsWidth, resumeButtonDimensionsHeight);
+
+			if(object.x > x1 && object.x < x2 && object.y > y1 && object.y < y2)
+			{
+				endPause(this);
+			}
+
+			function endPause(gameGet)
+			{
+				gameGet.backgroundPause.destroy();
+				gameGet.backButton.destroy();
+				gameGet.resumeButton.destroy();
+				game.paused = false;
+			}
 		}
 		/* End Siebe Add */
 
