@@ -31,6 +31,7 @@ Trump.MainMenu.prototype = {
 	},
 	accelorometer: function()
 	{
+		inMainMenu = true;
 		if (typeof  navigator.accelerometer != "undefined") {
 			watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, {frequency: 50});
 
