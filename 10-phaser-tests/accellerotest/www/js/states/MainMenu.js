@@ -1,3 +1,6 @@
+
+
+
 //////////////////////////////////////////ROWAN////////////////////////////////////////////////
 var xVel = null;
 var yVel = null;
@@ -9,18 +12,24 @@ document.addEventListener("deviceready", function(){
 
 function Accelorometer()
 {
-	watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, {frequency: 50});
+	if (typeof  navigator.accelerometer != "undefined") {
+		watchID = navigator.accelerometer.watchAcceleration(onSuccess, onError, {frequency: 50});
 
 
-	function onSuccess(acceleration) {
-		xVel = Math.round(acceleration.x);
-		yVel = Math.round(acceleration.y);
+		function onSuccess(acceleration) {
+			xVel = Math.round(acceleration.x);
+			yVel = Math.round(acceleration.y);
 
+		}
+
+		function onError() {
+			alert('onError!');
+		}
+
+	}else{
+		console.log("function dont exist");
 	}
 
-	function onError() {
-		alert('onError!');
-	}
 }
 /////////////////////////////////////////////ROWAN/////////////////////////////////////////////////
 
@@ -42,13 +51,21 @@ Trump.MainMenu.prototype = {
 	create: function ()
 	{
 		this.showMain();
-		cashgroupmainmenu = this.add.group();
-		cashgroupmainmenu.enableBody = true;
-		cashgroupmainmenu.physicsBodyType = Phaser.Physics.P2JS;
+		this.createCash();
 
-		for( var i = 0; i< 10 ; i++){
-		var money = this.add.sprite(i + 30,i + 30, 'money');
-			cashgroupmainmenu.add(money);
+	},
+	createCash: function(){
+		if (typeof  navigator.accelerometer != "undefined") {
+			cashgroupmainmenu = this.add.group();
+			cashgroupmainmenu.enableBody = true;
+			cashgroupmainmenu.physicsBodyType = Phaser.Physics.P2JS;
+
+			for (var i = 0; i < 10; i++) {
+				var money = this.add.sprite(i + 30, i + 30, 'money');
+				cashgroupmainmenu.add(money);
+			}
+		}else{
+			console.log("cant create money because accelerometer doesnt exist");
 		}
 	},
 	clear: function ()
@@ -63,6 +80,7 @@ Trump.MainMenu.prototype = {
 	},
 	showMain: function ()
 	{
+
 		this.clear();
 		this.menuBackground = this.add.sprite(0, 0, 'menuBackground');
 		this.menuBackground.scale.setTo(0.3333);
@@ -88,6 +106,8 @@ Trump.MainMenu.prototype = {
 	},
 	/////////////////////////////////////ROWAN////////////////////////////////////////////
 	acceleroUpdate: function(){
+
+		if (typeof  navigator.accelerometer != "undefined") {
 		if(inMainMenu){
 		game.physics.p2.gravity.x = -xVel * 50;
 		game.physics.p2.gravity.y = yVel * 50;
@@ -98,13 +118,16 @@ Trump.MainMenu.prototype = {
 			//world.gravity = [0, 0];
 			navigator.accelerometer.clearWatch(watchID);
 		}
+		}else{
+			console.log("cant update because function accelerometer doenst exists");
+		}
 	},
 	//////////////////////////////////////ROWAN////////////////////////////////////////////
 	/* End Siebe Add */
 
 	update: function ()
 	{
-	///////////////////////////////////////ROWAN/////////////////////////////////
+	///////////////////////////////////////ROWAN///////////////////////////////////
 	this.acceleroUpdate();
 	///////////////////////////////////////ROWAN//////////////////////////////////////
 
@@ -112,6 +135,7 @@ Trump.MainMenu.prototype = {
 	},
 	showInstructions: function ()
 	{
+
 		this.clear();
 		this.instructionBackground = this.add.sprite(0, 0, 'instructions');
 		this.instructionBackground.scale.setTo(0.3333);
