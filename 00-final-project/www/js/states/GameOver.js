@@ -16,19 +16,23 @@ Trump.GameOver.prototype = {
 		this.labelOver.anchor.set(0.5);
 
 		var scorestyle = {font: "30px Arial", fill: "#ffffff", align: "center"};
-		this.labelShowHighScore = this.add.text(this.world.centerX, this.world.centerY + 135, "SCORE: " + (game.score -2), scorestyle); 
+		this.labelShowScore = this.add.text(this.world.centerX, this.world.centerY + 115, "SCORE: " + (game.score -2), scorestyle); 
 		this.labelShowScore.anchor.set(0.5);
 		this.labelShowScore.stroke = "#000000";
 		this.labelShowScore.strokeThickness = 3;
 
-		this.labelShowHighScore = this.add.text(this.world.centerX, this.world.centerY + 185, "HIGHSCORE: " + game.bestScore, scorestyle); 
+		this.labelShowHighScore = this.add.text(this.world.centerX, this.world.centerY + 165, "HIGHSCORE: " + game.bestScore, scorestyle); 
 		this.labelShowHighScore.anchor.set(0.5);
 		this.labelShowHighScore.stroke = "#000000";
 		this.labelShowHighScore.strokeThickness = 3;
 
-        this.playButton = this.add.button(this.world.centerX, this.world.height - 60, 'playButton', this.startGame, this, 0, 0, 1);
+        this.playButton = this.add.button(this.world.centerX, this.world.height - 160, 'playButton', this.startGame, this, 0, 0, 1);
         this.playButton.scale.setTo(0.3333);
         this.playButton.anchor.setTo(0.5);
+
+        this.mainmenuBtn = game.add.button(game.world.centerX, game.world.height -60, 'mainmenuButton', this.mainMenu, this, 0, 0, 1);
+		this.mainmenuBtn.scale.setTo(0.3333);
+		this.mainmenuBtn.anchor.setTo(0.5);
 
 	},
 
@@ -40,6 +44,12 @@ Trump.GameOver.prototype = {
 
 		//	And start the actual game
 		this.state.start('Game');
+
+	},
+
+	mainMenu: function (pointer) {
+
+		this.state.start('MainMenu');
 
 	}
 

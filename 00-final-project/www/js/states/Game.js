@@ -33,11 +33,13 @@ Trump.Game = function (game)
 	this.defaultValues.moneyRate = 6;
 	this.defaultValues.moneyEndRate = 4;
 	this.defaultValues.tacoRate = 2;
-	
-	this.defaultValues.bomberRate = 5; // 15
+
+	this.defaultValues.bomberRate = 15; // 15
+	this.defaultValues.bomberEndRate = 7; // 12 //////////////////////////////
 	this.defaultValues.tacoEndRate = 1.7;
 	this.defaultValues.healthRegenerate = 4;
 	this.defaultValues.waveLength = 16;
+	this.defaultValues.waveBomberStart = 2; /////////////////////////////
 
 	this.projectileDespawnTime = 7;
 
@@ -187,7 +189,7 @@ Trump.Game.prototype =
 		//this.tacoLoop = this.time.events.loop(Phaser.Timer.SECOND * this.tacoRate, this.addProjectile, this); // IN NEXTWAVE
 		//this.moneyLoop = this.time.events.loop(Phaser.Timer.SECOND * this.moneyRate, this.addCash, this); // IN NEXTWAVE
 		//this.addingLoop = this.time.events.loop(Phaser.Timer.SECOND * this.moneyTimeOut, this.addMoney, this, 1); // IN NEXTWAVE
-		this.time.events.loop(Phaser.Timer.SECOND * this.bomberRate, this.addSuicideBomber,this); 
+		//this.bomberLoop = this.time.events.loop(Phaser.Timer.SECOND * this.bomberRate, this.addSuicideBomber,this); /////////////////////
 		this.time.events.loop(Phaser.Timer.SECOND, this.regenerateHealth, this);
 		this.time.events.loop(Phaser.Timer.SECOND, this.addScore, this);
 		this.time.events.loop(Phaser.Timer.SECOND * this.waveLength, this.nextWave, this);
@@ -254,22 +256,22 @@ Trump.Game.prototype =
 		this.labelMoney.strokeThickness = 6;
 
 		var scoreLabelStyle = {font: "40px Arial", fill: "#ffffff", align: "center"}; 
-		this.labelScore = this.add.text(this.world.centerX, 50, game.score, scoreLabelStyle);
-		this.labelScore.anchor.setTo(0.5,0.5);
-		this.labelScore.stroke = "#000000";
-		this.labelScore.strokeThickness = 6;
+        this.labelScore = this.add.text(this.world.centerX, 50, game.score, scoreLabelStyle); 
+        this.labelScore.anchor.setTo(0.5,0.5);
+        this.labelScore.stroke = "#000000"; 
+        this.labelScore.strokeThickness = 6; 
 
-		this.labelWave = this.game.add.text(this.world.centerX, this.world.centerY, "NEXT WAVE", this.scoreLabelStyle);
-		this.labelWave.anchor.setTo(0.5,0.5);
-		this.labelWave.stroke = "#000000";
-		this.labelWave.strokeThickness = 6;
-		this.labelWave.visible = false;
+        this.labelWave = this.game.add.text(this.world.centerX, this.world.centerY, "NEXT WAVE", scoreLabelStyle);
+        this.labelWave.anchor.setTo(0.5,0.5);
+        this.labelWave.stroke = "#000000"; 
+        this.labelWave.strokeThickness = 6;
+        this.labelWave.visible = false;
 
-		var waveLabelStyle = {font: "20px Arial", fill: "#ffffff", align: "center"};
-		this.labelCurrentWave = this.add.text(this.world.centerX, 80, "wave " + this.waveNumber, waveLabelStyle);
-		this.labelCurrentWave.anchor.setTo(0.5,0.5);
-		this.labelCurrentWave.stroke = "#000000";
-		this.labelCurrentWave.strokeThickness = 6;
+        var waveLabelStyle = {font: "20px Arial", fill: "#ffffff", align: "center"}; 
+        this.labelCurrentWave = this.add.text(this.world.centerX, 80, "wave " + this.waveNumber, waveLabelStyle); 
+        this.labelCurrentWave.anchor.setTo(0.5,0.5);
+        this.labelCurrentWave.stroke = "#000000"; 
+        this.labelCurrentWave.strokeThickness = 6;
 
 		// draw a circle around president
 		// guardFreeZone = this.add.graphics(0, 0);
@@ -781,8 +783,8 @@ Trump.Game.prototype =
 
     addSuicideBomber: function()
     {
-        var randomPos = this.getRandomPositionOffScreen();
-        var bomber = this.add.sprite(randomPos.x, randomPos.y, 'bomber');
+    	var randomPos = this.getRandomPositionOffScreen();
+      	var bomber = this.add.sprite(randomPos.x, randomPos.y, 'bomber');
         bombers.add(bomber);
         bomber.animations.add('walk', [1,2], 5, true);
         bomber.animations.play('walk');
@@ -852,7 +854,7 @@ Trump.Game.prototype =
 	{
 		// stop the projectile
 		this.stopProjectile(body2.sprite);
-
+		navigator.vibrate(250);
 		var rndouch = Math.floor(Math.random() * this.ouch.length);
 
 		// take trumps health
@@ -1185,12 +1187,14 @@ Trump.Game.prototype =
 		this.time.events.remove(this.tacoLoop);
 		this.time.events.remove(this.moneyLoop);
 		this.time.events.remove(this.addingLoop);
+		this.time.events.remove(this.bomberLoop);
 		this.tacoRate = (this.tacoRate - this.tacoEndRate) * Math.pow(0.8, this.waveNumber) + this.tacoEndRate;
 		this.moneyRate = (this.moneyRate - this.moneyEndRate) * Math.pow(0.8, this.waveNumber) + this.moneyEndRate;
 		this.moneyTimeOut = (this.moneyTimeOut - this.tacoEndRate) * Math.pow(0.8, this.waveNumber) + this.tacoEndRate;
+		
 		//console.log("taco rate: " + this.tacoRate);
 		//console.log("money rate: " + this.moneyRate);
-		//console.log("moneytime: " + this.moneyTimeOut);
+		//console.log("bomberrate: " + this.bomberRate);
 		if(this.waveNumber > 0) {
 			//this.labelWave.setText = "NEXT WAVE";//this.game.add.text(this.world.centerX, this.world.centerY, "NEXT WAVE", this.scoreLabelStyle);
 			this.labelWave.visible = true;
@@ -1201,6 +1205,12 @@ Trump.Game.prototype =
 		this.tacoLoop = this.time.events.loop(Phaser.Timer.SECOND * this.tacoRate, this.addProjectile, this);
 		this.moneyLoop = this.time.events.loop(Phaser.Timer.SECOND * this.moneyRate, this.addCash, this);
 		this.addingLoop = this.time.events.loop(Phaser.Timer.SECOND * this.moneyTimeOut, this.addMoney, this, 1);
+
+		if (this.waveNumber > this.waveBomberStart) { /////////////////////////////////////////////////////////////////////////////////
+			this.bomberRate = (this.bomberRate - this.bomberEndRate) * Math.pow(0.8, this.waveNumber) + this.bomberEndRate;
+			this.bomberLoop = this.time.events.loop(Phaser.Timer.SECOND * this.bomberRate, this.addSuicideBomber, this);
+    	}
+
 
 		// play random quote
         var rndquote = Math.floor(Math.random() * this.stupidquote.length);
